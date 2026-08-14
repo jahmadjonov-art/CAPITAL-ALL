@@ -1,6 +1,11 @@
 node_modules
-.env
-backend/data/*.sqlite
-frontend/dist
 dist
+frontend/dist
+
+# Local Supabase credentials for development; the committed ones live in
+# frontend/src/config.js.
+.env
+.env.local
+frontend/.env.local
+
 .DS_Store

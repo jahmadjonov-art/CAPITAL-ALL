@@ -1,46 +1,103 @@
-import React, {useEffect, useState} from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { supabase } from './supabaseClient'
+import { isConfigured } from './config'
+import { useStore } from './store'
+import Setup from './components/Setup'
+import Auth from './components/Auth'
+import Dashboard from './components/Dashboard'
+import Transactions from './components/Transactions'
+import Trucks from './components/Trucks'
+import Settings from './components/Settings'
+import AddSheet from './components/AddSheet'
 
-function Card({title, value}){
-  return <div className="card"><div className="card-title">{title}</div><div className="card-value">{value}</div></div>
-}
+function Shell({ session }) {
+  const store = useStore(session)
+  const [view, setView] = useState('dashboard')
+  const [adding, setAdding] = useState(false)
 
-export default function App(){
-  const [health, setHealth] = useState(null)
-  const [transactions, setTransactions] = useState([])
-
-  useEffect(()=>{
-    axios.get('/api/health').then(r=>setHealth(r.data))
-    axios.get('/api/transactions').then(r=>setTransactions(r.data))
-  },[])
+  if (store.loading) {
+    return <div className="splash">Loading your numbers…</div>
+  }
 
   return (
     <div className="app">
-      <header className="topbar">Capital Allocation Manager</header>
-      <main>
-        <section className="grid">
-          <Card title="Net Income This Month" value="$16,000" />
-          <Card title="Manager Salary Remaining" value="$3,200" />
-          <Card title="Truck Repair Reserve" value="$26,000 / $30,000" />
-          <Card title="Tax Reserve" value="$3,200" />
-        </section>
+      <header className="topbar">
+        <span className="topbar-title">Capital Allocation</span>
+      </header>
 
-        <section>
-          <h2>Recent Transactions</h2>
-          <div className="tx-list">
-            {transactions.map(tx=> (
-              <div key={tx.id} className="tx">{tx.date} — {tx.bucket} — {tx.amount}</div>
-            ))}
-          </div>
-        </section>
+      <main className="content">
+        {store.error && (
+          <p className="banner error">
+            {store.error}
+            <button className="btn link" onClick={store.refresh}>
+              Retry
+            </button>
+          </p>
+        )}
+
+        {view === 'dashboard' && (
+          <Dashboard
+            balances={store.balances}
+            summary={store.summary}
+            settings={store.settings}
+            transactions={store.transactions}
+          />
+        )}
+        {view === 'transactions' && <Transactions store={store} />}
+        {view === 'trucks' && <Trucks store={store} />}
+        {view === 'settings' && <Settings store={store} session={session} />}
       </main>
+
       <nav className="bottom-nav">
-        <button>Dashboard</button>
-        <button>Transactions</button>
-        <button className="add">+</button>
-        <button>Trucks</button>
-        <button>More</button>
+        <button
+          className={view === 'dashboard' ? 'active' : ''}
+          onClick={() => setView('dashboard')}
+        >
+          Home
+        </button>
+        <button
+          className={view === 'transactions' ? 'active' : ''}
+          onClick={() => setView('transactions')}
+        >
+          Ledger
+        </button>
+        <button className="add" onClick={() => setAdding(true)} aria-label="Add entry">
+          +
+        </button>
+        <button className={view === 'trucks' ? 'active' : ''} onClick={() => setView('trucks')}>
+          Trucks
+        </button>
+        <button className={view === 'settings' ? 'active' : ''} onClick={() => setView('settings')}>
+          Rules
+        </button>
       </nav>
+
+      {adding && <AddSheet store={store} onClose={() => setAdding(false)} />}
     </div>
   )
+}
+
+export default function App() {
+  const [session, setSession] = useState(null)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    if (!isConfigured) {
+      setChecking(false)
+      return
+    }
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setChecking(false)
+    })
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => setSession(next))
+    return () => sub.subscription.unsubscribe()
+  }, [])
+
+  if (!isConfigured) return <Setup />
+  if (checking) return <div className="splash">Checking your session…</div>
+  if (!session) return <Auth />
+
+  // Remounting on user change throws away the previous user's cached rows.
+  return <Shell key={session.user.id} session={session} />
 }

@@ -1,14 +1,12 @@
 {
   "name": "capital-allocation-manager",
   "private": true,
-  "version": "0.1.0",
-  "workspaces": ["backend", "frontend"],
+  "version": "0.2.0",
+  "description": "A static, serverless budgeting PWA for allocating trucking income.",
   "scripts": {
-    "install-all": "npm install --workspace=backend && npm install --workspace=frontend",
-    "dev": "concurrently \"npm:start --workspace=backend\" \"npm:start --workspace=frontend\"",
-    "start": "node backend/index.js"
-  },
-  "devDependencies": {
-    "concurrently": "^7.6.0"
+    "install-all": "npm --prefix frontend install",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview"
   }
 }

@@ -38,7 +38,8 @@ function Shell({ session }) {
         {view === 'dashboard' && (
           <Dashboard
             balances={store.balances}
-            summary={store.summary}
+            totals={store.totals}
+            lastPaycheck={store.lastPaycheck}
             settings={store.settings}
             transactions={store.transactions}
           />

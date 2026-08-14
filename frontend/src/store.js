@@ -117,30 +117,49 @@ export function useStore(session) {
     return totals
   }, [transactions])
 
-  const monthKey = new Date().toISOString().slice(0, 7)
-  const thisMonth = useMemo(
-    () => transactions.filter((tx) => String(tx.date).slice(0, 7) === monthKey),
-    [transactions, monthKey]
-  )
+  // The most recent income event, reassembled from the rows it wrote. Paydays
+  // are the unit that actually means something here, so the dashboard reports
+  // against the last one rather than against a calendar month that is only
+  // complete on its final day.
+  const lastPaycheck = useMemo(() => {
+    const income = transactions.filter((tx) => tx.type === 'income')
+    if (!income.length) return null
 
-  const summary = useMemo(() => {
-    const income = thisMonth
-      .filter((tx) => tx.type === 'income')
-      .reduce((sum, tx) => sum + Number(tx.amount), 0)
-    const spend = thisMonth
-      .filter((tx) => tx.type === 'expense')
-      .reduce((sum, tx) => sum + Number(tx.amount), 0)
-    const salaryPaid = thisMonth
-      .filter((tx) => tx.type === 'income' && tx.bucket_key === 'personal')
-      .reduce((sum, tx) => sum + Number(tx.amount), 0)
+    // transactions arrive newest-first, so the head row belongs to the newest
+    // paycheck; its group_id gathers the rest of that same split.
+    const head = income[0]
+    const lines = head.group_id ? income.filter((tx) => tx.group_id === head.group_id) : [head]
+
     return {
-      income,
-      spend: Math.abs(spend),
-      net: income + spend,
-      salaryPaid,
-      salaryRemaining: Math.max(0, Number(settings.manager_salary_cap) - salaryPaid),
+      date: head.date,
+      payee: head.payee,
+      gross: lines.reduce((sum, tx) => sum + Number(tx.amount), 0),
+      salary: lines
+        .filter((tx) => tx.bucket_key === 'personal')
+        .reduce((sum, tx) => sum + Number(tx.amount), 0),
+      lines: lines
+        .map((tx) => ({ bucket_key: tx.bucket_key, amount: Number(tx.amount) }))
+        .sort((a, b) => b.amount - a.amount),
     }
-  }, [thisMonth, settings])
+  }, [transactions])
+
+  // Running totals over everything ever entered. No date window: the numbers
+  // simply accumulate as you record paychecks.
+  const totals = useMemo(() => {
+    let income = 0
+    let spend = 0
+    let salary = 0
+    for (const tx of transactions) {
+      const amount = Number(tx.amount)
+      if (tx.type === 'income') {
+        income += amount
+        if (tx.bucket_key === 'personal') salary += amount
+      } else if (tx.type === 'expense') {
+        spend += amount
+      }
+    }
+    return { income, spend: Math.abs(spend), salary, held: income + spend }
+  }, [transactions])
 
   // ----------------------------------------------------------- mutations --
 
@@ -283,7 +302,8 @@ export function useStore(session) {
     trucks,
     transactions,
     balances,
-    summary,
+    lastPaycheck,
+    totals,
     refresh,
     addIncome,
     addExpense,

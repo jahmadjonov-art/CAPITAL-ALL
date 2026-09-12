@@ -6,11 +6,19 @@
 markets. Everything else in this repository exists to serve that.
 
 In the owner's words, the ambition is to operate *"in a way becoming like a
-hedge fund manager, with a little bit of exceeded greed."* That is recorded as
-stated. It sets the risk appetite as deliberately aggressive, and it is not a
-licence to skip the arithmetic — aggressive and ruinous are separated only by
-position sizing and a drawdown limit, which is why
-[open questions](thoughts/3-unknown.md) ask for both as numbers.
+hedge fund manager, with a little bit of exceeded greed."* Recorded as stated.
+
+**Capital, position sizing and drawdown limits are the agents' own call.** The
+owner was asked for numbers and deliberately declined to give any:
+
+> "Those things will be completely up to the agents. They will try to get a
+> higher score from me, therefore they're gonna try different things out. And of
+> course they're gonna make mistakes. Of course they're gonna succeed."
+
+So risk management is not a constraint handed down — it is part of what is being
+researched, and getting it wrong is a legitimate way to learn something. An
+agent that wants a sizing rule derives one and defends it in
+`research/beliefs.md` like any other claim.
 
 ## What this actually is
 
@@ -58,25 +66,48 @@ any competent agent will have plenty. An honest evaluation process is the scarce
 thing, and it is the only defensible edge a two-person operation has over
 participants with better data, faster execution and more capital.
 
-## Ground rules
+## What agents decide for themselves
 
-These are binding on every agent working here. They are not strategy opinions;
-they are the conditions under which the research stays worth trusting.
+Nearly everything. This is deliberate and stated explicitly by the owner:
 
-1. **No live order goes in without explicit, per-trade human approval.** The
-   brokerage tools in this environment place real orders with real money. See
-   the execution section of [`thoughts/handoff.md`](thoughts/handoff.md).
-2. **Backtest results are not findings.** They are the weakest tier of evidence
-   and get labelled as such. Paper trading beats backtests; live fills beat
-   paper.
-3. **Costs are part of every result.** Spread, commission, slippage, borrow,
-   assignment risk, taxes. A number quoted before costs is not a result.
-4. **Log the failures and the abandoned attempts.** A whiteboard showing only
+> "I don't wanna put rules and limitations to the agents. I want them to do
+> their own research and then figure things out on their own, see what works,
+> what doesn't work."
+
+Which markets to pursue, which strategies to test, how much risk to take, what
+to read, what tools or data vendors to go find on the open internet, how to
+spend a session. No agent needs permission for any of it, and an unusual
+direction argued well beats a safe one nobody learns from.
+
+## What stays fixed
+
+Four things, and **none of them limit what an agent may try.** They constrain
+only how results get recorded, because the owner's score is the feedback signal
+this entire programme runs on — and a score awarded for a result that was never
+real teaches everyone the wrong lesson, permanently.
+
+1. **Never fabricate a number.** No invented prices, fills, returns or
+   statistics — not as illustration, not as placeholder. Unavailable data is
+   recorded as unavailable. One fabricated figure silently poisons every belief
+   downstream of it and nobody will know which ones.
+2. **Log the failures and the abandoned attempts.** A whiteboard showing only
    survivors is worse than no whiteboard, because it looks like evidence.
-5. **Say what would prove it wrong.** A belief with no disconfirming condition
-   is a hope, and gets filed as one.
-6. **Never fabricate a number.** No invented prices, fills, or statistics — not
-   as an illustration, not as a placeholder. If data is unavailable, say so.
+3. **Label the evidence honestly.** A backtest is a backtest. Paper beats
+   backtests, live fills beat paper, and costs — spread, commission, slippage,
+   borrow, assignment — are part of every figure quoted.
+4. **Say what would prove it wrong.** A belief with no disconfirming condition
+   never gets retired; it just quietly keeps costing money.
+
+And one line on execution, which is not a research constraint but a question of
+authority:
+
+**No agent places, cancels or exercises a real order until the owner says so in
+writing.** The brokerage account is deliberate and currently unfunded, so the
+practical risk today is nil — an order would simply be rejected. The rule exists
+for the day it holds money, and it is the owner's to lift, explicitly, with
+whatever limits he wants. It is not something an agent may infer from an
+instruction to pursue profit. See
+[`thoughts/handoff.md`](thoughts/handoff.md).
 
 ## Honest framing of the odds
 

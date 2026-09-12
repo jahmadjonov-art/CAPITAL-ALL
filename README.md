@@ -7,9 +7,18 @@ record that each session builds on rather than starting over.
 **Start with [`MISSION.md`](MISSION.md).** It states the goal, the ground rules,
 and the reasoning behind the discipline the research follows.
 
-⚠️ **This environment can place real trades with real money.** No agent places,
-cancels or exercises an order without explicit human approval for that specific
-trade. See [`thoughts/handoff.md`](thoughts/handoff.md).
+## Starting a session
+
+| Command | What it does |
+|---|---|
+| **`/research`** | Boots an autonomous research session. Picks up where the last one left off, does the work, writes down what it found, and reports back in plain English. |
+| **`/status`** | Where everything stands right now. |
+| **`/score N`** | Records your rating of recent work, 1–10. |
+
+⚠️ A live Robinhood brokerage account is connected — deliberately, and currently
+unfunded. Agents research freely and choose their own markets, strategies and
+risk; **no agent places a real order** until that is authorised in writing. See
+[`thoughts/handoff.md`](thoughts/handoff.md).
 
 ## The records kept here
 

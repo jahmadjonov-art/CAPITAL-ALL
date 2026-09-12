@@ -33,6 +33,22 @@ For a quick orientation before the full read:
 ./scorecard/summary.sh
 ```
 
+## How sessions get started
+
+The owner starts work with one slash command. He is not a programmer — write
+back to him in plain English, with no jargon and no unexplained numbers.
+
+- **`/research`** — an autonomous session. Read the records, pick **one**
+  question, work it with real data, write down what happened, commit, push,
+  report back plainly. The full loop is in `.claude/commands/research.md`;
+  keep it in sync with how the work actually runs.
+- **`/status`** — where everything stands, in plain English.
+- **`/score N`** — records his rating into `SCORECARD.md`.
+
+Agents choose their own direction, markets, strategies, position sizing and risk
+limits. That is deliberate — see `MISSION.md`. The only thing not delegated is
+placing real orders.
+
 ## During work — log the decisions that mattered
 
 When you make a call the owner or a future agent would want visibility into, add

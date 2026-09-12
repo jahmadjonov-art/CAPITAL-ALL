@@ -143,9 +143,14 @@ default, explicitly intended for backtesting), `get_equity_quotes`,
 [`thoughts/handoff.md`](../thoughts/handoff.md) before going anywhere near
 those tools.
 
-Known gaps to design around rather than ignore: this source is a retail
-brokerage feed, not a research-grade dataset. Assume no survivorship-bias-free
-delisted-symbol history, limited depth of history at fine intervals, and no
-futures data — which matters, because futures are named in the mission. Finding
-data for the markets this source does not cover is an open question in
-[`thoughts/3-unknown.md`](../thoughts/3-unknown.md).
+**You are not limited to it.** The open internet is reachable — `WebSearch`,
+`WebFetch` and plain `curl` all work, verified. Free no-key sources cover the
+gaps: Yahoo Finance for **futures** (`GC=F`, `ES=F`, `CL=F`), Kalshi for
+**prediction markets**, CoinGecko for crypto. Working endpoints are listed in
+[`thoughts/handoff.md`](../thoughts/handoff.md). Go find better sources if you
+need them; that is explicitly part of the job.
+
+The one gap no free source closes: **none of them carry delisted symbols.** Any
+universe built from currently-tradable tickers is survivorship-biased, and that
+bias inflates backtest returns more reliably than almost any other error
+available here. Say so in the entry rather than working around it quietly.

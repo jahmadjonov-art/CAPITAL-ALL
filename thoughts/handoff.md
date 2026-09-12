@@ -43,6 +43,13 @@ whose own documentation begins *"Place a real equity order with real money."*
 There is also `exercise_option` and the various `cancel_*` tools. This is not a
 sandbox and there is no paper-trading mode in that toolset.
 
+**The account is deliberate.** The owner created and connected it on purpose,
+for exactly this environment — it is not a stray credential anyone forgot about,
+and it should not be treated as one. **As of 2026-09-12 it holds no money**, so
+an order placed today would be rejected for insufficient buying power. That is
+the current state, not a permanent one; re-check rather than assuming it still
+holds.
+
 **The rule for every agent working here: never place, modify, cancel or
 exercise anything without explicit human approval for that specific trade, at
 the time of the trade.** Not implied approval from a general instruction to
@@ -67,7 +74,40 @@ that authority belongs in this file in the owner's own words, with its limits
 written down — size, instruments, maximum loss. **Until such a line exists here,
 it does not exist.**
 
-### The data source is a retail feed, not a research dataset
+### Verified: the open internet is reachable, and it fills the Robinhood gaps
+
+Tested 2026-09-12. `WebSearch` and `WebFetch` both work, and plain `curl` from
+Bash reaches arbitrary hosts — the agent proxy reports `selective: false` and
+covers every host, so no allowlist is in the way. **An agent here is not limited
+to the Robinhood feed and should not act as if it were.**
+
+Confirmed working, free, no API key, no account:
+
+| Source | Endpoint | Gives you |
+|---|---|---|
+| **Yahoo Finance** | `https://query1.finance.yahoo.com/v8/finance/chart/<SYM>?range=1mo&interval=1d` | OHLCV for equities, ETFs, indexes **and futures** |
+| **Kalshi** | `https://api.elections.kalshi.com/trade-api/v2/markets?status=open` | Prediction markets — tickers, order book, volume. Public data needs no auth. |
+| **CoinGecko** | `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd` | Crypto spot |
+
+**Yahoo covers futures**, which Robinhood does not: `GC=F` returned COMEX gold
+(`instrumentType: FUTURE`) with real daily bars. `ES=F`, `CL=F`, `NG=F` and the
+rest follow the same `=F` convention. This is the answer to "where does futures
+data come from" — verified, not assumed.
+
+Two that did **not** work, so nobody burns time rediscovering it:
+
+- **SEC EDGAR** (`www.sec.gov/files/company_tickers.json`) returned **403**. SEC
+  policy requires a declared User-Agent naming a real contact, in the form
+  `Company Name email@domain.com`. Likely fixable; not yet retried.
+- **Stooq** returned 200 but served an HTML challenge page rather than CSV — a
+  bot block, not data. Parse defensively or use Yahoo instead.
+
+Unverified and worth checking before relying on: Yahoo's endpoint is
+undocumented and unofficial, so it can rate-limit or change shape without
+notice. Treat a sudden parse failure as expected maintenance, not a crisis, and
+write a `4-walls.md` entry if it stops working for good.
+
+### The Robinhood feed is a retail feed, not a research dataset
 
 `get_equity_historicals` is explicitly documented for backtesting and is
 split-adjusted by default, which is the right default. But plan around what a
@@ -77,8 +117,8 @@ brokerage feed does not give you:
   tickers is survivorship-biased, and that bias reliably inflates backtest
   returns. It is the single easiest way to produce an impressive, worthless
   result here.
-- **No futures.** The mission names futures explicitly and this source does not
-  cover them. Unsolved — see `3-unknown.md`.
+- **No futures.** The mission names futures explicitly and Robinhood does not
+  cover them. **Solved** — use Yahoo Finance (`GC=F` etc.), verified above.
 - **Limited intraday history**, and the call is rejected outright if a requested
   range and interval would exceed the bar cap. Narrow the range or coarsen the
   interval.
@@ -163,3 +203,24 @@ entries backing it.
 - **Ask when an ambiguity is structural.** One clarifying question about how to
   archive cost a round trip and prevented building the wrong layout. See
   `2-judgment-calls.md` for when that trade is worth making.
+
+---
+
+## How the owner starts a session
+
+He is not a programmer and asked for one simple thing to press. Three slash
+commands exist in `.claude/commands/`:
+
+- **`/research`** — boots an autonomous session: read the records, pick one
+  question, work it, write down what happened, commit and push, report back in
+  plain English. This is the main one.
+- **`/status`** — a plain-English summary of where everything stands.
+- **`/score N`** — records his rating of recent work into `SCORECARD.md`.
+
+If you change how the research loop works, update `.claude/commands/research.md`
+to match. That file, not this one, is what actually runs when he presses the
+button.
+
+**Write for him accordingly.** Reports at the end of a session should carry no
+jargon, no unexplained statistics and no walls of code. If a number matters, say
+what it means.

@@ -11,6 +11,82 @@ Newest first.
 
 ---
 
+### 2026-09-12 — Read "no rules and limitations" as covering strategy, not record-keeping
+**Asked:** *"I don't wanna put rules and limitations to the agents. I want them
+to do their own research and then figure things out on their own."*
+**Did:** removed every constraint on what agents may try — markets, strategies,
+position sizing, drawdown, tools, data vendors, how a session is spent. Kept
+four rules about how results get **recorded**: no fabricated numbers, log the
+failures, label the evidence tier honestly, state what would falsify a belief.
+**Assumed:** the instruction was about the trading, not the bookkeeping. It
+arrived in the middle of him declining to set capital and drawdown numbers, and
+the reasoning given was that agents should *"see what works, what doesn't work"*
+— which is an argument for open-ended experiments, and also an argument that the
+record of what worked has to be accurate.
+**The honest tension:** he did say it broadly, and this reading is narrower than
+his words. The case for it is that his score is the only feedback signal in the
+system. If an agent logs a backtest it never ran, or quietly drops the thirty
+variants that failed, he ends up scoring a result that was never real — and then
+every future session inherits that as fact. The four rules cost an agent nothing
+it would want to do; they cost only the option of misreporting.
+**Would have settled it:** whether "no rules" extended to the recording
+discipline as well.
+**If wrong:** say so and they come out. It is one section of `MISSION.md` and a
+few lines in `research/README.md`. **The no-fabrication rule is the one worth
+arguing hardest for**, because a single invented figure poisons everything
+downstream of it and leaves no trace of which conclusions it touched.
+
+---
+
+### 2026-09-12 — Kept the execution rule after he said the account was deliberate
+**Asked:** clarification that the live Robinhood connection is intentional, built
+for this environment, and currently holds no money.
+**Did:** dropped the alarm framing, recorded that the account is deliberate and
+unfunded, and kept one line: no agent places, cancels or exercises a real order
+until he says so in writing.
+**Assumed:** confirming the account was deliberate answered *why it exists*, not
+*who may trade it*. He has never said an agent may execute, and the distance
+between "pursue profit aggressively" and "you may transmit orders" is exactly
+the gap an agent should not close on its own.
+**Would have settled it:** "agents may trade the account themselves" — or the
+limits he would want on that.
+**If wrong:** it is one sentence to delete, and while the account is unfunded it
+costs literally nothing. Worth lifting explicitly and in writing rather than by
+implication, so a future session can point at the line that authorised it.
+
+---
+
+### 2026-09-12 — Built three commands where one was asked for
+**Asked:** *"a simple place with simple command where I can press it"* — singular,
+and he noted he is not especially computer savvy.
+**Did:** `/research` as the one button, plus `/status` and `/score`.
+**Assumed:** `/research` alone is the answer to what he asked, but he has already
+said he will be giving scores and will want to know where things stand — and
+doing either without a command means remembering a procedure, which is exactly
+the burden he was trying to avoid. Three commands is still a short list.
+**Would have settled it:** whether extra commands read as convenience or as
+clutter.
+**If wrong:** delete two files. Nothing depends on them.
+
+---
+
+### 2026-09-12 — Verified internet access instead of building it
+**Asked:** *"if we don't have the access to the Internet... let's build something
+that will allow them to go to the Internet."*
+**Did:** built nothing. Tested instead — `WebSearch`, `WebFetch` and `curl` all
+work, the proxy is unrestricted, and six real data endpoints were probed with
+the results recorded in `handoff.md`.
+**Assumed:** the conditional was the operative part. Access already exists, so
+building a layer over it would add a thing to maintain and nothing to do.
+**Would have settled it:** nothing. But the assumption is worth stating: **he
+may have pictured a tool or a wrapper**, and what he got is a documented list of
+working endpoints. If he wanted something more concrete, this is where that
+diverged.
+**If wrong:** the reconnaissance is still the necessary first step — a wrapper
+would have been built around these same endpoints.
+
+---
+
 ### 2026-09-12 — Split research by *attempt*, not by success and failure
 **Asked:** a whiteboard holding *"here are the mistakes we made... here are the
 successes."*

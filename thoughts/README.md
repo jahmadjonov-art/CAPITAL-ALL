@@ -8,6 +8,10 @@ Sessions do not share memory. Without something like this, every agent rebuilds
 the same understanding from scratch and repeats the same misreadings. These
 files are where that understanding gets left behind on purpose.
 
+These are the **detail layer**. The front page is [`KNOWLEDGE.md`](../KNOWLEDGE.md),
+which a session reads first and which points here when it needs to. Write for a
+reader who arrives by pointer, not for one reading front to back.
+
 ## The files
 
 | File | What goes in it |

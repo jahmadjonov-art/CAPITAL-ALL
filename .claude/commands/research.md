@@ -8,7 +8,12 @@ act, and write down what you decided and why.
 
 ## 1. Load the state (do this first, every time)
 
-Read, in order:
+**Start with `KNOWLEDGE.md`.** It is the one-page front of everything and is
+capped at 150 lines precisely so you never have to read the whole archive to get
+going. Most sessions need it and little else; descend into the detail only where
+it points you.
+
+Then, as needed:
 
 - `MISSION.md` — the goal and the ground rules
 - `thoughts/handoff.md` — verified facts, working data sources, traps
@@ -16,6 +21,9 @@ Read, in order:
 - `research/experiments.md` — the last few entries, so you do not repeat one
 - `thoughts/3-unknown.md` and `thoughts/4-walls.md` — open questions, past blockers
 - `SCORECARD.md` — how earlier work was rated, and any Standing Directives
+
+Run `./scorecard/summary.sh` — it reports scores and whether the brief is over
+its cap.
 
 Then say in one or two lines where things stand, so the transcript opens with
 context rather than with you thinking out loud.
@@ -52,6 +60,41 @@ You have real tools. Use them:
 Write real code against real data. The point is to find out something that was
 not known before this session started.
 
+## 3b. Bring in help when you need it
+
+You are not working alone. Three specialists exist in `.claude/agents/`, and you
+call them with the `Agent` tool. Use them — a second pair of eyes is cheaper than
+a wrong conclusion written into the record.
+
+| Agent | Use it for |
+|---|---|
+| **`skeptic`** | Red-teams a finding. Hand it a result and it tries to break it. |
+| **`quant`** | Fetches data and runs backtests correctly. Hand it a precise spec. |
+| **`scout`** | Researches the open internet — methods, prior work, data sources, contract specs. |
+
+**Call the `skeptic` before you believe anything.** It is mandatory before
+promoting a belief to T2 or above, and it is the single highest-value call
+available to you. Finding out a result is broken costs one subagent; finding out
+after it is in `KNOWLEDGE.md` costs every session that trusted it.
+
+Brief the skeptic adversarially. Give it the result, the method and the data —
+**never tell it what you hope the answer is.** A skeptic told a result looks
+promising will find reasons it is promising, and you will have paid for a mirror.
+
+Run them in parallel when the work is independent — scout the literature while
+quant runs the numbers. Spawn more than one skeptic on genuinely important
+results; they attack from different angles.
+
+**You are the single writer.** Specialists report to you; you decide what is
+true and you make every edit to `KNOWLEDGE.md`, `research/` and `thoughts/`.
+This keeps authorship coherent and stops two agents writing the same file at
+once. Their reports are not shown to the owner either, so anything that matters
+has to come through you — into the record, and into your closing summary.
+
+Delegating does not transfer responsibility. A number a specialist handed you
+that turns out to be wrong is your entry with your name on it, so sanity-check
+what comes back rather than pasting it in.
+
 ## 4. Write it down — this is the deliverable
 
 A session that researched brilliantly and recorded nothing has produced nothing,
@@ -68,6 +111,18 @@ because the next session cannot see your context.
   separately from the **outcome**, and say which you are judging.
 - Judgment call worth seeing → the right file in `thoughts/`.
 - Durable fact, working endpoint, or trap → `thoughts/handoff.md`.
+
+**Then update `KNOWLEDGE.md`, and treat that as part of the job rather than an
+afterthought.** Promote anything that reached T2 or better, move a belief whose
+falsification condition tripped into *What is dead*, refresh *What is live right
+now*, and carry the `B-NNN` / `EXP-NNN` ids so the trail from summary to
+evidence stays walkable.
+
+If the brief is at its cap, **consolidate instead of appending** — collapse
+several entries that circle one idea into a single sentence carrying the
+conclusion, with the ids after it. That compression is the mechanism that keeps
+catch-up cost flat while the archive grows, and skipping it is how the next
+session ends up spending its whole budget reading.
 
 A negative result is a result. Log it with the same care as a positive one; it
 is usually more trustworthy.

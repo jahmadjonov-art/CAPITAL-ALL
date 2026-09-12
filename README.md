@@ -4,8 +4,17 @@ A trading research programme — futures, equities, options and prediction
 markets. The goal is to make money; the method is an accumulating research
 record that each session builds on rather than starting over.
 
-**Start with [`MISSION.md`](MISSION.md).** It states the goal, the ground rules,
-and the reasoning behind the discipline the research follows.
+**Start with [`KNOWLEDGE.md`](KNOWLEDGE.md)** — one page, capped at 150 lines,
+holding what we know, what is dead, and what is being worked on right now. It is
+deliberately short so that catching up never means reading the whole archive.
+
+Then [`MISSION.md`](MISSION.md) for the goal, the ground rules, and the
+reasoning behind the discipline the research follows.
+
+Agents work in a small hierarchy. A session that gets stuck or wants a second
+opinion calls a specialist — a **skeptic** that tries to break a finding, a
+**quant** that runs the numbers, a **scout** that researches the open internet.
+They are defined in [`.claude/agents/`](.claude/agents/).
 
 ## Starting a session
 
@@ -28,6 +37,7 @@ session starts from what the last one learned, rather than from nothing.
 
 | | |
 |---|---|
+| [`KNOWLEDGE.md`](KNOWLEDGE.md) | The front page. What we know, what is dead, what is live. Size-capped on purpose: the archive grows, this does not. |
 | [`research/`](research/README.md) | The whiteboard. [`experiments.md`](research/experiments.md) is an append-only log of everything tried; [`beliefs.md`](research/beliefs.md) is what we currently think is true and why. |
 | [`SCORECARD.md`](SCORECARD.md) | How the owner rated each phase, out of 10, and the standing directives drawn from those ratings. Run [`./scorecard/summary.sh`](scorecard/summary.sh) for the short version. |
 | [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, decisions split by how confident they actually were, where sessions got stuck, and honest post-mortems when something went wrong. |

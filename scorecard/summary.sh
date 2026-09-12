@@ -1,14 +1,36 @@
 #!/usr/bin/env bash
 #
-# Derives statistics from SCORECARD.md. Nothing here is stored — every number
-# is recomputed from the log each time this runs, so it can never disagree with
-# the entries it is summarising.
+# Session orientation. Reports the size of the knowledge brief against its cap,
+# then derives score statistics from SCORECARD.md.
+#
+# Nothing here is stored — every number is recomputed from the source files each
+# time this runs, so it can never disagree with what it is summarising.
 #
 # Usage: ./scorecard/summary.sh
 
 set -euo pipefail
 
-ledger="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/SCORECARD.md"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ledger="$root/SCORECARD.md"
+
+# --- knowledge brief size against its cap ---------------------------------
+# The cap is what keeps catch-up cost flat while the record grows. Over it, the
+# next session consolidates instead of appending.
+brief="$root/KNOWLEDGE.md"
+CAP=150
+if [[ -f "$brief" ]]; then
+  lines=$(wc -l < "$brief" | tr -d ' ')
+  printf '\n  KNOWLEDGE.md  %s / %s lines' "$lines" "$CAP"
+  if (( lines > CAP )); then
+    printf '  ** OVER CAP **\n'
+    printf '  Consolidate before adding more: collapse related entries into one\n'
+    printf '  line that carries the conclusion, keeping the ids after it.\n'
+  else
+    printf '  (ok)\n'
+  fi
+else
+  printf '\n  KNOWLEDGE.md not found — the front page is missing.\n'
+fi
 
 if [[ ! -f "$ledger" ]]; then
   echo "No SCORECARD.md found at $ledger" >&2

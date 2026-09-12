@@ -11,6 +11,9 @@ made twice.
 
 ## Start of session — read these
 
+0. **[`KNOWLEDGE.md`](KNOWLEDGE.md)** — the one-page front of everything, capped
+   at 150 lines so catching up never requires reading the archive. **Start here.**
+   Most sessions need this plus whatever it points at, and nothing more.
 1. **[`MISSION.md`](MISSION.md)** — the goal and the binding ground rules. One
    of them concerns live money; do not skip it.
 2. **[`thoughts/handoff.md`](thoughts/handoff.md)** — durable facts and traps.
@@ -48,6 +51,34 @@ back to him in plain English, with no jargon and no unexplained numbers.
 Agents choose their own direction, markets, strategies, position sizing and risk
 limits. That is deliberate — see `MISSION.md`. The only thing not delegated is
 placing real orders.
+
+## You can call for help
+
+Three specialists live in `.claude/agents/`, invoked with the `Agent` tool:
+
+- **`skeptic`** — red-teams a finding and tries to break it. **Call it before
+  believing any promising result**, and always before promoting a belief to T2
+  or above. Brief it adversarially: give it the result and the method, never
+  what you hope the answer is.
+- **`quant`** — fetches data and runs backtests correctly, given a precise spec.
+- **`scout`** — researches the open internet: methods, prior work, data sources,
+  contract specifications.
+
+Run them in parallel when the work is independent. **The lead session is the
+single writer** — specialists report, you decide what is true and make every
+edit to the record. Their reports never reach the owner, so relay what matters.
+Delegating does not transfer responsibility for what ends up in the record.
+
+## Leave the front page better than you found it
+
+`KNOWLEDGE.md` is what stops catch-up cost growing forever. Appending to the log
+alone just moves the problem, so every session that learns something also edits
+the brief: promote what earned its place, retire what died into *What is dead*,
+sharpen a vague line, cut one that no longer carries weight.
+
+Over the 150-line cap, **consolidate rather than extend** — several entries
+circling one idea become a single sentence carrying the conclusion, with the
+`B-NNN` / `EXP-NNN` ids after it. `./scorecard/summary.sh` reports the size.
 
 ## During work — log the decisions that mattered
 
@@ -121,6 +152,8 @@ why, rather than quietly ignoring it.
 
 - `SCORECARD.md` — the owner's ratings and the directives drawn from them.
 - `scorecard/summary.sh` — derives statistics from that log on demand.
+- `KNOWLEDGE.md` — the one-page front of everything. Read first, capped at 150
+  lines, and every session leaves it better.
 - `MISSION.md` — the goal and the ground rules. Binding.
 - `research/` — the whiteboard: every experiment run, and what we believe.
 - `thoughts/` — the message board: handoff notes, categorised decisions, walls,

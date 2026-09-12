@@ -11,6 +11,71 @@ Newest first.
 
 ---
 
+### 2026-09-12 — Built the "neural network" as a capped summary, not a literal one
+**Asked:** *"start slowly building... a neural network where each session builds
+that network where next agent when they come in, they don't have to sit there
+and read through everything every single time."*
+**Did:** `KNOWLEDGE.md` — a single page with a hard 150-line cap, holding what we
+know, what is dead, and what is in flight, with `B-NNN`/`EXP-NNN` ids pointing
+down into the detail. No embeddings, no vector database, no model training.
+**Assumed:** the operative requirement is the clause about not re-reading
+everything — a catch-up cost that stays flat while the archive grows. That is a
+summarisation problem, and the mechanism that solves it is the cap plus a duty
+on every session to consolidate rather than only append. A literal neural
+network or a vector store would add infrastructure and solve nothing here: the
+corpus is small, and the actual failure mode is not retrieval, it is that
+nobody ever compresses.
+**The network part is real, just not neural:** the ids form a citation graph —
+front page → belief → experiment → raw work — that a reader descends only as far
+as their question requires.
+**Would have settled it:** whether he pictured actual machine-learning
+infrastructure or, as the sentence suggests, simply wanted catch-up to get
+faster over time.
+**If wrong:** the brief is still needed either way; a retrieval layer could be
+built over the same ids later without disturbing it.
+
+---
+
+### 2026-09-12 — Made the lead session the only writer in the hierarchy
+**Asked:** an agent should be able to boot a helper, forming a hierarchy that
+works toward the same goal.
+**Did:** three specialists in `.claude/agents/` — `skeptic`, `quant`, `scout` —
+which report back to the lead. **Only the lead edits the record.**
+**Assumed:** concurrent writers to the same markdown files produce lost edits and
+muddled authorship, and there is nothing to gain from it when the whole point of
+a helper is to return a finding. Keeping one writer also keeps responsibility
+located: a wrong number a specialist supplied is still the lead's entry.
+**Would have settled it:** whether he wants helpers writing into the record
+directly.
+**If wrong:** the constraint is one line in each agent definition. Worth
+revisiting if a session ever spawns enough parallel work that funnelling every
+write through the lead becomes the bottleneck.
+
+**One consequence worth knowing:** a subagent's report is not shown to him — only
+what the lead relays. If a specialist finds something important and the lead
+summarises it away, it is gone. Lead sessions are told to relay what matters,
+but this is a real failure mode rather than a solved problem.
+
+---
+
+### 2026-09-12 — Chose skeptic/quant/scout over market-domain specialists
+**Asked:** helpers that contribute *"their knowledge and expertise."*
+**Did:** split by **role** — one that attacks findings, one that measures, one
+that researches — rather than by market (an options expert, a futures expert).
+**Assumed:** role separation buys something structural that domain separation
+does not. The agent that produced a result cannot red-team it, because it
+already believes the answer; a separate skeptic with no stake can. Domain
+knowledge, by contrast, is mostly retrievable — `scout` can fetch contract
+specs on demand, and a static "futures expert" would just be a prompt asserting
+expertise it cannot demonstrate.
+**Would have settled it:** whether he pictured named market specialists.
+**If wrong:** adding domain agents later is cheap, and the role agents still
+apply underneath them. If a market turns out to have deep enough mechanics that
+`scout` keeps re-fetching the same ground, that is the signal to add one — and
+it belongs in `handoff.md` when it happens.
+
+---
+
 ### 2026-09-12 — Made the no-excuses rule symmetrical, covering lucky wins too
 **Asked:** that agents not reason their way to a higher score — specifically not
 by claiming *"I genuinely was correct, yet it didn't go my way."*

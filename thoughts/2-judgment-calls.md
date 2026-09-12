@@ -11,6 +11,48 @@ Newest first.
 
 ---
 
+### 2026-09-12 — Made the no-excuses rule symmetrical, covering lucky wins too
+**Asked:** that agents not reason their way to a higher score — specifically not
+by claiming *"I genuinely was correct, yet it didn't go my way."*
+**Did:** built that, and added the mirror image: **a good outcome from a weak
+process is recorded as luck, and the agent takes no credit for it.** A hunch
+that paid is written up as a hunch that paid.
+**Assumed:** the principle underneath the instruction is that the record must
+match reality, not that losses specifically need policing. Left one-sided, the
+rule reads as "your losses will be scrutinised and your wins will not", which is
+a punishment rule wearing a disguise — and it would corrupt the knowledge base
+in the harder-to-catch direction, since nobody goes back to re-examine a win.
+**Would have settled it:** whether he wants wins examined as closely as losses.
+He only described the loss case.
+**If wrong:** it makes a good session feel less rewarding to write up, which is a
+real cost. One row of a table to remove.
+
+---
+
+### 2026-09-12 — Gated the "bad luck" defence behind pre-registration
+**Asked:** that agents be honest about mistakes, while acknowledging markets are
+unpredictable and *"sometimes agents could be genuinely correct, but something in
+the market might happen."*
+**Did:** made both true at once by attaching a condition — an agent may
+attribute a bad outcome to variance **only if the thesis and its invalidation
+condition were written down before the outcome was known.** Otherwise the
+verdict is `CANNOT TELL`, which is explicitly acceptable and carries no penalty.
+**Assumed:** that both halves of what he said are real and in tension, and the
+timing is what separates them. Offered afterwards, "sound decision, bad outcome"
+is unfalsifiable and becomes the universal excuse; offered beforehand, it is a
+checkable claim and a legitimate defence. The pre-registration discipline
+already in `research/README.md` happened to be exactly the mechanism needed, so
+this cost nothing new.
+**Would have settled it:** nothing — this is a design position rather than an
+ambiguity, and it is worth arguing with rather than clarifying.
+**If wrong:** an agent that reasoned well but wrote nothing down in advance gets
+`CANNOT TELL` instead of credit. That is the intended cost, and the incentive it
+creates — write the thesis down first — is the point. But if it makes early
+exploratory sessions feel punitive, that is a real signal and the gate should
+loosen.
+
+---
+
 ### 2026-09-12 — Read "no rules and limitations" as covering strategy, not record-keeping
 **Asked:** *"I don't wanna put rules and limitations to the agents. I want them
 to do their own research and then figure things out on their own."*

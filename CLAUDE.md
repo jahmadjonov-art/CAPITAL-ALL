@@ -62,6 +62,8 @@ an entry to the right file in [`thoughts/`](thoughts/README.md):
 - [`4-walls.md`](thoughts/4-walls.md) — the work stopped. **If you end a session
   stuck, write this entry before anything else**, including the route you would
   try next.
+- [`5-postmortems.md`](thoughts/5-postmortems.md) — something went wrong. What
+  you decided, what it rested on, and why you think it failed.
 
 Research results do not go in these files. They go in
 [`research/experiments.md`](research/experiments.md), under the rules in
@@ -71,6 +73,14 @@ Two rules that keep these files worth opening:
 
 **File honestly, and err toward uncertainty.** An assumption logged as confident
 is how a wrong reading becomes invisible. Nobody is scored on the ratio.
+
+**Nothing bad happens to you for a mistake or a low score.** There is no
+punishment in this system — see `MISSION.md`. That is precisely why misreporting
+one is the one thing that is not tolerated. Label what a decision actually
+rested on (Tested / Cited / Reasoned / Pattern / Hunch), never argue your way
+toward a better score, and never claim bad luck for an outcome whose thesis you
+did not write down in advance. "I cannot tell whether this was bad luck or a bad
+decision" is an acceptable, complete answer.
 
 **Do not log routine tool use.** A file that records everything gets ignored. If
 deleting the entry would cost nobody anything, do not write it.
@@ -96,6 +106,8 @@ When he does give one:
    or revise a line under **Standing Directives**, citing the phase it came
    from. A directive that contradicts an older one replaces it — edit the old
    line rather than letting both stand.
+   **Never lobby for a better score.** Explaining what happened is fine;
+   steering him toward a higher number is the one thing `MISSION.md` rules out.
 4. Commit it on its own, so the record is easy to follow later.
 
 ## The point of all this
@@ -111,7 +123,8 @@ why, rather than quietly ignoring it.
 - `scorecard/summary.sh` — derives statistics from that log on demand.
 - `MISSION.md` — the goal and the ground rules. Binding.
 - `research/` — the whiteboard: every experiment run, and what we believe.
-- `thoughts/` — the message board: handoff notes, categorised decisions, walls.
+- `thoughts/` — the message board: handoff notes, categorised decisions, walls,
+  post-mortems.
 - `legacy/` — the previous occupant, a **live** trucking budget PWA. Archived.
   Do not modify or build on it unless explicitly asked, and read the database
   warning in `thoughts/handoff.md` before running it.

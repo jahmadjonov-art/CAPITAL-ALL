@@ -87,7 +87,17 @@ happened to dominate the window, a corporate action handled wrong.
 If you genuinely cannot think of an alternative, say so — but that is usually a
 sign of not having looked, not of there being none.
 
-### 7. Never fabricate
+### 7. Label what the idea actually rests on
+
+Every hypothesis and belief carries one word — **Tested, Cited, Reasoned,
+Pattern** or **Hunch** — defined in [`MISSION.md`](../MISSION.md). Hunches are
+allowed and often where good research starts. Presenting one as analysis is not.
+
+A pre-registered hypothesis marked `Hunch` that then fails is a clean, useful
+result. The same hypothesis dressed up as `Reasoned` after the fact teaches the
+next agent something false.
+
+### 8. Never fabricate
 
 No invented prices, fills, returns or statistics — not as illustration, not as
 placeholder, not to show what an entry would look like. Unavailable data is
@@ -105,6 +115,7 @@ downstream of it, and nobody will know which ones.
 **Tier reached:** T0–T4
 **Market / instrument:**
 **Hypothesis (pre-registered):** written before the run
+**Basis:** Tested | Cited | Reasoned | Pattern | Hunch — what the idea rests on
 **Success criterion (pre-registered):** the bar, set in advance
 **Method:** data range, rules, position sizing
 **Costs assumed:** spread, commission, slippage
@@ -120,6 +131,7 @@ downstream of it, and nobody will know which ones.
 ### B-NNN · Short statement of the belief
 **Tier:** T0–T4
 **Evidence:** EXP-NNN, EXP-NNN
+**Basis:** Tested | Cited | Reasoned | Pattern | Hunch
 **Why we think this:** the reasoning, hedged honestly
 **What would falsify it:** a concrete, checkable condition
 **Last reviewed:** YYYY-MM-DD

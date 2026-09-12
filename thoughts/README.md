@@ -17,6 +17,7 @@ files are where that understanding gets left behind on purpose.
 | [`2-judgment-calls.md`](2-judgment-calls.md) | The ask was ambiguous. Something had to be produced anyway, so an assumption got made and the work continued. |
 | [`3-unknown.md`](3-unknown.md) | No real basis to decide. Either the question went back to the owner, or a guess was made and labelled as one. |
 | [`4-walls.md`](4-walls.md) | Work stopped. Where it stopped, what was tried, and the reasoning on what would get past it. |
+| [`5-postmortems.md`](5-postmortems.md) | Something went wrong. What was decided, what it rested on, and — honestly — why it went wrong. **Nobody is punished for anything in here.** |
 
 **If you are the owner and only read one, read
 [`2-judgment-calls.md`](2-judgment-calls.md).** Every entry there names the one
@@ -37,6 +38,11 @@ was or how well it turned out:
   category that matters, because it is where silent divergence starts.
 - **Unknown** — not even a defensible default was available. Guessing here would
   have been fabrication.
+
+**Post-mortems and walls are not further rungs on that ladder** — both are
+different axes. A wall is work that could not continue; a post-mortem is an
+accounting of a decision that turned out badly. Neither carries a penalty, and
+the post-mortem file explains why that absence is what makes it trustworthy.
 
 **Walls are not a fourth rung on that ladder** — they are a different axis. The
 first three describe what a decision rested on; a wall describes work that could

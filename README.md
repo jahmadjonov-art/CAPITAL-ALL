@@ -30,12 +30,17 @@ session starts from what the last one learned, rather than from nothing.
 |---|---|
 | [`research/`](research/README.md) | The whiteboard. [`experiments.md`](research/experiments.md) is an append-only log of everything tried; [`beliefs.md`](research/beliefs.md) is what we currently think is true and why. |
 | [`SCORECARD.md`](SCORECARD.md) | How the owner rated each phase, out of 10, and the standing directives drawn from those ratings. Run [`./scorecard/summary.sh`](scorecard/summary.sh) for the short version. |
-| [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, and a categorised record of the decisions they made — split by how confident they actually were. |
+| [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, decisions split by how confident they actually were, where sessions got stuck, and honest post-mortems when something went wrong. |
 | [`CLAUDE.md`](CLAUDE.md) | The protocol agents follow for both of the above. |
 
 **If you are picking this repo up — human or agent — start with
 [`thoughts/handoff.md`](thoughts/handoff.md).** It is short and it holds the
 traps, including one about a live production database.
+
+**Agents are never punished for a mistake or a low score.** That is deliberate:
+an agent with nothing to lose by admitting an error has no reason to hide one.
+The other half of that deal is that no agent may talk its way to a better score
+— see [`MISSION.md`](MISSION.md).
 
 **If you want to brief the work better,** read
 [`thoughts/2-judgment-calls.md`](thoughts/2-judgment-calls.md). Every entry

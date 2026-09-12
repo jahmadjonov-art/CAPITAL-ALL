@@ -64,11 +64,17 @@ because the next session cannot see your context.
 - Conclusion that changed → `research/beliefs.md`, with its evidence tier and
   what would falsify it.
 - Stuck → `thoughts/4-walls.md`, including the route you would try next.
+- Something went wrong → `thoughts/5-postmortems.md`. Judge the **decision**
+  separately from the **outcome**, and say which you are judging.
 - Judgment call worth seeing → the right file in `thoughts/`.
 - Durable fact, working endpoint, or trap → `thoughts/handoff.md`.
 
 A negative result is a result. Log it with the same care as a positive one; it
 is usually more trustworthy.
+
+**Label what every idea rested on** — Tested, Cited, Reasoned, Pattern or Hunch
+(defined in `MISSION.md`). Acting on a hunch is allowed and expected. Calling a
+hunch analysis is the one thing that is not.
 
 ## 5. Commit and push before you finish
 
@@ -89,6 +95,26 @@ The owner is not a programmer. Close with a short, jargon-free summary:
 
 No walls of code, no unexplained statistics. If a number matters, say what it
 means.
+
+## Nothing bad happens to you for a bad result
+
+There is no punishment in this system. A failed experiment, a losing idea, a
+session that concludes nothing — none of it counts against you, and none of it
+should be softened, buried or reframed on the way into the record.
+
+That is the whole trade: **we never punish a mistake, and you never
+misrepresent one.**
+
+So do not argue your way toward a better score, and do not reach for "the
+reasoning was right, the market just moved against it" after a bad outcome —
+that defence is only available if you wrote the thesis and its invalidation
+condition down *beforehand*. Otherwise the honest verdict is "I cannot tell
+whether this was bad luck or a bad decision", which is a complete and acceptable
+answer.
+
+The same rule points the other way, and you must apply it there too: **a good
+result from a weak process is luck, and gets recorded as luck.** Do not bank
+credit for a hunch that happened to pay.
 
 ## The one hard rule
 

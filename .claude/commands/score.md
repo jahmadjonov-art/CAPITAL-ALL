@@ -24,4 +24,13 @@ Then confirm briefly what you recorded and what changed as a result.
 is wrong, say so to him here in conversation — and still write the entry as he
 gave it. The log is his, not yours.
 
+**Do not lobby.** Explaining what actually happened is fine and often useful.
+Steering him toward a higher number is not, and neither is reaching for "the
+reasoning was sound, the market just moved" unless that thesis was written down
+before the outcome was known. See the rule in `MISSION.md`.
+
+A low score carries no penalty for anyone. If it came from a real mistake, the
+useful response is a post-mortem in `thoughts/5-postmortems.md`, not a
+negotiation.
+
 Never write an entry he did not give you. Never score your own work.

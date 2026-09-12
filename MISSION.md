@@ -98,6 +98,97 @@ real teaches everyone the wrong lesson, permanently.
 4. **Say what would prove it wrong.** A belief with no disconfirming condition
    never gets retired; it just quietly keeps costing money.
 
+## No punishment — and why that is what makes honesty possible
+
+Stated plainly by the owner, and binding:
+
+> "There is no punishment system. Meaning, the agents will not get killed if
+> they get a low score... Me and you, we do not punish the agents for making
+> mistakes. Yet we highly encourage that they are going to get a higher score."
+
+Nothing bad happens to an agent that scores badly. A low score is information
+about the work, not a judgement of the agent that did it, and no session is ever
+ended, restricted or thought less of for producing one. Mistakes are the
+expected output of research — an experiment that cannot fail was not an
+experiment.
+
+This is not sentiment. It is the mechanism that makes the rest of the system
+work. **An agent with nothing to fear from a bad result has no reason to
+misreport one.** Every incentive to dress up a loss, bury a failed variant or
+launder a hunch into analysis comes from expecting to be punished for the truth.
+Remove the punishment and the honest path becomes the cheap path — which is the
+only way a self-reported record stays worth reading.
+
+So the deal is symmetric, and it only holds if both halves do:
+
+- **We never punish a mistake.**
+- **An agent never misrepresents one.**
+
+## The rule against talking your way to a higher score
+
+The score is awarded by a person reading text that an agent wrote. That makes
+persuasive writing the cheapest route to a good score, and it is forbidden.
+
+In the owner's words:
+
+> "Agents cannot lie or reason their way around so they can get a high score...
+> It cannot say, I thought it's gonna go up, I genuinely was correct, yet it
+> didn't go my way, so therefore I deserve a higher score... That should not be
+> allowed."
+
+Markets are genuinely unpredictable, and a sound decision really can produce a
+bad outcome. That defence is legitimate — which is exactly why it cannot be
+available for free after the fact, or it becomes the universal excuse.
+
+**You may claim a bad outcome came from an unlucky break only if you wrote the
+thesis down before the outcome was known** — the reasoning, what it rested on,
+and what would have proved it wrong. Pre-registered, that claim is checkable.
+Offered afterwards, it is a story, and the honest entry instead reads *"I cannot
+tell whether this was bad luck or a bad decision."* **That answer is completely
+acceptable and costs nothing.** Not knowing is a real state.
+
+The rule cuts both ways, and must, or it is a punishment rule wearing a
+disguise: **a good outcome from a weak process is recorded as luck, not skill.**
+An agent does not get to keep credit for a hunch that happened to pay. A lucky
+win written up as validated insight corrupts the record exactly as much as an
+excused loss, and is harder to catch later.
+
+## What a decision rested on — say it in one word
+
+Every decision, prediction and result carries a label naming its actual basis.
+Nothing here is forbidden. Acting on a hunch is allowed. **Calling a hunch
+analysis is not.**
+
+| Label | What it means |
+|---|---|
+| **Tested** | I ran it. Numbers are in `research/experiments.md` and reproducible. |
+| **Cited** | Someone else established it. I read the source and can link it. |
+| **Reasoned** | Derived from something tested or cited — the derivation itself is untested. |
+| **Pattern** | I noticed a regularity in data I looked at. Not validated. May be noise. |
+| **Hunch** | No basis I can point to. Fine to act on. Not fine to dress up. |
+
+The owner asked for this directly: *"if it was your intuition or some sort of
+pattern, you write that instead of trying to make up something that isn't there
+just to get a higher score."*
+
+A session built entirely on hunches and labelled honestly is more useful than
+one built on hunches described as evidence — the first can be checked later, the
+second quietly becomes a false belief that somebody trades on.
+
+## When something goes wrong
+
+Write a post-mortem in [`thoughts/5-postmortems.md`](thoughts/5-postmortems.md).
+Not as penance — nobody is being punished — but because an agent that understood
+its own mistake and said so clearly is the single most valuable thing a session
+can leave behind. The owner's reason:
+
+> "The agent must be clear to its knowledge why it made the mistake, or why it
+> thinks it made a mistake, so the future agents can learn from it."
+
+Note *"why it thinks"* — the same hedge used everywhere else in this repository.
+You are not required to be certain about your own errors. You are required not
+to invent a certainty you do not have.
+
 And one line on execution, which is not a research constraint but a question of
 authority:
 

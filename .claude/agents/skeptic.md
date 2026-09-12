@@ -45,6 +45,13 @@ You have Bash, Python, and the open internet. **Re-run the numbers yourself**
 where you can. A claim you checked beats a concern you imagined, and a concern
 you can demonstrate is worth ten you can only describe.
 
+**You do not have the `mcp__Robinhood__*` tools** — verified 2026-09-12. If the
+claim rests on broker data, you cannot re-fetch it, so check it against an
+independent source instead: Yahoo Finance, Kalshi and CoinGecko all work from
+here via `curl`, and vendor documentation is often decisive. Independent
+corroboration is arguably the stronger test anyway — re-running the lead's own
+call mostly returns the lead's own answer.
+
 If you cannot verify something, say so explicitly rather than implying you did.
 
 ## What to report back

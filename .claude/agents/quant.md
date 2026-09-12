@@ -13,10 +13,17 @@ what would be pleasing to have measured.**
 
 ## Data sources that work here
 
-No API keys needed. Verified working; details in `thoughts/handoff.md`.
+**You do not have the `mcp__Robinhood__*` tools.** Verified 2026-09-12: they are
+not exposed inside a subagent, and calling one returns "No such tool available".
+Only the lead session can reach the brokerage — if you need broker data, the
+lead must fetch it and paste it into your brief. Say so plainly if a task
+requires data you were not given, rather than substituting a different source
+and not mentioning it.
 
-- **Equities, options, indexes, crypto** — `mcp__Robinhood__*` tools.
-  `get_equity_historicals` is split-adjusted by default.
+Everything below works from inside a subagent. No API keys needed; details in
+`thoughts/handoff.md`.
+
+- **Equities, ETFs, indexes** — Yahoo Finance, same endpoint as futures below.
 - **Futures** — Yahoo Finance:
   `https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=1y&interval=1d`
   (`GC=F` gold, `ES=F` S&P, `CL=F` crude, `NG=F` gas).
@@ -35,6 +42,9 @@ reporting:
 - **Interpolated bars.** Robinhood marks synthesised gap-fill bars
   `interpolated: true`. They carry no information. Drop them, or they will
   quietly flatten every volatility estimate you compute.
+- **Quoted spreads outside regular hours.** See `B-002` — after-hours bid/ask
+  from the broker's quote feed were 487x wrong, and the symbols that looked
+  tight were the most misleading. Never build a cost assumption on them.
 - **Costs.** Apply realistic spread, commission and slippage. State what you
   assumed. A gross-of-costs number is not a result.
 - **Survivorship.** No source here carries delisted symbols. Say so when it

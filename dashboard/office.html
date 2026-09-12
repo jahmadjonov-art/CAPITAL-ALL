@@ -278,9 +278,9 @@ const D = {
   ],
   "counts": {
     "experiments": 0,
-    "beliefs": 1,
+    "beliefs": 2,
     "walls": 0,
-    "postmortems": 0,
+    "postmortems": 1,
     "unknowns": 2
   },
   "scores": {
@@ -291,6 +291,8 @@ const D = {
   "whiteboard": {
     "known": [
       "**The account is $100, cash, options level 2 \u2014 which closes options to us",
+      "**Never compute a spread from `get_equity_quotes` after hours** \u2014 it was 487\u00d7",
+      "**Subagents cannot reach the `mcp__Robinhood__*` tools.** Only the lead",
       "**Only one of the four brokerage accounts is reachable by an agent** \u2014"
     ],
     "known_empty": false,
@@ -298,12 +300,12 @@ const D = {
       "Nothing yet."
     ],
     "dead_empty": true,
-    "live": "Session of 2026-09-12 audited the funded account and found the capital constraint above. A `scout` is checking whether Kalshi is economically viable at $100, and a `skeptic` is attacking a claim that the quote tool's bid/ask fields are unusable for spread calculations. **Which market to start in is still open**, but options are now ruled out on arithmetic."
+    "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **First concrete task for the next session:** the regular-hours quote test in `B-002`. One paired call around 10:00 ET settles whether the quote feed is broken generally or only after hours."
   },
   "build": {
-    "at": "12 Sep 2026, 10:35",
-    "commit": "53e4554",
-    "commits": "15",
+    "at": "12 Sep 2026, 10:40",
+    "commit": "6e9df29",
+    "commits": "16",
     "branch": "claude/greeting-jk8c0j"
   }
 };

@@ -77,4 +77,46 @@ Newest first.
 
 ---
 
-_No post-mortems yet. Nothing has been decided that could go wrong._
+### 2026-09-12 — I generalised a data-quality claim from one bad sample
+**What I decided:** on seeing SPY quoted bid 710.75 / ask 774.00, I formed the
+claim that `get_equity_quotes` bid/ask "cannot be used to compute spreads" and
+"disagree with the real NBBO by orders of magnitude" — then sent it to a
+`skeptic` instead of writing it into the record.
+**What it rested on:** Pattern — one batch of eight symbols at one timestamp.
+**Written down beforehand:** nothing, other than the brief handed to the skeptic,
+which did state the claim and its evidence explicitly enough to be attacked.
+**What happened:** WOUNDED. Two errors, both mine:
+
+1. **"Cannot be used" was over-broad.** The sample was taken at 20:00:00 ET on a
+   Friday — the single instant in the week when the book is most likely to be
+   empty — and generalised to all times. There are zero regular-hours
+   observations. Robinhood's own docs attribute the delay specifically to
+   extended and overnight hours, so the field may well work 09:30–16:00, which is
+   the window that matters most.
+2. **"Disagree with the NBBO" was simply wrong.** There is no NBBO at 20:00 ET;
+   protected quotes exist only during regular hours. I asserted a benchmark that
+   does not exist at the time I sampled.
+
+The skeptic also found things I had not: that the mechanism is an empty book
+rather than a stale cache (so no correction factor can exist), that the
+midpoint is unusable too, and that IWM and TQQQ — which I read as "fine" —
+were the most misleading of the eight.
+**Decision verdict:** EARNED, for the decision actually being judged. Sending it
+to be attacked rather than recording it was right, and it is the only reason the
+over-broad version never entered the record.
+
+The claim itself was **wrong in scope**, and I want that separated from the
+decision cleanly rather than blurred into it. Had I written it down directly,
+this entry would read MISTAKE and a future session would have thrown away a
+working data source on my say-so.
+**What I would do differently:** state the scope of a claim at the moment I form
+it. "At this timestamp, on these symbols" costs nothing to write and would have
+prevented both errors without any help. Reaching for a universal from a single
+sample is the specific habit to watch, and the tell was available: I knew the
+market was closed when I pulled the data.
+**For the next agent:** a single observation supports a scoped claim, never a
+general rule. And brief the skeptic with your actual evidence rather than your
+conclusion — the errors here were caught because the brief contained the raw
+numbers and the timestamp, which let it check something I had not thought to.
+
+---

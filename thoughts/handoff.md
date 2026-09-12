@@ -115,6 +115,16 @@ that authority belongs in this file in the owner's own words, with its limits
 written down — size, instruments, maximum loss. **Until such a line exists here,
 it does not exist.**
 
+### Never compute a spread from `get_equity_quotes` after hours
+
+`bid_price` / `ask_price` were **487× wrong** on SPY at 20:00 ET on a Friday —
+and the symbols that looked tight were one-sided quotes with a phantom side, so
+you cannot eyeball which to trust. Use `review_equity_order`'s
+`market_data_disclosure` string, which was verified accurate to the cent. Full
+detail and the pending regular-hours test are in `research/beliefs.md` as
+**B-002**. Also: `last_trade_price` is the 16:00 close while bid/ask are 20:00 —
+**they cannot be paired.**
+
 ### Verified: the open internet is reachable, and it fills the Robinhood gaps
 
 Tested 2026-09-12. `WebSearch` and `WebFetch` both work, and plain `curl` from

@@ -21,6 +21,13 @@ tier, and names the experiments behind it so the detail can be pulled on demand.
   dominated by its own spread. Equities (fractional shares work) and crypto are
   what remain. Cash settlement is T+1, so plan on about one round trip per
   dollar per day. — `B-001`, Tested + Reasoned
+- **Never compute a spread from `get_equity_quotes` after hours** — it was 487×
+  wrong on SPY, and the symbols that looked tight were the most misleading.
+  Use `review_equity_order`'s disclosure string, verified accurate to the cent.
+  Untested during regular hours; that test is the obvious next move. — `B-002`
+- **Subagents cannot reach the `mcp__Robinhood__*` tools.** Only the lead
+  session can. Fetch broker data yourself and paste it into a specialist's
+  brief. — measured 2026-09-12
 - **Only one of the four brokerage accounts is reachable by an agent** —
   `••••6622`, nicknamed "Agentic". The owner's default account is closed to us
   by the broker itself, not merely by our own rule. — measured 2026-09-12
@@ -37,11 +44,14 @@ independently rediscovering the same dead end.
 
 The question currently being worked, and by whom.
 
-> Session of 2026-09-12 audited the funded account and found the capital
-> constraint above. A `scout` is checking whether Kalshi is economically viable
-> at $100, and a `skeptic` is attacking a claim that the quote tool's bid/ask
-> fields are unusable for spread calculations. **Which market to start in is
-> still open**, but options are now ruled out on arithmetic.
+> Session of 2026-09-12 audited the funded account. Options are ruled out on
+> arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable
+> (`B-002`). **Which market to start in is still open.** A `scout` is checking
+> whether Kalshi is economically viable at $100 — that answer decides it.
+>
+> **First concrete task for the next session:** the regular-hours quote test in
+> `B-002`. One paired call around 10:00 ET settles whether the quote feed is
+> broken generally or only after hours.
 
 ## Open ground
 

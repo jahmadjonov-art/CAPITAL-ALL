@@ -335,3 +335,62 @@ and politics contracts. **Sports markets are both the most liquid on the venue
 and the most legally exposed** — a strategy built on them risks the category
 disappearing mid-experiment. Economic, weather and financial-data markets look
 more durable.
+
+---
+
+## Scheduled runs
+
+A Routine fires a **fresh research session every weekday at 15:10 UTC**
+(11:10 ET in summer, 10:10 ET in winter — chosen so it stays inside US market
+hours through the daylight-saving change). Trigger id
+`trig_01CXe8Me3wzNA7MG7w2bMEQL`. First run: Monday 2026-09-14.
+
+**These fired sessions have no MCP connectors.** The trigger was created from
+inside a session that could not pass its connector grants through, so a
+scheduled run gets **no `mcp__Robinhood__*` and no `mcp__github__*` tools.** It
+can still reach Yahoo, Kalshi and CoinGecko over `curl`, plus `WebSearch` and
+`WebFetch` — which covers most research — but it **cannot read the brokerage
+account or quote equities through the broker.**
+
+Two consequences:
+
+- A scheduled session should pick work that does not need broker data. Kalshi,
+  futures via Yahoo, crypto, methodology and literature work are all reachable.
+- **The regular-hours quote test in `B-002` cannot be run by a scheduled
+  session** — it needs `get_equity_quotes` and `review_equity_order` side by
+  side. That one has to be run from an interactive session with the connectors
+  attached.
+
+The fix, if scheduled runs need broker access: the owner recreates or edits the
+Routine from the Routines UI on claude.ai, where his connectors can be attached
+to it. Worth doing before relying on the schedule for anything broker-shaped.
+
+## Options access: what it would actually take
+
+The account is **cash** with **`option_level_2`**. Spreads are level 3, and
+level 3 **additionally requires a margin or limited-margin account** — so this
+is two steps, not one:
+
+1. Convert the account from cash to margin or limited margin
+   (`get_limited_margin_upgrade_info` returns the link).
+2. *Then* apply for level 3 (`get_option_level_upgrade_info`, or
+   `https://applink.robinhood.com/upgrade_options?account_number=792646622`).
+
+Both require the owner to complete an application and be approved; no agent can
+do either. **And note that neither changes `B-001`** — at $100, the 100-share
+contract multiplier is what closes options, not the approval level. Spreads
+would reduce the collateral needed, but a $100 account still cannot carry a
+meaningful position in anything but sub-$1 underlyings.
+
+## Kalshi's Bitcoin contracts — verified 2026-09-12
+
+`KXBTCD` ("Bitcoin price Above/below") is **`fee_type: quadratic`,
+`fee_multiplier: 1`** — the fee-free-maker type, confirmed directly rather than
+inferred from the series survey. Contracts are short-dated and settle through
+the day (the 2026-09-12 08:00 batch closed at 12:00).
+
+This is the pocket where the fee-free structure and real volume may overlap, and
+it maps onto the owner's own interest in short-horizon crypto price contracts.
+**Nobody has measured its actual order books yet** — the `/markets` listing
+returns null bids and asks at weekends, so use the per-market
+`/markets/{ticker}/orderbook` endpoint during active hours.

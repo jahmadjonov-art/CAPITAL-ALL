@@ -28,6 +28,10 @@ tier, and names the experiments behind it so the detail can be pulled on demand.
 - **Never price a spread from `get_equity_quotes` after hours** — 487× wrong on
   SPY, and the symbols that looked tight were the most misleading. Use
   `review_equity_order`'s disclosure. Untested in regular hours. — `B-002`
+- **A weekday research run fires automatically at 15:10 UTC** — but those
+  sessions get **no broker tools**, so they cannot read the account or quote
+  equities. Broker-shaped work needs an interactive session. — measured
+  2026-09-12
 - **Only one brokerage account is agent-reachable** (`••••6622`); the owner's
   default is closed by the broker itself. **Subagents cannot reach the Robinhood
   tools at all** — the lead must fetch broker data and paste it into their brief.
@@ -70,6 +74,9 @@ Staked out, not built. Pick any up without asking — see
 - [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
 - [`markets-untouched.md`](sandbox/markets-untouched.md) — still unchosen. The
   prediction-market hunch was undermined, not killed.
+- [`data-collection.md`](sandbox/data-collection.md) — **nothing records
+  anything yet**, so no question about the past is answerable. Likely a GitHub
+  Actions cron, which needs a merge to `main` first.
 
 ## Where the detail lives
 

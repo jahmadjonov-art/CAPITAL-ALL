@@ -12,6 +12,56 @@ Newest first.
 
 ---
 
+### 2026-09-12 — OPEN: How much capital, and what drawdown ends the experiment?
+**Situation:** the stated risk appetite is *"a little bit of exceeded greed."*
+**Unknown:** what that means as numbers.
+**Why it cannot be assumed:** "aggressive" is not executable. Position sizing
+needs an account size, and the difference between an aggressive programme and a
+ruinous one is entirely a maximum-drawdown rule agreed in advance — agreed in
+advance specifically because nobody sets one honestly while losing.
+**Would resolve it:** two figures. Capital committed to this, and the loss at
+which the experiment stops rather than doubles down. A third, the loss on any
+single position, would be better still.
+**Blocks:** any position sizing, so any T3 paper run or T4 live trade. It does
+not block research.
+
+---
+
+### 2026-09-12 — OPEN: Where does futures and prediction-market data come from?
+**Situation:** the mission names futures and prediction markets. The attached
+Robinhood connection covers equities, options, indexes and crypto — **not
+futures**, and not prediction-market venues such as Kalshi or Polymarket.
+**Unknown:** whether to source that data elsewhere, or to start where the data
+already is and expand later.
+**Why it cannot be assumed:** starting with equities and options because that is
+what is wired up is a decision made by tooling rather than by reasoning, and it
+may be exactly wrong — prediction markets in particular are young, thinner, and
+plausibly less efficient, which is where a small operator's edge is most likely
+to be.
+**Deliberately not guessed:** no data vendor has been signed up for and no API
+key requested.
+**Would resolve it:** which market to start with, and whether paying for data is
+on the table or this stays free-tier.
+
+---
+
+### 2026-09-12 — OPEN: Does the no-autonomous-execution rule stand?
+**Situation:** the live brokerage tools can place real orders. A conservative
+default has been written into `MISSION.md` and `handoff.md`: no order is ever
+placed, cancelled or exercised without explicit human approval for that specific
+trade.
+**Unknown:** whether the owner wants that, or something looser once a strategy
+has earned confidence.
+**Why it is set conservatively by default:** the cost of the rule being too
+strict is that trades need a confirmation. The cost of it being too loose is
+unbounded and irreversible, and an agent misreading an instruction as
+authorisation is a well-documented way to lose money quickly.
+**Would resolve it:** confirmation that the rule stands, or a replacement stated
+in the owner's own words with explicit limits — instruments, maximum size,
+maximum loss — which then goes into `handoff.md` verbatim.
+
+---
+
 ### 2026-09-12 — OPEN: Will agents other than Claude Code ever read any of this?
 **Situation:** the stated goal is that "future agents" benefit from these files.
 **Unknown:** which ones, and through what tooling.
@@ -45,18 +95,11 @@ six of them rather than sixty.
 
 ---
 
-### 2026-09-12 — OPEN: What is the new project?
-**Situation:** the repository has been cleared and two support systems built,
-for a project that has not been described yet.
-**Unknown:** everything about it. Purpose, stack, audience, whether it relates
-to the trucking business at all.
-**Why it cannot be assumed:** the owner said the brief is coming after the
-scaffolding is finished, so this is sequencing, not an oversight. But it means
-no stack-dependent decision can be made yet, and at least one thing has already
-been deferred because of it — the root `.gitignore`, in
-`2-judgment-calls.md`.
-**Deliberately not guessed:** no framework was installed, no directory layout
-was invented, no `package.json` was written. Scaffolding a Next.js app on a hunch
-because the previous occupant was React would have been fabrication dressed as
-initiative, and unwinding a wrong stack costs more than waiting.
-**Would resolve it:** the brief.
+### 2026-09-12 — RESOLVED: What is the new project?
+**Answered:** 2026-09-12, by the owner.
+**Answer:** a trading research programme covering futures, equities, options and
+prediction markets, built as an accumulating research record that successive
+agent sessions add to. Full charter in [`MISSION.md`](../MISSION.md).
+**Consequence:** the deferred root `.gitignore` can now be written — though it
+should wait until the first analysis code lands and reveals whether this is a
+Python or a Node repository, which is still genuinely open.

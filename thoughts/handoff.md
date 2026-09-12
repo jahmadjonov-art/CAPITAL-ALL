@@ -11,10 +11,13 @@ worse than none, because it will be trusted.
 
 ## Orientation
 
-**This repository is being repurposed.** It used to hold one app; that app now
-sits in `legacy/` and the root is clear for new work. As of this writing the new
-project has not been specified yet, so anything at the root is scaffolding
-rather than product.
+**This repository is a trading research programme.** Read
+[`MISSION.md`](../MISSION.md) first — the goal is making money in futures,
+equities, options and prediction markets, and the method is an accumulating
+research record that future sessions build on. `research/` is that record.
+
+It used to hold a different app entirely; that one now sits in `legacy/` and is
+unrelated to the current work.
 
 **`legacy/` is a real, deployed application — not dead code.** It is the Capital
 Allocation Manager, a budgeting PWA that splits trucking income across tax,
@@ -29,6 +32,60 @@ phases. `./scorecard/summary.sh` gives the short version.
 ---
 
 ## Things that will bite you
+
+### This environment can place real trades with real money
+
+The most important fact in this file.
+
+A Robinhood connection is attached (`mcp__Robinhood__*`). Alongside market data
+it exposes `place_equity_order`, `place_option_order` and `place_crypto_order`,
+whose own documentation begins *"Place a real equity order with real money."*
+There is also `exercise_option` and the various `cancel_*` tools. This is not a
+sandbox and there is no paper-trading mode in that toolset.
+
+**The rule for every agent working here: never place, modify, cancel or
+exercise anything without explicit human approval for that specific trade, at
+the time of the trade.** Not implied approval from a general instruction to
+"trade profitably", not approval carried over from an earlier trade, not
+approval inferred from an approved strategy. A standing instruction to pursue
+profit is authorisation to research, never authorisation to transmit an order.
+
+Read-only market data tools — quotes, historicals, chains, fundamentals,
+filings, positions, orders — are fine to use freely. That is where essentially
+all the work lives.
+
+The broker enforces its own rails on top of this: orders require an
+`agentic_allowed=true` account, options require level 2 or 3, and the tools
+expect `review_equity_order` / `review_option_order` / `preview_crypto_order`
+first with the result shown to the user for confirmation. **Treat those as a
+backstop, not as the control.** They constrain the mechanism; they do not decide
+whether a trade should exist. Use the review tools freely — they simulate
+without placing, and are genuinely useful for pricing a hypothetical.
+
+If a future session is ever given standing authority to execute autonomously,
+that authority belongs in this file in the owner's own words, with its limits
+written down — size, instruments, maximum loss. **Until such a line exists here,
+it does not exist.**
+
+### The data source is a retail feed, not a research dataset
+
+`get_equity_historicals` is explicitly documented for backtesting and is
+split-adjusted by default, which is the right default. But plan around what a
+brokerage feed does not give you:
+
+- **No delisted symbols.** Any universe assembled from currently-tradable
+  tickers is survivorship-biased, and that bias reliably inflates backtest
+  returns. It is the single easiest way to produce an impressive, worthless
+  result here.
+- **No futures.** The mission names futures explicitly and this source does not
+  cover them. Unsolved — see `3-unknown.md`.
+- **Limited intraday history**, and the call is rejected outright if a requested
+  range and interval would exceed the bar cap. Narrow the range or coarsen the
+  interval.
+- `interpolated: true` on a bar means it was **synthesised to fill a gap** and
+  carries no information. Filter these out before computing anything, or they
+  will quietly flatten your volatility estimates.
+
 
 ### The Supabase database in `legacy/` is live, shared, and holds real money data
 

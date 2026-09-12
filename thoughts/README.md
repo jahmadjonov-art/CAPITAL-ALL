@@ -16,6 +16,7 @@ files are where that understanding gets left behind on purpose.
 | [`1-confident.md`](1-confident.md) | The ask was clear, the path was obvious, the work got done. |
 | [`2-judgment-calls.md`](2-judgment-calls.md) | The ask was ambiguous. Something had to be produced anyway, so an assumption got made and the work continued. |
 | [`3-unknown.md`](3-unknown.md) | No real basis to decide. Either the question went back to the owner, or a guess was made and labelled as one. |
+| [`4-walls.md`](4-walls.md) | Work stopped. Where it stopped, what was tried, and the reasoning on what would get past it. |
 
 **If you are the owner and only read one, read
 [`2-judgment-calls.md`](2-judgment-calls.md).** Every entry there names the one
@@ -36,6 +37,12 @@ was or how well it turned out:
   category that matters, because it is where silent divergence starts.
 - **Unknown** — not even a defensible default was available. Guessing here would
   have been fabrication.
+
+**Walls are not a fourth rung on that ladder** — they are a different axis. The
+first three describe what a decision rested on; a wall describes work that could
+not continue at all. An agent that ends a session stuck should leave an entry in
+`4-walls.md` before anything else, because that is the one another session most
+directly inherits.
 
 When an entry sits between two categories, file it in the more uncertain one.
 Overstating confidence is the failure mode that costs something; understating it

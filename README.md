@@ -1,6 +1,15 @@
 # CAPITAL-ALL
 
-This repository is being repurposed for a new project. Work in progress.
+A trading research programme — futures, equities, options and prediction
+markets. The goal is to make money; the method is an accumulating research
+record that each session builds on rather than starting over.
+
+**Start with [`MISSION.md`](MISSION.md).** It states the goal, the ground rules,
+and the reasoning behind the discipline the research follows.
+
+⚠️ **This environment can place real trades with real money.** No agent places,
+cancels or exercises an order without explicit human approval for that specific
+trade. See [`thoughts/handoff.md`](thoughts/handoff.md).
 
 ## The records kept here
 
@@ -10,6 +19,7 @@ session starts from what the last one learned, rather than from nothing.
 
 | | |
 |---|---|
+| [`research/`](research/README.md) | The whiteboard. [`experiments.md`](research/experiments.md) is an append-only log of everything tried; [`beliefs.md`](research/beliefs.md) is what we currently think is true and why. |
 | [`SCORECARD.md`](SCORECARD.md) | How the owner rated each phase, out of 10, and the standing directives drawn from those ratings. Run [`./scorecard/summary.sh`](scorecard/summary.sh) for the short version. |
 | [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, and a categorised record of the decisions they made — split by how confident they actually were. |
 | [`CLAUDE.md`](CLAUDE.md) | The protocol agents follow for both of the above. |

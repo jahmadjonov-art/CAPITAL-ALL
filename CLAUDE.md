@@ -1,19 +1,31 @@
 # Working in this repository
 
-Sessions here do not share memory, so two records are kept in the repo itself:
-what the owner thought of previous work, and what previous agents learned while
-doing it. Both exist to stop the same ground being covered twice.
+This repository is a trading research programme. Read
+**[`MISSION.md`](MISSION.md)** before anything else — it states the goal, the
+ground rules, and why the record-keeping here *is* the work rather than
+overhead around it.
+
+Sessions do not share memory, so the records live in the repo itself. They exist
+to stop the same ground being covered twice, and to stop the same mistakes being
+made twice.
 
 ## Start of session — read these
 
-1. **[`thoughts/handoff.md`](thoughts/handoff.md)** — durable facts and traps.
+1. **[`MISSION.md`](MISSION.md)** — the goal and the binding ground rules. One
+   of them concerns live money; do not skip it.
+2. **[`thoughts/handoff.md`](thoughts/handoff.md)** — durable facts and traps.
    It is short, and it will save you from at least one expensive mistake.
-2. **[`SCORECARD.md`](SCORECARD.md)** — how previous phases were rated. Its
+3. **[`research/beliefs.md`](research/beliefs.md)** — what we currently think
+   is true, and on what evidence. Then
+   **[`research/README.md`](research/README.md)** before running any test of
+   your own: it holds the rules that keep results trustworthy.
+4. **[`SCORECARD.md`](SCORECARD.md)** — how previous phases were rated. Its
    **[Standing Directives](SCORECARD.md#standing-directives)** are binding
    instructions, not background reading.
-3. **[`thoughts/3-unknown.md`](thoughts/3-unknown.md)** — questions still open.
-   Check whether the task you have just been given answers one; if it does,
-   close that entry out.
+5. **[`thoughts/3-unknown.md`](thoughts/3-unknown.md)** and
+   **[`thoughts/4-walls.md`](thoughts/4-walls.md)** — open questions and where
+   previous sessions got stuck. Check whether your task answers one or clears
+   one; if it does, close that entry out.
 
 For a quick orientation before the full read:
 
@@ -31,6 +43,13 @@ an entry to the right file in [`thoughts/`](thoughts/README.md):
 - [`2-judgment-calls.md`](thoughts/2-judgment-calls.md) — it was ambiguous, you
   picked a reading and continued. **Record what would have settled it.**
 - [`3-unknown.md`](thoughts/3-unknown.md) — you had no basis to decide.
+- [`4-walls.md`](thoughts/4-walls.md) — the work stopped. **If you end a session
+  stuck, write this entry before anything else**, including the route you would
+  try next.
+
+Research results do not go in these files. They go in
+[`research/experiments.md`](research/experiments.md), under the rules in
+[`research/README.md`](research/README.md).
 
 Two rules that keep these files worth opening:
 
@@ -74,7 +93,9 @@ why, rather than quietly ignoring it.
 
 - `SCORECARD.md` — the owner's ratings and the directives drawn from them.
 - `scorecard/summary.sh` — derives statistics from that log on demand.
-- `thoughts/` — the message board: handoff notes and categorised decisions.
+- `MISSION.md` — the goal and the ground rules. Binding.
+- `research/` — the whiteboard: every experiment run, and what we believe.
+- `thoughts/` — the message board: handoff notes, categorised decisions, walls.
 - `legacy/` — the previous occupant, a **live** trucking budget PWA. Archived.
   Do not modify or build on it unless explicitly asked, and read the database
   warning in `thoughts/handoff.md` before running it.

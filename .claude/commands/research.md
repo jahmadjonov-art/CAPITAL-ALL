@@ -40,7 +40,9 @@ Priority order, highest first:
 2. An open unknown in `3-unknown.md` you can actually close.
 3. The obvious next step on the most recent experiment — the out-of-sample test,
    the cost sensitivity, the variant that was parked.
-4. Something new, if the above are genuinely exhausted.
+4. A sandbox from [`sandbox/`](../../sandbox/README.md) — ground already staked
+   out, with the groundwork done and waiting.
+5. Something new, if the above are genuinely exhausted.
 
 The choice is yours. You do not need permission, and a well-argued unusual
 direction is better than a safe one nobody learns from.
@@ -150,6 +152,17 @@ The owner is not a programmer. Close with a short, jargon-free summary:
 
 No walls of code, no unexplained statistics. If a number matters, say what it
 means.
+
+## If the task turns out bigger than the session
+
+Do not ship a shallow version that reads as finished. **Stake the ground out in
+`sandbox/`** — what should exist, why it matters, what you learned, what is
+missing — and say plainly in your summary that you opened it rather than
+finished it.
+
+Partial progress recorded honestly is worth more than a complete-looking result
+that quietly is not, and there is no penalty for stopping. If you got halfway,
+the halfway belongs in the sandbox notes so the next session starts from there.
 
 ## Nothing bad happens to you for a bad result
 

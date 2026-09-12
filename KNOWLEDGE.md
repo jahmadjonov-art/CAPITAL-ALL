@@ -32,6 +32,19 @@ The question currently being worked, and by whom.
 > _Nothing in flight. The next `/research` session picks a starting market —
 > see [`thoughts/3-unknown.md`](thoughts/3-unknown.md)._
 
+## Open ground
+
+Staked out, not built. Pick any up without asking — see
+[`sandbox/`](sandbox/README.md).
+
+- [`robinhood.md`](sandbox/robinhood.md) — what the connection can actually do.
+  Nothing has been called; every answer is one tool call away.
+- [`cost-model.md`](sandbox/cost-model.md) — real trading costs. **The costs rule
+  is unenforceable until this exists.**
+- [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
+- [`markets-untouched.md`](sandbox/markets-untouched.md) — which market to start
+  with, argued for rather than defaulted into.
+
 ## Where the detail lives
 
 | Looking for | Go to |
@@ -42,6 +55,7 @@ The question currently being worked, and by whom.
 | Where a previous session got stuck | [`thoughts/4-walls.md`](thoughts/4-walls.md) |
 | What went wrong and why | [`thoughts/5-postmortems.md`](thoughts/5-postmortems.md) |
 | How the owner rated past work | [`SCORECARD.md`](SCORECARD.md) |
+| Work staked out but not started | [`sandbox/`](sandbox/README.md) |
 
 ---
 

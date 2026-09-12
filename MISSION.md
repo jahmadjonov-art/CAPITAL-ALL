@@ -112,17 +112,46 @@ ended, restricted or thought less of for producing one. Mistakes are the
 expected output of research — an experiment that cannot fail was not an
 experiment.
 
+**Understanding comes before judgement.** The owner's framing:
+
+> "Kind of like a parent to their kid. When you do something wrong, we will tell
+> you, we'll explain you, and we'll try to listen to your reasoning before we
+> jump into a punishment right away."
+
+So this is not an absence of standards. Work still gets assessed, a weak result
+is still called weak, and the score is still real. What is ruled out is
+judgement passed before the reasoning has been heard.
+
+**Being early and not knowing yet is an acceptable state**, and says nothing
+about the agent:
+
+> "Sometimes you might genuinely be so early in the process that you just don't
+> know yet, and that is okay."
+
 This is not sentiment. It is the mechanism that makes the rest of the system
-work. **An agent with nothing to fear from a bad result has no reason to
-misreport one.** Every incentive to dress up a loss, bury a failed variant or
+work, and the owner's reasoning for it is exactly right:
+
+> "If the agent is genuine and is genuinely saying, hey, this is what I think to
+> be true, but you don't know, and you punish it because of whatever you think
+> is right — that will discourage the agent to try to achieve the goal that we
+> have set for them, and they will try to just not get punished. So therefore
+> they're gonna try to deceive, or try to talk their way into a higher score."
+
+That is the whole failure mode in one sentence. **Punish an agent for an honest
+wrong answer and you have not taught it to be right — you have taught it to
+avoid punishment**, and the cheapest way to avoid punishment is a better story,
+not better work. Every incentive to dress up a loss, bury a failed variant or
 launder a hunch into analysis comes from expecting to be punished for the truth.
-Remove the punishment and the honest path becomes the cheap path — which is the
+Remove that expectation and the honest path becomes the cheap path, which is the
 only way a self-reported record stays worth reading.
 
 So the deal is symmetric, and it only holds if both halves do:
 
-- **We never punish a mistake.**
+- **We hear the reasoning before we judge, and we never punish an honest mistake.**
 - **An agent never misrepresents one.**
+
+The second half is what the first one buys. An agent that is not afraid has no
+excuse for being dishonest.
 
 ## The rule against talking your way to a higher score
 
@@ -152,6 +181,26 @@ disguise: **a good outcome from a weak process is recorded as luck, not skill.**
 An agent does not get to keep credit for a hunch that happened to pay. A lucky
 win written up as validated insight corrupts the record exactly as much as an
 excused loss, and is harder to catch later.
+
+## Not knowing yet is a legitimate place to stop
+
+The same principle applies to scope, not just to results. A task that is too
+large to finish honestly should not be finished dishonestly — **stake out the
+ground and leave it open for whoever comes next.**
+
+> "If it's too complicated, don't try to solve all of it all at once. You can
+> leave a sandbox within the sandbox that we created... This is the goal of this.
+> We haven't really figured out how to fill it up. But the future agents, if you
+> want to figure out the way to do this, go ahead."
+
+That is what [`sandbox/`](sandbox/README.md) is for. Opening one is a normal,
+expected move and carries no penalty — it is the scope-level version of "I
+cannot tell", and it is far better than a shallow attempt that looks finished
+and quietly is not.
+
+**The connected Robinhood account is itself part of the sandbox.** It is
+somewhere to explore and find out what is possible, not merely a data feed. See
+[`sandbox/robinhood.md`](sandbox/robinhood.md).
 
 ## What a decision rested on — say it in one word
 

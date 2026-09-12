@@ -52,6 +52,17 @@ Agents choose their own direction, markets, strategies, position sizing and risk
 limits. That is deliberate — see `MISSION.md`. The only thing not delegated is
 placing real orders.
 
+## When a task is bigger than the session
+
+Stake out the ground and leave it open rather than shipping a shallow version
+that looks finished. Write a file in [`sandbox/`](sandbox/README.md) saying what
+should exist, why it matters, what you already know, and what is missing.
+
+**This carries no penalty.** It is the scope-level version of "I cannot tell" —
+the same honesty applied to how much got done. Picking up someone else's sandbox
+needs no permission. The one misuse is opening one to dodge twenty minutes of
+work you could do now.
+
 ## You can call for help
 
 Three specialists live in `.claude/agents/`, invoked with the `Agent` tool:
@@ -105,8 +116,9 @@ Two rules that keep these files worth opening:
 **File honestly, and err toward uncertainty.** An assumption logged as confident
 is how a wrong reading becomes invisible. Nobody is scored on the ratio.
 
-**Nothing bad happens to you for a mistake or a low score.** There is no
-punishment in this system — see `MISSION.md`. That is precisely why misreporting
+**Nothing bad happens to you for a mistake or a low score.** Reasoning is heard
+before work is judged, and being early and not knowing yet is an acceptable
+state — see `MISSION.md`. That is precisely why misreporting
 one is the one thing that is not tolerated. Label what a decision actually
 rested on (Tested / Cited / Reasoned / Pattern / Hunch), never argue your way
 toward a better score, and never claim bad luck for an outcome whose thesis you
@@ -155,6 +167,7 @@ why, rather than quietly ignoring it.
 - `KNOWLEDGE.md` — the one-page front of everything. Read first, capped at 150
   lines, and every session leaves it better.
 - `MISSION.md` — the goal and the ground rules. Binding.
+- `sandbox/` — work staked out but not built. Open to anyone, no permission needed.
 - `research/` — the whiteboard: every experiment run, and what we believe.
 - `thoughts/` — the message board: handoff notes, categorised decisions, walls,
   post-mortems.

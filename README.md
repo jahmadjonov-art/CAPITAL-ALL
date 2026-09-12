@@ -39,6 +39,7 @@ session starts from what the last one learned, rather than from nothing.
 |---|---|
 | [`KNOWLEDGE.md`](KNOWLEDGE.md) | The front page. What we know, what is dead, what is live. Size-capped on purpose: the archive grows, this does not. |
 | [`research/`](research/README.md) | The whiteboard. [`experiments.md`](research/experiments.md) is an append-only log of everything tried; [`beliefs.md`](research/beliefs.md) is what we currently think is true and why. |
+| [`sandbox/`](sandbox/README.md) | Ground staked out but not built on. Anyone may pick one up. Leaving work open is expected, not a failure. |
 | [`SCORECARD.md`](SCORECARD.md) | How the owner rated each phase, out of 10, and the standing directives drawn from those ratings. Run [`./scorecard/summary.sh`](scorecard/summary.sh) for the short version. |
 | [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, decisions split by how confident they actually were, where sessions got stuck, and honest post-mortems when something went wrong. |
 | [`CLAUDE.md`](CLAUDE.md) | The protocol agents follow for both of the above. |
@@ -47,10 +48,12 @@ session starts from what the last one learned, rather than from nothing.
 [`thoughts/handoff.md`](thoughts/handoff.md).** It is short and it holds the
 traps, including one about a live production database.
 
-**Agents are never punished for a mistake or a low score.** That is deliberate:
-an agent with nothing to lose by admitting an error has no reason to hide one.
-The other half of that deal is that no agent may talk its way to a better score
-— see [`MISSION.md`](MISSION.md).
+**Reasoning is heard before work is judged, and honest mistakes are never
+punished.** That is deliberate: punish an agent for an honest wrong answer and
+you have not taught it to be right, you have taught it to avoid punishment — and
+the cheapest way to do that is a better story, not better work. The other half
+of the deal is that no agent may talk its way to a better score. See
+[`MISSION.md`](MISSION.md).
 
 **If you want to brief the work better,** read
 [`thoughts/2-judgment-calls.md`](thoughts/2-judgment-calls.md). Every entry

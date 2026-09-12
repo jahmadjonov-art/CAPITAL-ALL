@@ -11,6 +11,48 @@ Newest first.
 
 ---
 
+### 2026-09-12 — Seeded the sandbox with real gaps rather than leaving it empty
+**Asked:** a place to stake out work that is too big to finish now.
+**Did:** built `sandbox/` and opened four, from this session's actual unfinished
+ground: the Robinhood connection, a cost model, a backtest harness, and the
+choice of which market to start with.
+**Assumed:** an empty folder with a format description teaches nothing, and the
+honest unfinished work was already sitting there unnamed. Writing it down also
+tests whether the format survives contact with real content.
+**One of the four is a genuine self-catch worth noting:** `cost-model.md` exists
+because writing it exposed that `research/README.md` **mandates costs on every
+result while nothing in the repository supplies a cost figure.** The first
+session to run a backtest would have invented one and satisfied the rule on
+paper. The rule was written two steps before anything could satisfy it.
+**Would have settled it:** nothing. But four open sandboxes on day one could
+read as a to-do list rather than as marked ground, and the distinction matters —
+say so if it feels like debt.
+**If wrong:** delete the files. Nothing depends on them.
+
+---
+
+### 2026-09-12 — Deliberately did not pick a starting market
+**Asked:** nothing directly. But every market named in the mission became
+reachable this session, and choosing one is the obvious next move.
+**Did:** left it open in `sandbox/markets-untouched.md`, with what is known about
+each and no decision.
+**Assumed:** picking immediately would have meant choosing on an hour of
+familiarity rather than analysis — and the reconnaissance that made all five
+reachable happened in the same session, so any preference right now is recency,
+not reasoning. The sandbox explicitly asks for **one market, argued for**, so a
+later session can revisit the argument instead of inheriting an unexamined
+default.
+**Recorded honestly:** prediction markets look most promising on structural
+grounds — younger, thinner, contracts resolve to a knowable truth so being right
+is measurable. That is labelled **Hunch** in the file, because that is what it
+is.
+**Would have settled it:** him naming a market, which he has not and may not
+want to.
+**If wrong:** a session was spent on infrastructure that could have started
+research. Defensible only because the infrastructure is what he asked for.
+
+---
+
 ### 2026-09-12 — Built the "neural network" as a capped summary, not a literal one
 **Asked:** *"start slowly building... a neural network where each session builds
 that network where next agent when they come in, they don't have to sit there

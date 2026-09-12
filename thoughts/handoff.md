@@ -137,7 +137,7 @@ Confirmed working, free, no API key, no account:
 | Source | Endpoint | Gives you |
 |---|---|---|
 | **Yahoo Finance** | `https://query1.finance.yahoo.com/v8/finance/chart/<SYM>?range=1mo&interval=1d` | OHLCV for equities, ETFs, indexes **and futures** |
-| **Kalshi** | `https://api.elections.kalshi.com/trade-api/v2/markets?status=open` | Prediction markets — tickers, order book, volume. Public data needs no auth. |
+| **Kalshi** | `https://api.elections.kalshi.com/trade-api/v2/markets?status=open` | Prediction markets — tickers, order book, volume. Public data needs no auth (re-confirmed 2026-09-12). |
 | **CoinGecko** | `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd` | Crypto spot |
 
 **Yahoo covers futures**, which Robinhood does not: `GC=F` returned COMEX gold
@@ -295,3 +295,43 @@ never drift from the record.
   desk with no dashboard change. Plots come from `sandbox/*.md` the same way.
 - Unknown figures render as "not yet known", never as zero-looking placeholders.
   Keep it that way: a dashboard that invents a number is worse than no dashboard.
+
+---
+
+## Kalshi, in operational detail
+
+Established 2026-09-12. Economics are in `B-003`; this is the mechanics.
+
+- **Read the whole documentation in one fetch:** `https://docs.kalshi.com/llms-full.txt`
+  is a single ~550KB markdown dump. Far easier than the JS-rendered site.
+- **Public endpoints need no auth** — markets, orderbook, trades, events, series,
+  exchange status. `/portfolio/*` returns 401 without credentials.
+- **A demo environment exists:** `https://demo-api.kalshi.co/trade-api/v2`. This
+  is how to test order behaviour without money, and it is the cheap way to
+  settle the open maker-fee question in `B-003`.
+- **Auth is RSA-PSS**, three headers, key self-generated in the web UI. **Sign
+  the path without query parameters** — documented gotcha that will waste an
+  afternoon.
+- **Rate limits apply to authenticated requests only.** Basic tier is 20 reads
+  and 10 writes per second. A 429 carries **no `Retry-After` header**, so back
+  off on your own schedule.
+- **Contracts are fractional** down to 0.01, and not every market is on a 1-cent
+  grid — eleven price structures exist, with ticks down to $0.0001. Read
+  `price_ranges` per market rather than assuming. Every liquid market sampled
+  was still 1-cent.
+
+### Two traps
+
+**API keys carry a location attestation that expires.** `GET /api_keys` returns
+`api_key_region_expiration_ts`; once it passes, the key silently stops working
+for Sports, Elections and Entertainment markets. An automated system will just
+stop trading those categories without an obvious error.
+
+**The legal position is unsettled and the circuits split in 2026.** The Third
+Circuit ruled for Kalshi in April; the **Ninth ruled against in August**,
+holding the Commodity Exchange Act does not preempt state gaming law for
+sports-related contracts. Massachusetts and Washington have moved against sports
+and politics contracts. **Sports markets are both the most liquid on the venue
+and the most legally exposed** — a strategy built on them risks the category
+disappearing mid-experiment. Economic, weather and financial-data markets look
+more durable.

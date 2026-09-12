@@ -22,7 +22,21 @@ the most reliable ways to manufacture an edge that does not exist.
 
 ## What is already known
 
-Nothing measured. Only the shape of the problem:
+**Kalshi is now priced properly — see `B-003`.** Taker fee is
+`ceil(0.07 x contracts x P x (1-P))` per side, so 3.5c round trip at a 50c
+contract against a 1c spread. Settlement is free, so holding to resolution costs
+one fee rather than two. Maker fees appear to be zero on 1,287 of 1,329 open
+series (untested — the demo environment settles it). Caveat: the 0.07 constant
+is from the 2022 CFTC filing, not the current July 2026 schedule, which is
+behind a bot checkpoint.
+
+**Equities: the quote feed cannot price a spread after hours** (`B-002`). Use
+`review_equity_order`'s `market_data_disclosure`, which was verified accurate to
+the cent. That tool simulates without placing, so it is the safe way to measure
+real spreads — and during regular hours it is the obvious instrument for
+building this model.
+
+Still unmeasured, and the shape of what remains:
 
 - **Equities** — commission-free at this broker, but payment-for-order-flow
   execution means the real cost is spread and price improvement, not fees.
@@ -33,7 +47,12 @@ Nothing measured. Only the shape of the problem:
 - **Futures (Yahoo data)** — not tradable through this connection at all, so any
   futures backtest needs a cost assumption from a venue we do not have. Say so
   rather than borrowing the equity number.
-- **Prediction markets (Kalshi)** — its own fee schedule, published.
+- **Prediction markets (Kalshi)** — **done, see above.** Note that Robinhood's
+  own event contracts are *not* Kalshi contracts: Robinhood Derivatives routes
+  to three exchanges and adds its own commission, `k x p x (1-p) x c` with
+  k = 5% on Gold or 10% without, capped at 1c per contract, plus a
+  pass-through of up to another 1c. Cheaper than Kalshi near 50c, dearer at the
+  extremes. Do not treat the two venues as interchangeable.
 
 ## What is missing
 

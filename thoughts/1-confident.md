@@ -8,6 +8,25 @@ files a baseline to contrast against, not because each one is interesting.
 
 ---
 
+### 2026-09-12 — Sent both findings to specialists before recording either
+**Asked:** run a research session.
+**Did:** audited the funded account, then handed the two claims that came out of
+it to a `skeptic` and a `scout` rather than writing them down.
+**If wrong:** nothing — verification is cheap and both came back changed.
+
+Both returned corrections. The skeptic wounded a data-quality claim that was
+over-broad in exactly the way that would have cost a future session a working
+data source. The scout undermined a hunch this repository had already written
+down about prediction markets, then **corrected its own report unprompted** when
+its series survey turned out to have undercounted — in a direction that weakened
+its own headline finding.
+
+Recording this in the confident file because the decision was not a close call:
+the rule says call the skeptic before believing anything, and the rule paid for
+itself twice in the first session.
+
+---
+
 ### 2026-09-12 — Inventory the repository before changing anything
 **Asked:** look at what is in the repo so nothing gets deleted by accident.
 **Did:** read every tracked file (29 of them), then reported the app's purpose,

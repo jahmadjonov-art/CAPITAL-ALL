@@ -278,7 +278,7 @@ const D = {
   ],
   "counts": {
     "experiments": 0,
-    "beliefs": 2,
+    "beliefs": 3,
     "walls": 0,
     "postmortems": 1,
     "unknowns": 2
@@ -290,22 +290,22 @@ const D = {
   },
   "whiteboard": {
     "known": [
-      "**The account is $100, cash, options level 2 \u2014 which closes options to us",
-      "**Never compute a spread from `get_equity_quotes` after hours** \u2014 it was 487\u00d7",
-      "**Subagents cannot reach the `mcp__Robinhood__*` tools.** Only the lead",
-      "**Only one of the four brokerage accounts is reachable by an agent** \u2014"
+      "**$100, cash account, options level 2 \u2014 options are closed to us.** A contract",
+      "**Kalshi: fees are ~3.5\u00d7 the spread, so active taking is dead at $100.** A",
+      "**Never price a spread from `get_equity_quotes` after hours** \u2014 487\u00d7 wrong on",
+      "**Only one brokerage account is agent-reachable** (`\u2022\u2022\u2022\u20226622`); the owner's"
     ],
     "known_empty": false,
     "dead": [
       "Nothing yet."
     ],
     "dead_empty": true,
-    "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **First concrete task for the next session:** the regular-hours quote test in `B-002`. One paired call around 10:00 ET settles whether the quote feed is broken generally or only after hours."
+    "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **Two concrete tasks are queued, both cheap and both decisive:** 1. **The Kalshi maker-fee test** (`B-003`) \u2014 do resting orders on plain `quadratic` series really cost nothing? The demo environment settles it without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place fee-free and liquid overlap. 2. **The regular-hours quote test** (`B-002`) \u2014 one paired call around 10:00 ET says whether the quote feed is broken generally or only after hours."
   },
   "build": {
-    "at": "12 Sep 2026, 10:40",
-    "commit": "6e9df29",
-    "commits": "16",
+    "at": "12 Sep 2026, 10:55",
+    "commit": "ebd2723",
+    "commits": "17",
     "branch": "claude/greeting-jk8c0j"
   }
 };

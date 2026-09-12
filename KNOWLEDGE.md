@@ -15,22 +15,23 @@ Full charter in [`MISSION.md`](MISSION.md).
 Claims that have earned a place here. Each is one line, carries its evidence
 tier, and names the experiments behind it so the detail can be pulled on demand.
 
-- **The account is $100, cash, options level 2 — which closes options to us
-  entirely.** A contract covers 100 shares, so cash-secured puts and covered
-  calls both cap out at a $1.00 underlying, and a long call buys one binary bet
-  dominated by its own spread. Equities (fractional shares work) and crypto are
-  what remain. Cash settlement is T+1, so plan on about one round trip per
-  dollar per day. — `B-001`, Tested + Reasoned
-- **Never compute a spread from `get_equity_quotes` after hours** — it was 487×
-  wrong on SPY, and the symbols that looked tight were the most misleading.
-  Use `review_equity_order`'s disclosure string, verified accurate to the cent.
-  Untested during regular hours; that test is the obvious next move. — `B-002`
-- **Subagents cannot reach the `mcp__Robinhood__*` tools.** Only the lead
-  session can. Fetch broker data yourself and paste it into a specialist's
-  brief. — measured 2026-09-12
-- **Only one of the four brokerage accounts is reachable by an agent** —
-  `••••6622`, nicknamed "Agentic". The owner's default account is closed to us
-  by the broker itself, not merely by our own rule. — measured 2026-09-12
+- **$100, cash account, options level 2 — options are closed to us.** A contract
+  covers 100 shares, capping puts and covered calls at a $1 underlying. Equities
+  (fractional works) and crypto remain; T+1 settlement allows ~one round trip
+  per dollar per day. — `B-001`
+- **Kalshi: fees are ~3.5× the spread, so active taking is dead at $100.** A
+  round trip near 50¢ costs 7% of the account. The fee-free series and the
+  liquid series are **mostly different series** — the cheap route is the thin
+  one. **The one overlap worth a look: Kalshi's crypto markets are fee-free type
+  *and* had real volume at 1–2¢.** Fee multipliers are per-market; never
+  hard-code them. — `B-003`
+- **Never price a spread from `get_equity_quotes` after hours** — 487× wrong on
+  SPY, and the symbols that looked tight were the most misleading. Use
+  `review_equity_order`'s disclosure. Untested in regular hours. — `B-002`
+- **Only one brokerage account is agent-reachable** (`••••6622`); the owner's
+  default is closed by the broker itself. **Subagents cannot reach the Robinhood
+  tools at all** — the lead must fetch broker data and paste it into their brief.
+  — measured 2026-09-12
 
 ## What is dead
 
@@ -49,9 +50,13 @@ The question currently being worked, and by whom.
 > (`B-002`). **Which market to start in is still open.** A `scout` is checking
 > whether Kalshi is economically viable at $100 — that answer decides it.
 >
-> **First concrete task for the next session:** the regular-hours quote test in
-> `B-002`. One paired call around 10:00 ET settles whether the quote feed is
-> broken generally or only after hours.
+> **Two concrete tasks are queued, both cheap and both decisive:**
+> 1. **The Kalshi maker-fee test** (`B-003`) — do resting orders on plain
+>    `quadratic` series really cost nothing? The demo environment settles it
+>    without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place
+>    fee-free and liquid overlap.
+> 2. **The regular-hours quote test** (`B-002`) — one paired call around 10:00 ET
+>    says whether the quote feed is broken generally or only after hours.
 
 ## Open ground
 
@@ -60,11 +65,11 @@ Staked out, not built. Pick any up without asking — see
 
 - [`robinhood.md`](sandbox/robinhood.md) — what the connection can actually do.
   Nothing has been called; every answer is one tool call away.
-- [`cost-model.md`](sandbox/cost-model.md) — real trading costs. **The costs rule
-  is unenforceable until this exists.**
+- [`cost-model.md`](sandbox/cost-model.md) — Kalshi now priced (`B-003`);
+  equities still need a regular-hours measurement.
 - [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
-- [`markets-untouched.md`](sandbox/markets-untouched.md) — which market to start
-  with, argued for rather than defaulted into.
+- [`markets-untouched.md`](sandbox/markets-untouched.md) — still unchosen. The
+  prediction-market hunch was undermined, not killed.
 
 ## Where the detail lives
 

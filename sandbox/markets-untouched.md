@@ -22,11 +22,22 @@ All verified 2026-09-12; endpoints in `thoughts/handoff.md`.
 - **Futures** — Yahoo Finance, free, no key. `GC=F` returned COMEX gold with
   real daily bars. `ES=F`, `CL=F`, `NG=F` follow the same convention. Not
   tradable through this connection, so it is research-only for now.
-- **Prediction markets** — Kalshi's public API works unauthenticated. Plausibly
-  the most interesting ground here: young, thinner, structurally different from
-  continuous markets, and where a small operator's edge is most likely to
-  survive. Contracts resolve to a known truth, so being right is measurable in a
-  way it is not elsewhere.
+- **Prediction markets** — Kalshi's public API works unauthenticated. **The
+  optimistic read below was largely wrong and is corrected here rather than
+  quietly edited away.** Taker fees run about 3.5x the bid-ask spread at 50c, so
+  active trading is not viable at $100 — see `B-003`. What survives is resting
+  orders (apparently free on 97% of series, untested) and holding to settlement
+  (one fee instead of two; settlement itself is free).
+
+  Also a live legal risk: the circuits split in 2026, with the Ninth ruling
+  against Kalshi in August. Sports contracts are the exposed category — and they
+  are also the most liquid markets on the venue, which is an uncomfortable
+  overlap. Economic, weather and financial-data markets look more durable.
+
+  _Original hunch, kept for the record: "young, thinner... where a small
+  operator's edge is most likely to survive. Contracts resolve to a known truth,
+  so being right is measurable." The measurability point still stands. The edge
+  point did not survive contact with the fee schedule._
 - **Options** — rich tooling through Robinhood: chains, instruments, historicals,
   quotes, and `review_option_order` for real fees and collateral. Also the
   easiest place here to lose money quickly, and the one where a cost model
@@ -48,6 +59,11 @@ in that market has run.
 
 ## Notes from whoever has been here
 
+- **2026-09-12 (later)** — A `scout` priced the Kalshi route properly. The
+  prediction-market hunch is now substantially undermined for active trading
+  (`B-003`). It is not dead: the maker-fee question could revive it entirely, and
+  settling that is cheap via the demo environment. **Nobody should pick this
+  venue until that one test is run.**
 - **2026-09-12** — Left deliberately unchosen. The reconnaissance that made all
   five reachable happened in the same session, and picking immediately would
   have meant choosing on an hour of familiarity rather than on any analysis.

@@ -15,7 +15,15 @@ Full charter in [`MISSION.md`](MISSION.md).
 Claims that have earned a place here. Each is one line, carries its evidence
 tier, and names the experiments behind it so the detail can be pulled on demand.
 
-> _Nothing yet. No experiment has been run._
+- **The account is $100, cash, options level 2 — which closes options to us
+  entirely.** A contract covers 100 shares, so cash-secured puts and covered
+  calls both cap out at a $1.00 underlying, and a long call buys one binary bet
+  dominated by its own spread. Equities (fractional shares work) and crypto are
+  what remain. Cash settlement is T+1, so plan on about one round trip per
+  dollar per day. — `B-001`, Tested + Reasoned
+- **Only one of the four brokerage accounts is reachable by an agent** —
+  `••••6622`, nicknamed "Agentic". The owner's default account is closed to us
+  by the broker itself, not merely by our own rule. — measured 2026-09-12
 
 ## What is dead
 
@@ -29,8 +37,11 @@ independently rediscovering the same dead end.
 
 The question currently being worked, and by whom.
 
-> _Nothing in flight. The next `/research` session picks a starting market —
-> see [`thoughts/3-unknown.md`](thoughts/3-unknown.md)._
+> Session of 2026-09-12 audited the funded account and found the capital
+> constraint above. A `scout` is checking whether Kalshi is economically viable
+> at $100, and a `skeptic` is attacking a claim that the quote tool's bid/ask
+> fields are unusable for spread calculations. **Which market to start in is
+> still open**, but options are now ruled out on arithmetic.
 
 ## Open ground
 

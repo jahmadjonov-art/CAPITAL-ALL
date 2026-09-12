@@ -204,10 +204,11 @@ footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--rule);
 <script>
 const D = {
   "book": {
-    "capital": 0.0,
-    "realised": null,
-    "open_positions": null,
-    "note": "Brokerage account connected and deliberately unfunded. No order has ever been placed. Balances read as zero because they are zero, not because nothing was fetched.",
+    "capital": 100.0,
+    "realised": 0.0,
+    "open_positions": 0,
+    "account": "\u2022\u2022\u2022\u20226622 \u00b7 cash \u00b7 options level 2",
+    "note": "Account funded with $100.00 and verified 12 Sep 2026 \u2014 cash, not margin, with level-2 options approval. No order has ever been placed, so realised P&L is genuinely zero rather than unchecked. An option contract covers 100 shares, which puts every options strategy out of reach at this size: see B-001.",
     "verified": "2026-09-12"
   },
   "mandate": "Make money in tradable markets \u2014 futures, equities, options, prediction markets.",
@@ -277,7 +278,7 @@ const D = {
   ],
   "counts": {
     "experiments": 0,
-    "beliefs": 0,
+    "beliefs": 1,
     "walls": 0,
     "postmortems": 0,
     "unknowns": 2
@@ -289,19 +290,20 @@ const D = {
   },
   "whiteboard": {
     "known": [
-      "Nothing yet. No experiment has been run."
+      "**The account is $100, cash, options level 2 \u2014 which closes options to us",
+      "**Only one of the four brokerage accounts is reachable by an agent** \u2014"
     ],
-    "known_empty": true,
+    "known_empty": false,
     "dead": [
       "Nothing yet."
     ],
     "dead_empty": true,
-    "live": "Nothing in flight. The next `/research` session picks a starting market \u2014 see [`thoughts/3-unknown.md`](thoughts/3-unknown.md)."
+    "live": "Session of 2026-09-12 audited the funded account and found the capital constraint above. A `scout` is checking whether Kalshi is economically viable at $100, and a `skeptic` is attacking a claim that the quote tool's bid/ask fields are unusable for spread calculations. **Which market to start in is still open**, but options are now ruled out on arithmetic."
   },
   "build": {
-    "at": "12 Sep 2026, 10:28",
-    "commit": "7d55ba4",
-    "commits": "14",
+    "at": "12 Sep 2026, 10:35",
+    "commit": "53e4554",
+    "commits": "15",
     "branch": "claude/greeting-jk8c0j"
   }
 };
@@ -319,9 +321,9 @@ $("stamp").innerHTML =
 
 const money = (n) => "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
 const figs = [
-  {k:"Capital deployed", v:money(D.book.capital), sub:"verified " + D.book.verified},
-  {k:"Realised P&L", v:D.book.realised, sub:"no order has been placed", money:true},
-  {k:"Open positions", v:D.book.open_positions, sub:"nothing held", raw:true},
+  {k:"Capital deployed", v:money(D.book.capital), sub:D.book.account || ("verified " + D.book.verified)},
+  {k:"Realised P&L", v:D.book.realised === null ? null : money(D.book.realised), sub:"no order placed yet"},
+  {k:"Open positions", v:D.book.open_positions, sub:"verified empty", raw:true},
   {k:"Experiments run", v:D.counts.experiments, sub:"research/experiments.md", raw:true},
   {k:"Beliefs held", v:D.counts.beliefs, sub:"nothing tested yet", raw:true},
   {k:"Average score", v:D.scores.average, sub:D.scores.count + " scored", raw:true},

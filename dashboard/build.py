@@ -134,13 +134,20 @@ DATA = {
     # The account is real and deliberately unfunded. These are stated as
     # unknown-until-checked rather than filled with plausible figures — see
     # sandbox/robinhood.md, where checking it is the open task.
+    # Measured 2026-09-12 by calling get_accounts / get_portfolio /
+    # get_equity_positions. Where a figure is genuinely zero it is written as
+    # zero; where nobody has checked it stays None and renders as "not yet
+    # known". Never fill this with a plausible number.
     "book": {
-        "capital": 0.0,
-        "realised": None,
-        "open_positions": None,
-        "note": "Brokerage account connected and deliberately unfunded. "
-                "No order has ever been placed. Balances read as zero because "
-                "they are zero, not because nothing was fetched.",
+        "capital": 100.00,
+        "realised": 0.00,
+        "open_positions": 0,
+        "account": "••••6622 · cash · options level 2",
+        "note": "Account funded with $100.00 and verified 12 Sep 2026 — cash, "
+                "not margin, with level-2 options approval. No order has ever "
+                "been placed, so realised P&L is genuinely zero rather than "
+                "unchecked. An option contract covers 100 shares, which puts "
+                "every options strategy out of reach at this size: see B-001.",
         "verified": "2026-09-12",
     },
     "mandate": "Make money in tradable markets — futures, equities, options, "

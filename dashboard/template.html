@@ -217,9 +217,9 @@ $("stamp").innerHTML =
 
 const money = (n) => "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
 const figs = [
-  {k:"Capital deployed", v:money(D.book.capital), sub:"verified " + D.book.verified},
-  {k:"Realised P&L", v:D.book.realised, sub:"no order has been placed", money:true},
-  {k:"Open positions", v:D.book.open_positions, sub:"nothing held", raw:true},
+  {k:"Capital deployed", v:money(D.book.capital), sub:D.book.account || ("verified " + D.book.verified)},
+  {k:"Realised P&L", v:D.book.realised === null ? null : money(D.book.realised), sub:"no order placed yet"},
+  {k:"Open positions", v:D.book.open_positions, sub:"verified empty", raw:true},
   {k:"Experiments run", v:D.counts.experiments, sub:"research/experiments.md", raw:true},
   {k:"Beliefs held", v:D.counts.beliefs, sub:"nothing tested yet", raw:true},
   {k:"Average score", v:D.scores.average, sub:D.scores.count + " scored", raw:true},

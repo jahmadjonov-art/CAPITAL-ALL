@@ -44,11 +44,52 @@ There is also `exercise_option` and the various `cancel_*` tools. This is not a
 sandbox and there is no paper-trading mode in that toolset.
 
 **The account is deliberate.** The owner created and connected it on purpose,
-for exactly this environment — it is not a stray credential anyone forgot about,
-and it should not be treated as one. **As of 2026-09-12 it holds no money**, so
-an order placed today would be rejected for insufficient buying power. That is
-the current state, not a permanent one; re-check rather than assuming it still
-holds.
+for exactly this environment — it is not a stray credential anyone forgot about.
+
+### The account, measured 2026-09-12
+
+Verified by calling `get_accounts` and `get_portfolio`. Re-check rather than
+trusting these numbers indefinitely.
+
+Four accounts exist on this login. **Only one is reachable by an agent:**
+
+| | |
+|---|---|
+| Account | `792646622`, nicknamed **"Agentic"** |
+| Reachable by agents | **Yes** — the only one. The owner's default account returns `agentic_allowed: false` and is beyond reach, by design |
+| Type | **Cash account**, not margin |
+| Options approval | **`option_level_2`** — long calls/puts, covered calls, cash-secured puts. **No spreads** (that needs level 3) |
+| Funded | **$100.00**, all cash, $100.00 buying power |
+| Positions | None. No order has ever been placed |
+
+**Pass `792646622` as `account_number`.** Calls against the other three are
+rejected, which is the correct behaviour and not a bug to work around.
+
+### What $100 in a cash account at level 2 actually permits
+
+This is the binding constraint on every strategy, and it rules more out than it
+allows. An option contract covers 100 shares, so:
+
+- **Cash-secured puts** need `strike × 100` in collateral. At $100 that caps the
+  strike at **$1.00**. There is no worthwhile underlying there.
+- **Covered calls** need 100 shares first. At $100 that caps the share price at
+  **$1.00**. Same problem.
+- **Long calls or puts** need `premium × 100` ≤ $100, so a premium under **$1.00**
+  per share. Possible, but it buys one contract — a single binary bet where the
+  bid-ask spread is the largest cost in the trade.
+
+**So options are, in practice, closed to this account until it is much larger.**
+That is arithmetic from the standard 100-share multiplier, not an opinion.
+
+What remains open: **equities including fractional shares** (dollar-denominated
+market orders work — a $50 SPY review returned no broker alerts), and **crypto**,
+which has its own $100 buying power and trades around the clock.
+
+One more constraint on frequency: a **cash account settles T+1**, so capital
+committed to a trade is unavailable until settlement. Buying again with
+unsettled proceeds causes a good-faith violation. Plan for roughly one round
+trip per dollar per day — strategies needing faster turnover are not available
+here regardless of whether they work.
 
 **The rule for every agent working here: never place, modify, cancel or
 exercise anything without explicit human approval for that specific trade, at

@@ -1,16 +1,19 @@
 # Working in this repository
 
-## Before you start: read the scorecard
+Sessions here do not share memory, so two records are kept in the repo itself:
+what the owner thought of previous work, and what previous agents learned while
+doing it. Both exist to stop the same ground being covered twice.
 
-[`SCORECARD.md`](SCORECARD.md) is a running record of how the owner of this
-repository rated previous phases of work, and what he wanted differently. Read
-it at the start of every session, before planning or writing anything.
+## Start of session — read these
 
-**[Standing Directives](SCORECARD.md#standing-directives) is the part that
-changes what you do.** It is the accumulated preferences distilled from every
-score so far — treat those lines as binding instructions, not background
-reading. The scored entries below them are the evidence for where each one came
-from, and are worth reading when a directive's reasoning isn't obvious.
+1. **[`thoughts/handoff.md`](thoughts/handoff.md)** — durable facts and traps.
+   It is short, and it will save you from at least one expensive mistake.
+2. **[`SCORECARD.md`](SCORECARD.md)** — how previous phases were rated. Its
+   **[Standing Directives](SCORECARD.md#standing-directives)** are binding
+   instructions, not background reading.
+3. **[`thoughts/3-unknown.md`](thoughts/3-unknown.md)** — questions still open.
+   Check whether the task you have just been given answers one; if it does,
+   close that entry out.
 
 For a quick orientation before the full read:
 
@@ -18,36 +21,60 @@ For a quick orientation before the full read:
 ./scorecard/summary.sh
 ```
 
+## During work — log the decisions that mattered
+
+When you make a call the owner or a future agent would want visibility into, add
+an entry to the right file in [`thoughts/`](thoughts/README.md):
+
+- [`1-confident.md`](thoughts/1-confident.md) — the instruction or the code
+  determined the answer.
+- [`2-judgment-calls.md`](thoughts/2-judgment-calls.md) — it was ambiguous, you
+  picked a reading and continued. **Record what would have settled it.**
+- [`3-unknown.md`](thoughts/3-unknown.md) — you had no basis to decide.
+
+Two rules that keep these files worth opening:
+
+**File honestly, and err toward uncertainty.** An assumption logged as confident
+is how a wrong reading becomes invisible. Nobody is scored on the ratio.
+
+**Do not log routine tool use.** A file that records everything gets ignored. If
+deleting the entry would cost nobody anything, do not write it.
+
+Add anything durable — a trap, a live system, a fact that took real work to
+establish — to [`thoughts/handoff.md`](thoughts/handoff.md), and remove entries
+there that have stopped being true.
+
 ## When you are given a score
 
-The owner scores a phase when he has run it and formed an opinion. Scoring is
-his call and happens whenever he feels like it — never solicit a score, never
-score your own work, and never write an entry he did not give you.
+The owner scores a phase when he has run it and formed an opinion. **Never
+solicit a score, never score your own work, never write an entry he did not
+give you.**
 
 When he does give one:
 
-1. Append an entry to the **Log** in `SCORECARD.md`, newest first, using the
-   template at the top of that section.
-2. Record his words about what worked and what missed. Quote him where the
-   phrasing carries the point. Do not soften a low score, do not editorialize,
-   and do not argue with the rating in the record — if you disagree, say so to
-   him in conversation and leave the entry honest.
+1. Append it to the **Log** in `SCORECARD.md`, newest first, using the template
+   in that section.
+2. Record what worked and what missed in his words. Quote where the phrasing
+   carries the point. Do not soften a low score. If you disagree with a rating,
+   say so to him in conversation and leave the written record honest.
 3. If the feedback implies a lasting preference rather than a one-off note, add
-   or revise a line under **Standing Directives**, and cite the phase it came
+   or revise a line under **Standing Directives**, citing the phase it came
    from. A directive that contradicts an older one replaces it — edit the old
    line rather than letting both stand.
-4. Commit the entry on its own, so the record is easy to follow later.
+4. Commit it on its own, so the record is easy to follow later.
 
-## A note on what the scorecard is for
+## The point of all this
 
-Its value is entirely in whether it changes behaviour. A log nobody acts on is
-just bookkeeping. When a directive applies to what you are about to build,
-follow it; when one is genuinely wrong for the task at hand, say so out loud and
-explain why, rather than quietly ignoring it.
+Its value is entirely in whether it changes what gets built. A log nobody acts
+on is bookkeeping with extra steps. When a directive applies, follow it; when
+one is genuinely wrong for the task in front of you, say so out loud and explain
+why, rather than quietly ignoring it.
 
 ## Repository layout
 
-- `SCORECARD.md` — the performance record. Source of truth.
-- `scorecard/summary.sh` — derives statistics from that record on demand.
-- `legacy/` — the previous occupant, a trucking budget PWA. Archived, not in
-  use. Do not modify it or build on it unless explicitly asked.
+- `SCORECARD.md` — the owner's ratings and the directives drawn from them.
+- `scorecard/summary.sh` — derives statistics from that log on demand.
+- `thoughts/` — the message board: handoff notes and categorised decisions.
+- `legacy/` — the previous occupant, a **live** trucking budget PWA. Archived.
+  Do not modify or build on it unless explicitly asked, and read the database
+  warning in `thoughts/handoff.md` before running it.

@@ -224,3 +224,23 @@ button.
 **Write for him accordingly.** Reports at the end of a session should carry no
 jargon, no unexplained statistics and no walls of code. If a number matters, say
 what it means.
+
+---
+
+## The office dashboard
+
+The owner's view of the operation is a floor plan, not the markdown:
+**https://claude.ai/code/artifact/7b709ccd-35aa-4f97-a096-26026bf8573b**
+
+`dashboard/build.py` reads the repository and writes `dashboard/office.html`.
+Every figure on it — desk count, experiments, beliefs, scores, sandbox plots — is
+parsed from the markdown at build time. Nothing is stored twice, so the page can
+never drift from the record.
+
+- **Never hand-edit `office.html`.** It is generated. Edit the source and rebuild.
+- **Republish to the URL above** by passing it as `url` to the `Artifact` tool,
+  or he loses his bookmark to a second copy.
+- Desks are generated from `.claude/agents/*.md`, so adding a specialist adds a
+  desk with no dashboard change. Plots come from `sandbox/*.md` the same way.
+- Unknown figures render as "not yet known", never as zero-looking placeholders.
+  Keep it that way: a dashboard that invents a number is worse than no dashboard.

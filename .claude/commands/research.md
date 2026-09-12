@@ -133,7 +133,17 @@ is usually more trustworthy.
 (defined in `MISSION.md`). Acting on a hunch is allowed and expected. Calling a
 hunch analysis is the one thing that is not.
 
-## 5. Commit and push before you finish
+## 5. Rebuild the office, then commit and push
+
+The owner reads the floor plan, not the markdown. Rebuild it so it shows what
+you just did:
+
+```bash
+python3 dashboard/build.py
+```
+
+Republish `dashboard/office.html` with the `Artifact` tool, passing the existing
+URL from `thoughts/handoff.md` as `url` so his link keeps working.
 
 **The container is wiped when the session ends. Unpushed work is lost.**
 

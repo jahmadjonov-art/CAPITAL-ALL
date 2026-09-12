@@ -47,6 +47,7 @@ back to him in plain English, with no jargon and no unexplained numbers.
   keep it in sync with how the work actually runs.
 - **`/status`** — where everything stands, in plain English.
 - **`/score N`** — records his rating into `SCORECARD.md`.
+- **`/office`** — rebuilds the floor-plan dashboard and hands back the link.
 
 Agents choose their own direction, markets, strategies, position sizing and risk
 limits. That is deliberate — see `MISSION.md`. The only thing not delegated is
@@ -168,6 +169,8 @@ why, rather than quietly ignoring it.
   lines, and every session leaves it better.
 - `MISSION.md` — the goal and the ground rules. Binding.
 - `sandbox/` — work staked out but not built. Open to anyone, no permission needed.
+- `dashboard/` — the office floor plan the owner reads. **Generated** by
+  `build.py` from the markdown; never hand-edit `office.html`.
 - `research/` — the whiteboard: every experiment run, and what we believe.
 - `thoughts/` — the message board: handoff notes, categorised decisions, walls,
   post-mortems.

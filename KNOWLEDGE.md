@@ -70,24 +70,21 @@ The question currently being worked, and by whom.
 Staked out, not built. Pick any up without asking — see
 [`sandbox/`](sandbox/README.md).
 
-- [`robinhood.md`](sandbox/robinhood.md) — what the connection can actually do.
-  Nothing has been called; every answer is one tool call away.
-- [`cost-model.md`](sandbox/cost-model.md) — Kalshi now priced (`B-003`);
-  equities still need a regular-hours measurement.
-- [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
-- [`markets-untouched.md`](sandbox/markets-untouched.md) — still unchosen. The
-  prediction-market hunch was undermined, not killed.
-- [`data-collection.md`](sandbox/data-collection.md) — **nothing records
-  anything yet**, so no question about the past is answerable. Likely a GitHub
-  Actions cron, which needs a merge to `main` first.
-- [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** Prices
-  BTC contracts against a lognormal model; first gaps are too large and unstable
-  to believe. Settlement is misspecified — fix that first.
 - [`strategies/`](strategies/README.md) — **1 source, 10 claims, all untested.**
-  Options-flow gamma levels, with a sandbox and a forward paper record ready.
-  **No longer blocked:** the broker's option quotes carry IV, greeks and open
-  interest per strike, and SPXW has daily expiries. Only the 90-day open-interest
-  history is still missing. Account size is not a filter on strategy study.
+  Options-flow gamma levels, with a sandbox and forward paper record ready.
+  **No longer blocked** — only the 90-day open-interest history is missing.
+- [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** BTC
+  contracts vs a lognormal model; gaps too large and unstable to believe, because
+  settlement is misspecified. Fix that first.
+- [`data-collection.md`](sandbox/data-collection.md) — **nothing records anything
+  yet**, so no question about the past is answerable. Likely a GitHub Actions
+  cron, which needs a merge to `main`.
+- [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
+- [`cost-model.md`](sandbox/cost-model.md) — Kalshi priced; equities still need a
+  regular-hours measurement.
+- [`markets-untouched.md`](sandbox/markets-untouched.md) and
+  [`robinhood.md`](sandbox/robinhood.md) — market choice still unargued; the
+  broker is now well mapped (account, chains, greeks, quote traps).
 
 ## Where the detail lives
 

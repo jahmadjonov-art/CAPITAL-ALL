@@ -169,6 +169,12 @@
       "claim": "Indices move together, so a level hit on SPX is hit on ES, NQ, QQQ and NDX.",
       "kind": "mechanism",
       "status": "untested"
+    },
+    {
+      "claim": "Fading a gamma wall works in a positive-gamma regime and gets run over in a negative-gamma one, so the regime must be read before applying any level rule.",
+      "kind": "mechanism",
+      "status": "untested",
+      "note": "Not from this transcript \u2014 from a reference tool. Recorded because it is a precondition on every level rule above."
     }
   ],
   "calendar": [
@@ -228,6 +234,14 @@
     {
       "term": "Volatility surface",
       "definition": "Three dimensions: implied volatility, strike, time."
+    },
+    {
+      "term": "Net dealer gamma",
+      "definition": "Call gamma exposure minus put gamma exposure. Positive means dealers dampen moves and fading the edges works; negative means they amplify moves and fading gets run over. Not from this transcript \u2014 added from a working tool the owner already had. The transcript describes the negative-gamma snowball without naming the sign."
+    },
+    {
+      "term": "Gamma flip",
+      "definition": "The strike where cumulative net dealer gamma crosses zero \u2014 the boundary between the two regimes. Also not from this transcript; it is what decides whether the level rules here should be applied at all."
     }
   ],
   "philosophy": [

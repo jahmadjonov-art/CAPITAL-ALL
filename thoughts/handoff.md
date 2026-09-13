@@ -564,3 +564,59 @@ Published: **https://claude.ai/code/artifact/f85f0329-ca21-4474-bf1a-e6449c1e902
 The source relies on a **90-day open-interest history**. The broker returns
 current open interest only. That is the real remaining gap and the one an
 options subscription would close.
+
+---
+
+## Dealer gamma: the sign is the whole thing
+
+The owner showed a gamma tool another Claude built for him two months ago, and it
+was ahead of ours on the concept that matters most. Recorded here so nobody
+rebuilds the weaker version.
+
+**Gamma has a sign, and the sign decides the regime.** Summing gamma as a
+positive quantity — which our first surface page did — throws away the finding.
+
+```
+net dealer gamma = call gamma exposure  −  put gamma exposure
+```
+
+The convention assumes dealers are **long calls** (customers sell covered calls
+to them) and **short puts** (customers buy puts as portfolio hedges).
+
+| Regime | Dealer behaviour | What it means for a trade |
+|---|---|---|
+| **Positive gamma** | sells rallies, buys dips | moves are dampened, mean-reverting tape, fading the edges works |
+| **Negative gamma** | buys rallies, sells dips | moves are **amplified**, trend continues, **do not fade** |
+
+Negative gamma is the snowball the options-flow transcript describes. A strategy
+of fading a wall is a positive-gamma strategy and gets run over in a negative-gamma
+tape — so **read the regime before applying any level rule.**
+
+**The gamma flip** is the strike where cumulative net gamma crosses zero: the
+boundary between the two regimes, and the single most actionable number on the
+page. Knowing which side of it spot sits on before the open is worth more than
+any level.
+
+**Other concepts from that tool worth carrying:**
+
+- **Call wall** = max call gamma (resistance). **Put wall** = max put gamma
+  (support). **When they are the same strike it is a pin, not a barrier** —
+  expect price drawn to it and chopping across it rather than reversing cleanly.
+- **Max open interest** is a separate "pin candidate" from the gamma walls.
+- **Cash strikes are not futures points.** That tool converts SPX cash to ES with
+  a ×1.00033 basis. Ours does not convert at all yet — anything quoted in ES or
+  NQ terms must be basis-adjusted or it is simply the wrong level.
+- It surfaces **feed health** ("2 feeds degraded") and **session state**
+  ("weekend — closed"). A dashboard that cannot say its data is stale will
+  eventually mislead someone.
+
+### What ours now computes, and what it does not
+
+`dashboard/surface.py` does net dealer gamma, the regime, both walls, the pin
+warning, and a flip estimate. On the 2026-09-11 SPXW snapshot it read
+**−$54.2M net, NEGATIVE**, with call wall and put wall both at **7,675**.
+
+**The sign agreed with the reference tool; the magnitude is not comparable** —
+six strikes against a full chain, and that tool read −$14.73bn. Our flip landed
+at the edge of the sampled range, which means it was not determined. Sample the
+whole chain before trusting either number.

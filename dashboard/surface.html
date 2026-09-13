@@ -26,6 +26,13 @@ h1,h2{margin:0}
   background:var(--line);border:1px solid var(--line);margin-top:13px;border-radius:3px;overflow:hidden}
 .cell{background:var(--panel);padding:10px 13px}
 .cell .v{font-size:19px;font-weight:700;margin-top:4px}
+.big{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.05;margin-top:8px}
+.pill{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:2px;border:1px solid}
+.pill.neg{color:#FF5757;border-color:#5A1A1A;background:#1C0A0A}
+.pill.pos{color:var(--ok);border-color:#14442C;background:#08170F}
+.warn{background:#1A1207;border:1px solid #3D2B0C;border-radius:3px;padding:11px 13px;
+  color:#E0B968;font-size:12px;margin-top:12px}
 .cell .s{font-size:10.5px;color:var(--faint);margin-top:2px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:13px}
 .card > header{padding:8px 13px;border-bottom:1px solid var(--line);display:flex;
@@ -58,15 +65,24 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-si
     <div class="stamp" id="stamp"></div>
   </header>
 
+  <section class="card" id="regimecard">
+    <header><h2 class="lbl">Dealer gamma exposure</h2><span class="lbl" id="wallflag"></span></header>
+    <div class="b">
+      <div id="regimepill"></div>
+      <div class="big num" id="netgex"></div>
+      <div id="regimetext" style="color:var(--dim);max-width:64ch;margin-top:5px"></div>
+    </div>
+  </section>
+
   <div class="strip" id="strip"></div>
 
   <div class="two">
     <section class="card">
-      <header><h2 class="lbl">Implied volatility by strike — the smile</h2><span class="lbl" id="ivlab"></span></header>
+      <header><h2 class="lbl">Implied volatility — call vs put</h2><span class="lbl" id="ivlab"></span></header>
       <div class="b"><svg id="smile" role="img" aria-label="Implied volatility against strike"></svg></div>
     </section>
     <section class="card">
-      <header><h2 class="lbl">Gamma exposure by strike — the wall</h2><span class="lbl" id="gexlab"></span></header>
+      <header><h2 class="lbl">Gamma by strike — calls up, puts down</h2><span class="lbl" id="gexlab"></span></header>
       <div class="b"><svg id="gex" role="img" aria-label="Gamma exposure against strike"></svg></div>
     </section>
   </div>
@@ -83,145 +99,124 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-si
 
 <script>
 const D = {
-  "built": "13 Sep 2026  21:42",
+  "built": "13 Sep 2026  21:49",
   "snapshot": "spxw-2026-09-11T2015Z.json",
   "captured": "2026-09-11T20:15:00Z",
-  "captured_note": "Friday post-close snapshot, pulled Sunday. Quotes are stale by design of when they were taken \u2014 this proves the fields exist, it is not a live reading.",
+  "captured_note": "Friday post-close snapshot, pulled Sunday. Stale by design of when it was taken \u2014 this proves the fields exist and the method works; it is not a live reading.",
   "underlying": "SPX",
   "chain": "SPXW",
   "expiry": "2026-09-14",
   "spot": 7657.0,
-  "spot_method": "Interpolated from the delta-0.5 crossing between the 7650 call (delta 0.564) and the 7675 call (delta 0.354). Not a quoted index level \u2014 SPX spot was not fetched directly.",
-  "type": "call",
+  "spot_method": "Interpolated from the delta-0.5 crossing between the 7650 call (delta 0.564) and the 7675 call (delta 0.354). Not a quoted index level.",
   "rows": [
     {
       "k": 7575,
-      "iv": 0.168314,
-      "delta": 0.900174,
-      "gamma": 0.002694,
-      "theta": -6.840255,
-      "vega": 0.677502,
-      "oi": 263,
-      "vol": 119,
-      "bid": 85.4,
-      "ask": 86.2,
-      "mark": 85.8,
-      "gex": 41540396.168778,
-      "moneyness": -0.0107091550215489
+      "moneyness": -0.0107091550215489,
+      "call_iv": 0.168314,
+      "put_iv": 0.173292,
+      "call_gamma": 0.002694,
+      "put_gamma": 0.002737,
+      "call_oi": 263,
+      "put_oi": 1392,
+      "call_vol": 119,
+      "put_vol": 3385,
+      "call_gex": 41540396.168778,
+      "put_gex": 223373334.243696,
+      "net_gex": -181832938.074918
     },
     {
       "k": 7600,
-      "iv": 0.154364,
-      "delta": 0.835192,
-      "gamma": 0.004157,
-      "theta": -8.616705,
-      "vega": 0.95879,
-      "oi": 738,
-      "vol": 1016,
-      "bid": 62.7,
-      "ask": 63.2,
-      "mark": 62.95,
-      "gex": 179867906.759034,
-      "moneyness": -0.007444168734491274
+      "moneyness": -0.007444168734491274,
+      "call_iv": 0.154364,
+      "put_iv": 0.15803,
+      "call_gamma": 0.004157,
+      "put_gamma": 0.004151,
+      "call_oi": 738,
+      "put_oi": 2009,
+      "call_vol": 1016,
+      "put_vol": 9218,
+      "call_gex": 179867906.759034,
+      "put_gex": 488933691.054991,
+      "net_gex": -309065784.29595697
     },
     {
       "k": 7650,
-      "iv": 0.127476,
-      "delta": 0.56357,
-      "gamma": 0.007993,
-      "theta": -10.880218,
-      "vega": 1.52244,
-      "oi": 689,
-      "vol": 4082,
-      "bid": 23.6,
-      "ask": 23.9,
-      "mark": 23.75,
-      "gex": 322883854.49087304,
-      "moneyness": -0.000914196160376135
+      "moneyness": -0.000914196160376135,
+      "call_iv": 0.127476,
+      "put_iv": 0.129905,
+      "call_gamma": 0.007993,
+      "put_gamma": 0.007867,
+      "call_oi": 689,
+      "put_oi": 479,
+      "call_vol": 4082,
+      "put_vol": 5352,
+      "call_gex": 322883854.49087304,
+      "put_gex": 220933695.91915703,
+      "net_gex": 101950158.57171601
     },
     {
       "k": 7675,
-      "iv": 0.118225,
-      "delta": 0.353976,
-      "gamma": 0.008138,
-      "theta": -9.41762,
-      "vega": 1.437568,
-      "oi": 1878,
-      "vol": 27202,
-      "bid": 10.8,
-      "ask": 11.0,
-      "mark": 10.9,
-      "gex": 896046540.9294358,
-      "moneyness": 0.00235079012668149
+      "moneyness": 0.00235079012668149,
+      "call_iv": 0.118225,
+      "put_iv": 0.120765,
+      "call_gamma": 0.008138,
+      "put_gamma": 0.008008,
+      "call_oi": 1878,
+      "put_oi": 1298,
+      "call_vol": 27202,
+      "put_vol": 5383,
+      "call_gex": 896046540.929436,
+      "put_gex": 609419085.491216,
+      "net_gex": 286627455.43822
     },
     {
       "k": 7700,
-      "iv": 0.114048,
-      "delta": 0.170195,
-      "gamma": 0.005745,
-      "theta": -6.136551,
-      "vega": 0.978862,
-      "oi": 1626,
-      "vol": 11535,
-      "bid": 3.9,
-      "ask": 4.1,
-      "mark": 4.0,
-      "gex": 547681244.27913,
-      "moneyness": 0.005615776413739004
+      "moneyness": 0.005615776413739004,
+      "call_iv": 0.114048,
+      "put_iv": 0.117611,
+      "call_gamma": 0.005745,
+      "put_gamma": 0.005726,
+      "call_oi": 1626,
+      "put_oi": 1747,
+      "call_vol": 11535,
+      "put_vol": 1899,
+      "call_gex": 547681244.27913,
+      "put_gex": 586491257.6939781,
+      "net_gex": -38810013.41484809
     },
     {
       "k": 7750,
-      "iv": 0.118075,
-      "delta": 0.022399,
-      "gamma": 0.001168,
-      "theta": -1.325179,
-      "vega": 0.205973,
-      "oi": 1765,
-      "vol": 3978,
-      "bid": 0.35,
-      "ask": 0.4,
-      "mark": 0.375,
-      "gex": 120866194.00648,
-      "moneyness": 0.012145748987854255
-    },
-    {
-      "k": 7800,
-      "iv": 0.140238,
-      "delta": 0.004705,
-      "gamma": 0.000253,
-      "theta": -0.402846,
-      "vega": 0.052942,
-      "oi": 2966,
-      "vol": 2859,
-      "bid": 0.05,
-      "ask": 0.1,
-      "mark": 0.075,
-      "gex": 43995571.350302,
-      "moneyness": 0.018675721561969505
-    },
-    {
-      "k": 7850,
-      "iv": 0.152251,
-      "delta": 0.000635,
-      "gamma": 3.8e-05,
-      "theta": -0.070625,
-      "vega": 0.008568,
-      "oi": 819,
-      "vol": 18336,
-      "bid": 0.0,
-      "ask": 0.1,
-      "mark": 0.05,
-      "gex": 1824671.9361780004,
-      "moneyness": 0.025205694136084533
+      "moneyness": 0.012145748987854255,
+      "call_iv": 0.118075,
+      "put_iv": 0.130381,
+      "call_gamma": 0.001168,
+      "put_gamma": 0.001511,
+      "call_oi": 1765,
+      "put_oi": 383,
+      "call_vol": 3978,
+      "put_vol": 160,
+      "call_gex": 120866194.00648,
+      "put_gex": 33929740.061737,
+      "net_gex": 86936453.94474299
     }
   ],
-  "total_gex": 2154706379.9202113,
-  "wall_strike": 7675,
-  "wall_gex": 896046540.9294358,
+  "net_total": -54194667.83104406,
+  "regime": "NEGATIVE",
+  "regime_text": "Dealers amplify moves. Expect trend continuation and a larger realised range. Do not fade.",
+  "call_wall": 7675,
+  "call_wall_gex": 896046540.929436,
+  "put_wall": 7675,
+  "put_wall_gex": 609419085.491216,
+  "walls_coincide": true,
+  "max_oi_strike": 7700,
+  "max_oi": 3373,
+  "flip": 7575,
+  "flip_reliable": false,
+  "convention": "Dealer gamma = call gamma exposure MINUS put gamma exposure. The standard assumption is that dealers are long calls (customers sell covered calls to them) and short puts (customers buy puts as portfolio hedges). Positive net means dealers dampen moves; negative means they amplify them.",
   "floor_strike": 7700,
   "floor_iv": 0.114048,
-  "coverage_note": "Calls only, one expiry, eight strikes. A full surface needs puts as well and several expiries \u2014 that is one more pull, not a different capability.",
-  "greeks_gap_note": "Deep in-the-money strikes (7100-7300) returned null greeks and null implied volatility on the same call. Sparse coverage away from the money is real and must be handled, not assumed away.",
+  "coverage_note": "Six strikes with both sides, one expiry. The reference tool this was compared against reads the whole chain \u2014 magnitudes here are not comparable to it, only the method and the sign.",
+  "greeks_gap_note": "Deep in-the-money strikes returned null greeks. Sparse coverage away from the money is real.",
   "snapshots_available": [
     "spxw-2026-09-11T2015Z.json"
   ]
@@ -230,96 +225,118 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const m$ = n => n>=1e9 ? "$"+(n/1e9).toFixed(2)+"B" : n>=1e6 ? "$"+(n/1e6).toFixed(0)+"M" : "$"+Math.round(n).toLocaleString();
 
-$("sub").textContent = `${D.underlying} · ${D.chain} · expiry ${D.expiry} · ${D.type}s`;
+$("sub").textContent = `${D.underlying} · ${D.chain} · expiry ${D.expiry} · calls and puts`;
 $("stamp").innerHTML = `snapshot ${esc(D.captured)}<br>built ${esc(D.built)}`;
 $("foot").textContent = `Rendered from ${D.snapshot}. Every figure fetched from the broker's option chain — none modelled, none invented.`;
 
+const neg = D.net_total < 0;
+$("regimepill").innerHTML = `<span class="pill ${neg?"neg":"pos"}">${neg?"▼":"▲"} ${D.regime} GAMMA</span>`;
+$("netgex").innerHTML = `<span style="color:${neg?"#FF5757":"var(--ok)"}">${m$(Math.abs(D.net_total)).replace("$", neg?"$-":"$+")}</span>`;
+$("regimetext").innerHTML = `net dealer gamma per 1% move in spot.<br><b style="color:var(--txt)">${esc(D.regime_text)}</b>`;
+$("wallflag").textContent = D.walls_coincide ? "call wall = put wall" : "";
+
 $("strip").innerHTML = [
-  ["Spot (derived)", D.spot.toLocaleString("en-US",{maximumFractionDigits:0}), "from the delta-0.5 crossing"],
-  ["Gamma wall", D.wall_strike.toLocaleString(), m$(D.wall_gex)+" per 1% move", "var(--gex)"],
-  ["Total gamma", m$(D.total_gex), D.rows.length+" strikes sampled"],
-  ["Vol floor", D.floor_strike.toLocaleString(), (D.floor_iv*100).toFixed(2)+"% implied", "var(--iv)"],
-].map(([k,v,s,c])=>`<div class="cell"><div class="lbl">${k}</div>
-  <div class="v num" ${c?`style="color:${c}"`:""}>${v}</div><div class="s">${s}</div></div>`).join("");
+  ["Spot (derived)", D.spot.toLocaleString("en-US",{maximumFractionDigits:0}), "delta-0.5 crossing"],
+  ["Call wall", D.call_wall.toLocaleString(), m$(D.call_wall_gex)+" call gamma", "var(--gex)"],
+  ["Put wall", D.put_wall.toLocaleString(), m$(D.put_wall_gex)+" put gamma", "var(--iv)"],
+  ["Gamma flip", D.flip ? D.flip.toLocaleString() : "n/a",
+   D.flip_reliable ? "regime boundary" : "at the edge of the sample — unreliable", "var(--spot)"],
+  ["Max open interest", D.max_oi_strike.toLocaleString(), D.max_oi.toLocaleString()+" contracts · pin candidate"],
+].map(([k,v,s2,c])=>`<div class="cell"><div class="lbl">${k}</div>
+  <div class="v num" ${c?`style="color:${c}"`:""}>${v}</div><div class="s">${s2}</div></div>`).join("");
+
+if (D.walls_coincide) $("strip").insertAdjacentHTML("afterend",
+  `<div class="warn"><b>Call wall and put wall are the same strike.</b> One strike carrying the
+   largest gamma on both sides behaves as a pin rather than a directional barrier — expect price to
+   be drawn to it and to chop across it, rather than to reverse cleanly off it.</div>`);
 
 const W=560, H=290, PL=54, PR=16, PT=16, PB=34;
 const ks = D.rows.map(r=>r.k);
 const kmin=Math.min(...ks), kmax=Math.max(...ks);
 const x = k => PL + (k-kmin)/(kmax-kmin||1)*(W-PL-PR);
-const axis = (svg, ticks, fmt) => ticks.map(t=>
-  `<text x="${x(t).toFixed(1)}" y="${H-PB+16}" text-anchor="middle" fill="var(--faint)" font-size="9.5"
-    font-family="JetBrains Mono,monospace">${fmt(t)}</text>`).join("");
-const spotLine = `<line x1="${x(D.spot).toFixed(1)}" y1="${PT}" x2="${x(D.spot).toFixed(1)}" y2="${H-PB}"
+const xax = ts => ts.map(t=>`<text x="${x(t).toFixed(1)}" y="${H-PB+16}" text-anchor="middle"
+  fill="var(--faint)" font-size="9.5" font-family="JetBrains Mono,monospace">${t.toLocaleString()}</text>`).join("");
+const spotLine = h => `<line x1="${x(D.spot).toFixed(1)}" y1="${PT}" x2="${x(D.spot).toFixed(1)}" y2="${h}"
   stroke="var(--spot)" stroke-width="1" stroke-dasharray="3 3"/>
   <text x="${x(D.spot).toFixed(1)}" y="${PT-4}" text-anchor="middle" fill="var(--spot)" font-size="9.5"
    font-family="JetBrains Mono,monospace">SPOT ${D.spot.toLocaleString("en-US",{maximumFractionDigits:0})}</text>`;
 
-/* ---- smile ---- */
+/* ---- smile: both sides ---- */
 (function(){
-  const ivs=D.rows.map(r=>r.iv), lo=Math.min(...ivs)*0.96, hi=Math.max(...ivs)*1.04;
+  const all=[...D.rows.map(r=>r.call_iv),...D.rows.map(r=>r.put_iv)];
+  const lo=Math.min(...all)*0.96, hi=Math.max(...all)*1.04;
   const y = v => PT + (1-(v-lo)/(hi-lo))*(H-PT-PB);
-  const pts = D.rows.map(r=>`${x(r.k).toFixed(1)},${y(r.iv).toFixed(1)}`).join(" ");
-  let g = `<rect x="0" y="0" width="${W}" height="${H}" fill="none"/>`;
+  let g="";
   for(let i=0;i<=4;i++){ const v=lo+(hi-lo)*i/4, yy=y(v).toFixed(1);
     g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>
         <text x="${PL-7}" y="${(+yy+3).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9.5"
          font-family="JetBrains Mono,monospace">${(v*100).toFixed(1)}%</text>`; }
-  g += spotLine;
-  g += `<polyline points="${pts}" fill="none" stroke="var(--iv)" stroke-width="2"/>`;
-  D.rows.forEach(r=>{
-    const isFloor = r.k===D.floor_strike;
-    g+=`<circle cx="${x(r.k).toFixed(1)}" cy="${y(r.iv).toFixed(1)}" r="${isFloor?4.5:3}"
-        fill="${isFloor?"var(--spot)":"var(--iv)"}"/>`;
-    if(isFloor) g+=`<text x="${x(r.k).toFixed(1)}" y="${(y(r.iv)+17).toFixed(1)}" text-anchor="middle"
-        fill="var(--spot)" font-size="9.5" font-family="JetBrains Mono,monospace">floor ${(r.iv*100).toFixed(1)}%</text>`;
+  g += spotLine(H-PB);
+  [["call_iv","var(--iv)"],["put_iv","var(--gex)"]].forEach(([f,col])=>{
+    g+=`<polyline points="${D.rows.map(r=>`${x(r.k).toFixed(1)},${y(r[f]).toFixed(1)}`).join(" ")}"
+        fill="none" stroke="${col}" stroke-width="2"/>`;
+    D.rows.forEach(r=>{g+=`<circle cx="${x(r.k).toFixed(1)}" cy="${y(r[f]).toFixed(1)}" r="3" fill="${col}"/>`;});
   });
-  g += axis(null, ks.filter((_,i)=>i%2===0), t=>t.toLocaleString());
+  g+=`<text x="${W-PR}" y="${PT+11}" text-anchor="end" fill="var(--iv)" font-size="10"
+      font-family="JetBrains Mono,monospace">calls</text>
+      <text x="${W-PR}" y="${PT+24}" text-anchor="end" fill="var(--gex)" font-size="10"
+      font-family="JetBrains Mono,monospace">puts</text>`;
+  g += xax(ks);
   $("smile").setAttribute("viewBox",`0 0 ${W} ${H}`); $("smile").innerHTML=g;
-  $("ivlab").textContent = `${(Math.min(...ivs)*100).toFixed(1)}% – ${(Math.max(...ivs)*100).toFixed(1)}%`;
+  $("ivlab").textContent = `${(Math.min(...all)*100).toFixed(1)}% – ${(Math.max(...all)*100).toFixed(1)}%`;
 })();
 
-/* ---- gamma exposure ---- */
+/* ---- gamma: calls above the axis, puts below ---- */
 (function(){
-  const gs=D.rows.map(r=>r.gex), gmax=Math.max(...gs);
-  const y = v => PT + (1-v/(gmax*1.08))*(H-PT-PB);
-  const bw = Math.max(6,(W-PL-PR)/D.rows.length*0.55);
-  let g="";
-  for(let i=0;i<=4;i++){ const v=gmax*1.08*i/4, yy=y(v).toFixed(1);
+  const mx=Math.max(...D.rows.map(r=>Math.max(r.call_gex,r.put_gex)))*1.1;
+  const mid=(PT+(H-PB))/2;
+  const y = v => mid - (v/mx)*((H-PB-PT)/2);
+  const bw=Math.max(6,(W-PL-PR)/D.rows.length*0.4);
+  let g=`<line x1="${PL}" y1="${mid}" x2="${W-PR}" y2="${mid}" stroke="var(--line-2)" stroke-width="1"/>`;
+  [0.5,1].forEach(f=>{ [1,-1].forEach(sgn=>{ const yy=(mid-sgn*f*((H-PB-PT)/2)).toFixed(1);
     g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>
         <text x="${PL-7}" y="${(+yy+3).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9.5"
-         font-family="JetBrains Mono,monospace">${v>=1e9?(v/1e9).toFixed(1)+"B":(v/1e6).toFixed(0)+"M"}</text>`; }
-  g += spotLine;
+         font-family="JetBrains Mono,monospace">${(mx*f/1e6).toFixed(0)}M</text>`; }); });
+  g += spotLine(H-PB);
   D.rows.forEach(r=>{
-    const isWall = r.k===D.wall_strike;
-    const yy=y(r.gex), h=Math.max(1,(H-PB)-yy);
-    g+=`<rect x="${(x(r.k)-bw/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}"
-        fill="var(--gex)" opacity="${isWall?"1":"0.45"}"/>`;
-    if(isWall) g+=`<text x="${x(r.k).toFixed(1)}" y="${(yy-6).toFixed(1)}" text-anchor="middle"
-        fill="var(--gex)" font-size="10" font-weight="700" font-family="JetBrains Mono,monospace">WALL</text>`;
+    const isCW=r.k===D.call_wall, isPW=r.k===D.put_wall;
+    const ytc=y(r.call_gex);
+    g+=`<rect x="${(x(r.k)-bw).toFixed(1)}" y="${ytc.toFixed(1)}" width="${bw.toFixed(1)}"
+        height="${(mid-ytc).toFixed(1)}" fill="var(--gex)" opacity="${isCW?1:.45}"/>`;
+    const hp=(mid-y(r.put_gex));
+    g+=`<rect x="${x(r.k).toFixed(1)}" y="${mid}" width="${bw.toFixed(1)}"
+        height="${hp.toFixed(1)}" fill="var(--iv)" opacity="${isPW?1:.45}"/>`;
+    if(isCW) g+=`<text x="${(x(r.k)-bw/2).toFixed(1)}" y="${(ytc-5).toFixed(1)}" text-anchor="middle"
+        fill="var(--gex)" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">CALL WALL</text>`;
+    if(isPW) g+=`<text x="${(x(r.k)+bw/2).toFixed(1)}" y="${(mid+hp+12).toFixed(1)}" text-anchor="middle"
+        fill="var(--iv)" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">PUT WALL</text>`;
   });
-  g += axis(null, ks.filter((_,i)=>i%2===0), t=>t.toLocaleString());
+  if(D.flip) g+=`<line x1="${x(D.flip).toFixed(1)}" y1="${PT}" x2="${x(D.flip).toFixed(1)}" y2="${H-PB}"
+      stroke="var(--spot)" stroke-width="1.5"/>`;
+  g += xax(ks);
   $("gex").setAttribute("viewBox",`0 0 ${W} ${H}`); $("gex").innerHTML=g;
-  $("gexlab").textContent = `peak ${m$(D.wall_gex)} at ${D.wall_strike.toLocaleString()}`;
+  $("gexlab").textContent = `net ${D.net_total<0?"-":"+"}${m$(Math.abs(D.net_total)).slice(1)}`;
 })();
 
 /* ---- table ---- */
 $("nlab").textContent = D.rows.length + " strikes";
-$("tbl").innerHTML = `<thead><tr><th>Strike</th><th>Moneyness</th><th>Implied vol</th><th>Delta</th>
-  <th>Gamma</th><th>Open int</th><th>Volume</th><th>Gamma $ / 1%</th></tr></thead><tbody>` +
-  D.rows.map(r=>`<tr class="${r.k===D.wall_strike?"wall":""}">
+$("tbl").innerHTML = `<thead><tr><th>Strike</th><th>Call IV</th><th>Put IV</th><th>Call OI</th>
+  <th>Put OI</th><th>Call gamma $</th><th>Put gamma $</th><th>Net $ / 1%</th></tr></thead><tbody>` +
+  D.rows.map(r=>`<tr class="${(r.k===D.call_wall||r.k===D.put_wall)?"wall":""}">
     <td class="num"><b>${r.k.toLocaleString()}</b></td>
-    <td class="num">${(r.moneyness*100).toFixed(2)}%</td>
-    <td class="num" style="color:var(--iv)">${(r.iv*100).toFixed(2)}%</td>
-    <td class="num">${r.delta.toFixed(3)}</td>
-    <td class="num">${r.gamma.toFixed(6)}</td>
-    <td class="num">${r.oi.toLocaleString()}</td>
-    <td class="num">${r.vol.toLocaleString()}</td>
-    <td class="num" style="color:var(--gex)">${m$(r.gex)}</td></tr>`).join("") + "</tbody>";
+    <td class="num" style="color:var(--iv)">${(r.call_iv*100).toFixed(2)}%</td>
+    <td class="num" style="color:var(--gex)">${(r.put_iv*100).toFixed(2)}%</td>
+    <td class="num">${r.call_oi.toLocaleString()}</td>
+    <td class="num">${r.put_oi.toLocaleString()}</td>
+    <td class="num" style="color:var(--gex)">${m$(r.call_gex)}</td>
+    <td class="num" style="color:var(--iv)">${m$(r.put_gex)}</td>
+    <td class="num" style="color:${r.net_gex<0?"#FF5757":"var(--ok)"}">${r.net_gex<0?"-":"+"}${m$(Math.abs(r.net_gex)).slice(1)}</td>
+    </tr>`).join("") + "</tbody>";
 
 $("honesty").innerHTML =
   `<b>What this is, and what it is not.</b> ${esc(D.captured_note)} ${esc(D.spot_method)}
    <br><br><b>Coverage:</b> ${esc(D.coverage_note)} ${esc(D.greeks_gap_note)}
-   <br><br><b>A true three-dimensional surface needs several expiries.</b> This is one slice through it —
-   implied volatility against strike at a single expiry, which is the skew the source describes. Adding
-   expiries is one more pull from the same endpoint, not a different capability.`;
+   <br><br><b>Sign convention:</b> ${esc(D.convention)}
+   <br><br><b>A true three-dimensional surface needs several expiries.</b> This is one slice through it.
+   Adding expiries is one more pull from the same endpoint, not a different capability.`;
 </script>

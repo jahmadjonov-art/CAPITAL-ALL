@@ -94,7 +94,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
 
 <script>
 const D = {
-  "built": "13 Sep 2026  20:00",
+  "built": "13 Sep 2026  21:50",
   "strategies": [
     {
       "id": "options-flow-gamma",
@@ -267,6 +267,12 @@ const D = {
           "claim": "Indices move together, so a level hit on SPX is hit on ES, NQ, QQQ and NDX.",
           "kind": "mechanism",
           "status": "untested"
+        },
+        {
+          "claim": "Fading a gamma wall works in a positive-gamma regime and gets run over in a negative-gamma one, so the regime must be read before applying any level rule.",
+          "kind": "mechanism",
+          "status": "untested",
+          "note": "Not from this transcript \u2014 from a reference tool. Recorded because it is a precondition on every level rule above."
         }
       ],
       "calendar": [
@@ -326,6 +332,14 @@ const D = {
         {
           "term": "Volatility surface",
           "definition": "Three dimensions: implied volatility, strike, time."
+        },
+        {
+          "term": "Net dealer gamma",
+          "definition": "Call gamma exposure minus put gamma exposure. Positive means dealers dampen moves and fading the edges works; negative means they amplify moves and fading gets run over. Not from this transcript \u2014 added from a working tool the owner already had. The transcript describes the negative-gamma snowball without naming the sign."
+        },
+        {
+          "term": "Gamma flip",
+          "definition": "The strike where cumulative net dealer gamma crosses zero \u2014 the boundary between the two regimes. Also not from this transcript; it is what decides whether the level rules here should be applied at all."
         }
       ],
       "philosophy": [
@@ -344,10 +358,11 @@ const D = {
         "Gamma exposure by strike is the one input this requires and it is not currently available in this environment. CBOE is named as the free source, delayed 10-15 minutes. Establishing a source is the first blocker."
       ],
       "blockers_here": [
-        "**Gamma exposure by strike is the one hard requirement and nothing here pulls it.** The transcript names CBOE as a free source with a 10-15 minute delay, raw. An options data subscription is expected from the owner, which would replace this.",
-        "No SPX or NDX option chain is being pulled yet. Robinhood exposes chains and the account carries level-2 approval, so this is work rather than a wall.",
-        "The 90-day open interest view the source relies on is not available from any source currently wired up.",
-        "Live execution is not delegated to agents and no order has ever been placed. This is studied on paper regardless of that."
+        "**RESOLVED 2026-09-13 \u2014 gamma exposure by strike is available after all.** `mcp__Robinhood__get_option_quotes` returns `implied_volatility`, `delta`, `gamma`, `theta`, `vega` and `open_interest` per contract, and SPXW carries daily expirations. Gamma x open interest per strike is exactly what this strategy needs. An earlier entry here said nothing pulled it; that was wrong.",
+        "Coverage is sparse away from the money \u2014 deep in-the-money strikes returned null greeks in the same call. Handle the gaps rather than assuming them away.",
+        "The 90-day open-interest history the source uses is still not available; the broker gives current open interest only. This is the remaining real gap, and an options subscription would close it.",
+        "Only the lead session can reach these MCP tools \u2014 a script cannot. Capture and rendering are therefore separate steps: a session snapshots to `data/snapshots/`, `dashboard/surface.py` renders it.",
+        "Live execution is not delegated to agents and no order has ever been placed."
       ],
       "evaluation": {
         "capital_is_not_a_filter": "Judge this strategy at the size its source describes \u2014 one NQ contract, $5 a tick. Whether any particular account can carry that is a separate question answered later. Narrowing the study to what is currently affordable would throw away the finding.",

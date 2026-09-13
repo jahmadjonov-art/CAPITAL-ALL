@@ -1,0 +1,252 @@
+<title>BTC Fair Value Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Single-theme by intent: this is a trading desk, it is black. Every colour
+   is painted explicitly so the page holds on any host ground. */
+:root{
+  --bg:#06080B; --panel:#0D1117; --sunk:#12161D; --line:#1E2630; --line-2:#2A3440;
+  --txt:#DCE3EA; --dim:#7B8794; --faint:#4A5561;
+  --mkt:#FF4D8D;      /* what the market says */
+  --mdl:#35D6E8;      /* what the model says */
+  --warn:#F5A524; --ok:#3DD68C; --bad:#FF5C5C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 13px/1.55 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+h1,h2,h3{margin:0}
+.cond{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;letter-spacing:.04em}
+.lbl{font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.num{font-variant-numeric:tabular-nums}
+
+/* masthead */
+.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;
+  justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--line-2)}
+.title{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;letter-spacing:.03em}
+.title span{color:var(--mkt)}
+.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.7}
+
+/* honesty band — the most important element on the page */
+.band{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:12px;
+  padding:9px 12px;background:#1A1207;border:1px solid #3D2B0C;border-radius:3px}
+.chip{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px;
+  background:#3D2B0C;color:var(--warn);white-space:nowrap}
+.band p{margin:0;font-size:12px;color:#C9A86B;flex:1;min-width:220px}
+
+/* spot strip */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px;border-radius:3px;overflow:hidden}
+.cell{background:var(--panel);padding:11px 13px}
+.cell .v{font-size:19px;font-weight:500;margin-top:5px}
+.cell .s{font-size:11px;color:var(--faint);margin-top:2px}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:18px}
+.panel > header{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;padding:10px 13px;border-bottom:1px solid var(--line)}
+.panel > .body{padding:13px}
+
+/* the ladder — the point of the page */
+.row{padding:11px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.rhead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:9px}
+.tick{font-size:12px;color:var(--dim)}
+.strike{font-size:16px;font-weight:700}
+.mins{font-size:11px;color:var(--faint)}
+.track{position:relative;height:30px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.gapfill{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,rgba(255,77,141,.20),rgba(53,214,232,.20))}
+.mark{position:absolute;top:0;bottom:0;width:2px}
+.mark.m{background:var(--mkt)} .mark.f{background:var(--mdl)}
+.mark i{position:absolute;top:50%;transform:translateY(-50%);font-style:normal;
+  font-size:10px;font-weight:700;letter-spacing:.06em;white-space:nowrap;padding:2px 5px;border-radius:2px}
+.mark.m i{background:var(--mkt);color:#1A0410;left:4px}
+.mark.f i{background:var(--mdl);color:#03181B;right:4px}
+.scale{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);margin-top:3px}
+.rfoot{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:11px;color:var(--dim);margin-top:7px}
+.gapv{font-weight:700}
+.gapv.wide{color:var(--warn)}
+
+/* two-up */
+.duo{display:grid;grid-template-columns:1fr;gap:18px}
+@media (min-width:860px){.duo{grid-template-columns:1fr 1fr}}
+.duo .panel{margin-top:0}
+ul.tight{margin:0;padding-left:17px}
+ul.tight li{margin-bottom:8px;font-size:12px;color:var(--dim)}
+ul.tight li b{color:var(--txt);font-weight:500}
+ul.tight li:last-child{margin-bottom:0}
+dl.kv{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:12px}
+dl.kv dt{color:var(--faint)} dl.kv dd{margin:0;text-align:right}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 class="title">BTC FAIR VALUE <span>DESK</span></h1>
+      <div class="lbl" style="margin-top:3px">Kalshi contracts vs a lognormal model</div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="band">
+    <span class="chip">No orders placed</span>
+    <span class="chip">Nothing simulated</span>
+    <span class="chip">Model unvalidated</span>
+    <p id="bandtext"></p>
+  </div>
+
+  <section class="strip" id="strip" aria-label="Spot prices"></section>
+
+  <section class="panel">
+    <header>
+      <h2 class="lbl">Market price vs model fair value</h2>
+      <span class="lbl" id="ladder-n"></span>
+    </header>
+    <div class="body" id="ladder"></div>
+  </section>
+
+  <div class="duo" style="margin-top:18px">
+    <section class="panel">
+      <header><h2 class="lbl">The model</h2></header>
+      <div class="body">
+        <dl class="kv" id="modelkv"></dl>
+        <p style="font-size:12px;color:var(--dim);margin:12px 0 0">
+          Probability that BTC settles above the strike, under a driftless
+          lognormal walk: <b style="color:var(--txt)">P = &Phi;(d&#8322;)</b> with
+          <b style="color:var(--txt)">d&#8322; = [ln(S/K) &minus; &sigma;&sup2;&tau;/2] / (&sigma;&radic;&tau;)</b>.
+          Volatility is measured from recent one-minute returns, not assumed.
+        </p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header><h2 class="lbl" style="color:var(--warn)">Why the gap is probably the model, not the market</h2></header>
+      <div class="body">
+        <ul class="tight">
+          <li><b>Settlement is not spot.</b> These contracts resolve on a CF
+            Benchmarks index averaged over the final minute. Averaging cuts
+            terminal variance, so the true fair value is pushed toward the
+            extremes relative to this model. <b>This alone can explain several
+            cents</b> and is the first thing to fix.</li>
+          <li><b>Recent volatility is not future volatility.</b> &sigma; comes from
+            the last few hours of one-minute bars. Over a 15-minute horizon that
+            estimate is noisy, and the model is most sensitive to it near the money.</li>
+          <li><b>Zero drift is assumed.</b> Defensible over minutes, but it is an
+            assumption, not a measurement.</li>
+          <li><b>A large persistent gap on a liquid contract is a red flag.</b>
+            The market has more information than this model does. When they
+            disagree by more than a cent or two, the prior should be that the
+            model is wrong.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <header><h2 class="lbl">What would have to be true before any of this is tradable</h2></header>
+    <div class="body">
+      <ul class="tight">
+        <li><b>Venue.</b> Everything here is Kalshi-direct. The funded account is
+          Robinhood, whose event pricing is roughly 4&cent; per round trip against a
+          1&cent; spread. <b>Until that is resolved, a gap this desk finds is not
+          reachable.</b></li>
+        <li><b>Edge must survive costs and queue.</b> A maker fill earns the
+          spread; a forced taker exit costs 1.75&cent; per contract, about 1.75 round
+          trips of profit.</li>
+        <li><b>The model must be calibrated before it is trusted.</b> Record
+          predicted probability against realised outcome over many contracts. If
+          the 30% bucket does not settle yes about 30% of the time, the gap
+          column is noise.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span id="foot"></span>
+    <span>Every figure fetched live and computed at build time. No trade has been placed from this account.</span>
+  </footer>
+</div>
+
+<script>
+const D = /*__DESK__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const usd = n => "$" + Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+$("stamp").innerHTML = `built ${esc(D.built)}<br>${esc(D.built_utc)}`;
+$("foot").textContent = "Built " + D.built;
+$("bandtext").textContent =
+  "Every number below was fetched from public APIs moments ago and computed here. "
+  + "Where the model is known to be wrong, it says so rather than hiding it.";
+
+/* spot strip */
+const cells = Object.entries(D.spot).map(([k,v]) =>
+  `<div class="cell"><div class="lbl">${esc(k)}</div><div class="v num">${usd(v)}</div>
+   <div class="s">BTC spot</div></div>`);
+cells.push(`<div class="cell"><div class="lbl">Median</div>
+  <div class="v num" style="color:var(--mkt)">${usd(D.median)}</div>
+  <div class="s">venues differ by ${D.disagree!=null?usd(D.disagree):"n/a"}</div></div>`);
+cells.push(`<div class="cell"><div class="lbl">Realised vol</div>
+  <div class="v num" style="color:var(--mdl)">${(D.ann_vol*100).toFixed(1)}%</div>
+  <div class="s">annualised, ${D.nbars} one-minute bars</div></div>`);
+$("strip").innerHTML = cells.join("");
+
+/* ladder */
+$("ladder-n").textContent = D.rows.length + (D.rows.length === 1 ? " contract open" : " contracts open");
+if (!D.rows.length){
+  $("ladder").innerHTML = `<p style="color:var(--dim);font-size:12px;margin:0">
+    No open contracts with a two-sided book right now. These series are
+    short-dated, so this is normal between expiries rather than a failure.</p>`;
+} else {
+  $("ladder").innerHTML = D.rows.map(r => {
+    const lo = Math.max(0, Math.min(r.mid, r.fair) - 0.10);
+    const hi = Math.min(1, Math.max(r.mid, r.fair) + 0.10);
+    const pos = v => ((v - lo) / (hi - lo)) * 100;
+    const pm = pos(r.mid), pf = pos(r.fair);
+    const wide = Math.abs(r.gap) > 0.02;
+    return `<div class="row">
+      <div class="rhead">
+        <span class="strike num">${r.strike.toLocaleString("en-US")}</span>
+        <span class="tick">${esc(r.ticker)}</span>
+        <span class="mins num">${r.mins} min left</span>
+      </div>
+      <div class="track">
+        <div class="gapfill" style="left:${Math.min(pm,pf)}%;width:${Math.abs(pf-pm)}%"></div>
+        <div class="mark m" style="left:${pm}%"><i>MKT ${(r.mid*100).toFixed(1)}&cent;</i></div>
+        <div class="mark f" style="left:${pf}%"><i>MODEL ${(r.fair*100).toFixed(1)}&cent;</i></div>
+      </div>
+      <div class="scale"><span>${(lo*100).toFixed(0)}&cent;</span><span>${(hi*100).toFixed(0)}&cent;</span></div>
+      <div class="rfoot">
+        <span>bid <b class="num">${(r.bid*100).toFixed(0)}&cent;</b> / ask <b class="num">${(r.ask*100).toFixed(0)}&cent;</b></span>
+        <span>spread <b class="num">${r.spread}&cent;</b></span>
+        <span>24h vol <b class="num">${r.vol.toLocaleString("en-US")}</b></span>
+        <span>gap <b class="num gapv ${wide?"wide":""}">${(r.gap*100>=0?"+":"")}${(r.gap*100).toFixed(1)}&cent;</b>
+          ${wide?'<span style="color:var(--warn)"> &mdash; too large to believe</span>':""}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* model panel */
+$("modelkv").innerHTML = [
+  ["Spot used (median)", usd(D.median)],
+  ["Venue disagreement", D.disagree!=null ? usd(D.disagree) : "n/a"],
+  ["&sigma; per minute", (D.sd_min*100).toFixed(4) + "%"],
+  ["&sigma; annualised", (D.ann_vol*100).toFixed(1) + "%"],
+  ["Sample", D.nbars + " one-minute returns"],
+  ["Drift assumed", "zero"],
+  ["Settlement modelled as", "spot at close <b style='color:var(--warn)'>(wrong)</b>"],
+].map(([k,v]) => `<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
+if (D.errors && D.errors.length){
+  $("modelkv").insertAdjacentHTML("afterend",
+    `<p style="font-size:12px;color:var(--bad);margin:10px 0 0">Fetch errors: ${esc(D.errors.join(", "))}</p>`);
+}
+</script>

@@ -428,3 +428,23 @@ Two more things that cost time:
 
 Working recipe: tape → group tickers by series → `/series/{ticker}` for
 `fee_type` and `fee_multiplier` → `/markets/{ticker}/orderbook` for the touch.
+
+---
+
+## The desk console
+
+**https://claude.ai/code/artifact/a0aa3e0b-1fe1-420e-99b1-fc9103ac170d**
+
+`dashboard/desk.py` builds it; `desk_template.html` is the page. It fetches spot
+from three venues, measures realised volatility from one-minute bars, prices
+every open Kalshi BTC contract, and shows the gap between market and model.
+
+It is deliberately built to be un-fakeable in the way the screenshots that
+inspired it were fake: no simulated fills, no P&L, no win rate, no equity curve.
+Every number is fetched at build time, and the model's known defects are printed
+on the page next to its own output. **Keep it that way.** A console that can show
+a flattering number will eventually show one.
+
+Crypto spot sources: **Binance.com returns 451** (geo-blocked from here).
+Binance.US, Coinbase and Kraken all work; they disagreed by $33.51 on one
+reading, which matters when strikes sit $100 apart.

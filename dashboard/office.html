@@ -268,6 +268,14 @@ const D = {
       "missing": "- What to capture. Kalshi order books for a chosen series and crypto prices are the obvious first candidates, since both run 24/7 and neither needs the broker. - Cadence, traded against repository size. A snapshot every 5 minutes is ~105k r"
     },
     {
+      "file": "fair-value-model.md",
+      "title": "Fair-value model for short-dated BTC contracts",
+      "status": "IN PROGRESS",
+      "goal": "A model that prices Kalshi's short-dated Bitcoin contracts well enough that a disagreement with the market means something. Then a calibration record proving it, before a cent is ever risked on it.",
+      "why": "It is the one version of \"spot mispricing across markets\" that does **not** require speed. A latency race against co-located firms is unwinnable from a REST API; being better-calibrated than a thin market is not. **That reframe is the whole",
+      "missing": "- The settlement-index fix, and a spot feed that matches it. - **A calibration record \u2014 the part that actually decides this.** Log predicted probability against realised outcome for every contract that settles, then check whether the 30% bu"
+    },
+    {
       "file": "markets-untouched.md",
       "title": "Markets nobody has looked at yet",
       "status": "OPEN",
@@ -313,9 +321,9 @@ const D = {
     "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **Two concrete tasks are queued, both cheap and both decisive:** 1. **The Kalshi maker-fee test** (`B-003`) \u2014 do resting orders on plain `quadratic` series really cost nothing? The demo environment settles it without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place fee-free and liquid overlap. 2. **The regular-hours quote test** (`B-002`) \u2014 one paired call around 10:00 ET says whether the quote feed is broken generally or only after hours."
   },
   "build": {
-    "at": "13 Sep 2026, 03:49",
-    "commit": "5b1925a",
-    "commits": "21",
+    "at": "13 Sep 2026, 09:21",
+    "commit": "46ec758",
+    "commits": "22",
     "branch": "claude/greeting-jk8c0j"
   }
 };

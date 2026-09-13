@@ -82,6 +82,9 @@ Staked out, not built. Pick any up without asking — see
 - [`data-collection.md`](sandbox/data-collection.md) — **nothing records
   anything yet**, so no question about the past is answerable. Likely a GitHub
   Actions cron, which needs a merge to `main` first.
+- [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** Prices
+  BTC contracts against a lognormal model; first gaps are too large and unstable
+  to believe. Settlement is misspecified — fix that first.
 
 ## Where the detail lives
 

@@ -55,6 +55,59 @@ is trusted.
 
 **Variants tried:** 1 — this is a single pre-specified measurement, not a search.
 
-**Result:** _running_
+**Result:** **Criterion technically met — by one series — but the criterion
+itself turned out to be poorly designed, and that matters more than the pass.**
+
+Measured from a 1,000-trade tape window at ~23:30 ET, fee type per series, and
+live top-of-book:
+
+| Series | Fee type | Contracts (window) | Median spread |
+|---|---|---|---|
+| KXBOXING | **quadratic (free maker)** | 13,896 | 1c |
+| KXNCAAFGAME | quadratic_with_maker_fees | 11,891 | 2c |
+| **KXBTC15M** | **quadratic (free maker)** | 6,171 | **1c** |
+| KXBOXINGMOV | quadratic (free maker) | 4,825 | 6c |
+| KXLIGAMXGAME | **quadratic (free maker)** | 1,586 | **1c** |
+| KXETH15M / KXSOL15M / KXBTCD | quadratic (free maker) | 550–580 | 1c |
+
+**The headline, which contradicts the earlier finding:** fee-free series and
+liquid series **do** overlap. KXBOXING traded the most contracts of any series
+in the window at a 1-cent spread with no maker fee. KXBTC15M — Bitcoin
+15-minute contracts — was second, also 1 cent, with 2,982 / 1,126 contracts
+resting at the touch. A $100 account needs ~200 contracts at 50c, so the book
+carries that size many times over.
+
+The earlier "largely disjoint" conclusion was drawn from NFL, EPL and MLB, which
+do charge maker fees. It was not wrong about those; it generalised from an
+in-season sample. **Which categories are liquid changes with the sporting
+calendar and the hour**, so neither reading is a fixed property of the venue.
+
+**The criterion flaw, stated rather than defended:** the bar required 3+ markets
+in one series at ≤2c. Only **KXLIGAMXGAME** cleared it — and its three markets
+are home/away/tie on a *single football match*, not three independent markets.
+Meanwhile **KXBTC15M failed** on 1 market despite better volume and the same 1c
+spread, purely because 15-minute contracts are **sequential** — only one is live
+at a time, so it can never show three.
+
+So the bar measured *market count per event*, not liquidity, and it excluded the
+most interesting candidate on a technicality. **The pass is an artifact.** The
+honest reading is that the underlying question — do fee-free liquid markets
+exist — is answered **yes** by the volume and spread data, and the pre-registered
+test was simply the wrong instrument for it.
+
+**Alternative explanations, not ruled out:**
+- **Saturday-night selection.** College football, boxing and crypto were live;
+  the NFL/MLB markets that charge maker fees were not. This may be an
+  hours-of-the-week artifact rather than a property of the venue.
+- **One snapshot, top-of-book only.** Depth behind the touch is unmeasured, and
+  a 1c spread holding 10 contracts is not a 1c spread for a $100 position.
+- **The load-bearing assumption is still untested:** that `fee_type: quadratic`
+  actually means resting orders pay nothing. That is read from an API enum and a
+  2022 filing, never from a filled order. **If it is false, everything above is
+  irrelevant.**
+
+**Status:** T1 — real measurement, single snapshot, weekend. Sent to a `skeptic`.
+Not promoted to any belief about tradability until the maker-fee assumption is
+tested on the demo environment.
 
 ---

@@ -394,3 +394,37 @@ it maps onto the owner's own interest in short-horizon crypto price contracts.
 **Nobody has measured its actual order books yet** — the `/markets` listing
 returns null bids and asks at weekends, so use the per-market
 `/markets/{ticker}/orderbook` endpoint during active hours.
+
+---
+
+## Kalshi's API renamed its fields, and the old names fail SILENTLY
+
+Cost three failed measurement passes on 2026-09-13 before it was spotted. The
+fixed-point migration renamed most numeric fields, and **requesting an old name
+returns nothing rather than an error** — so a script using them reports zero
+markets, zero volume, and looks like a real finding.
+
+| Do not use | Use |
+|---|---|
+| `yes_bid` / `yes_ask` | **`yes_bid_dollars`** / **`yes_ask_dollars`** |
+| `volume_24h` / `volume` | **`volume_24h_fp`** / **`volume_fp`** |
+| `open_interest` | **`open_interest_fp`** |
+| `count` (on a trade) | **`count_fp`** |
+| `orderbook` | **`orderbook_fp`**, with sides `yes_dollars` / `no_dollars` |
+
+**Prices are now dollars, not cents** — `0.5300` is 53 cents.
+
+Two more things that cost time:
+
+- **`/markets?status=open` is not a list of tradable markets.** It returns
+  thousands of auto-generated provisional combo markets (`KXMVECROSSCATEGORY`)
+  created seconds ago with empty books. Paginating 8,000 of them yielded nothing
+  tradable. **Use `/markets/trades?limit=1000` instead** — the trade tape shows
+  what is genuinely active right now, and grouping its tickers by series is the
+  fastest route to the live venue.
+- **Order-book sides are both bids.** `yes_dollars` are bids for YES,
+  `no_dollars` are bids for NO. The best YES *ask* is `1 - (best NO bid)`. There
+  is no ask side to read directly.
+
+Working recipe: tape → group tickers by series → `/series/{ticker}` for
+`fee_type` and `fee_multiplier` → `/markets/{ticker}/orderbook` for the touch.

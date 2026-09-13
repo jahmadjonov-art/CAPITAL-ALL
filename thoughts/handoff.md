@@ -481,3 +481,31 @@ the experiment, not the extraction. See `strategies/README.md`.
 all untested. Its own stated blocker is that it needs gamma-exposure-by-strike,
 which nothing here currently pulls; CBOE is named as a free source with a
 10-15 minute delay.
+
+## Following a strategy on paper
+
+`strategies/paper/<id>.jsonl` is an append-only forward record. `paper.py` opens
+a signal, settles it, and reports win rate, expectancy and P&L after costs.
+
+**The mechanism that makes it worth anything:** a signal must be committed to git
+before it is settled. The tool looks up the commit that introduced the signal id
+and marks anything settled without one `unverified`. Tested on a dummy signal
+that showed a 100% win rate and $2,586 profit — and was correctly refused.
+
+Without that check, a strategy log shows a strategy that works, every time, for
+any strategy, because whoever writes it already knows the outcome.
+
+Contract economics used: **NQ $5.00/tick, ES $12.50/tick**, plus one tick of
+slippage each way and commission. Costs are applied on every settlement and
+printed in every report, so a result can never quietly be gross of costs.
+
+**Account size is deliberately not a filter.** A strategy is judged at the size
+its source describes; whether an account can carry it is a separate question.
+Do not reintroduce the $100 as a reason to narrow a study.
+
+An options data subscription with an unlimited API pool is expected from the
+owner. Each strategy file carries a `data_readiness` block naming the exact
+fields it needs, so it can be wired the day access arrives. First thing to check
+then: whether the feed carries intraday history or only snapshots — snapshots
+allow forward testing only, history allows a backtest, and that decides how long
+everything takes.

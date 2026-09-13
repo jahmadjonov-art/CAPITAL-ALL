@@ -94,7 +94,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
 
 <script>
 const D = {
-  "built": "13 Sep 2026  19:53",
+  "built": "13 Sep 2026  20:00",
   "strategies": [
     {
       "id": "options-flow-gamma",
@@ -344,11 +344,40 @@ const D = {
         "Gamma exposure by strike is the one input this requires and it is not currently available in this environment. CBOE is named as the free source, delayed 10-15 minutes. Establishing a source is the first blocker."
       ],
       "blockers_here": [
-        "No gamma-exposure-by-strike feed is currently wired up. Named free source: CBOE, with a 10-15 minute delay, raw.",
-        "No SPX or NDX option chain is being pulled yet, though Robinhood exposes option chains and the account is approved for level 2.",
-        "The account is $100 in a cash account. One NQ contract is far beyond that, so this cannot be traded here as described even if it works.",
-        "No order has ever been placed from this account and execution is not delegated to agents."
-      ]
+        "**Gamma exposure by strike is the one hard requirement and nothing here pulls it.** The transcript names CBOE as a free source with a 10-15 minute delay, raw. An options data subscription is expected from the owner, which would replace this.",
+        "No SPX or NDX option chain is being pulled yet. Robinhood exposes chains and the account carries level-2 approval, so this is work rather than a wall.",
+        "The 90-day open interest view the source relies on is not available from any source currently wired up.",
+        "Live execution is not delegated to agents and no order has ever been placed. This is studied on paper regardless of that."
+      ],
+      "evaluation": {
+        "capital_is_not_a_filter": "Judge this strategy at the size its source describes \u2014 one NQ contract, $5 a tick. Whether any particular account can carry that is a separate question answered later. Narrowing the study to what is currently affordable would throw away the finding.",
+        "method": "Forward paper record. Log every signal the rules produce before the market resolves it, settle it with what happened, and attribute the result to a rule.",
+        "log": "strategies/paper/options-flow-gamma.jsonl",
+        "tool": "python3 strategies/paper.py",
+        "the_binding_rule": "A signal committed to git before the outcome counts. One written afterwards does not, and the report marks it unverified. Without that, any strategy log shows a strategy that works.",
+        "what_to_attribute": "On every settlement say which it was: the rule was wrong, or the rule was right and the market did something else. That distinction is the whole exercise and is only honest if the reasoning was written at open time.",
+        "read_expectancy_not_win_rate": "The source claims 75% wins. A 75% win rate says nothing on its own \u2014 paired with the stated 1:10 reward it is one thing, paired with a 1:1 it is another, and either can lose money. Record both."
+      },
+      "data_readiness": {
+        "note": "An options data subscription with an unlimited API pool is expected from the owner. These are the fields this strategy actually needs, so it can be wired the moment access arrives.",
+        "required": [
+          "Full SPX and NDX option chain by strike and expiry, including same-day (0DTE)",
+          "Open interest per strike \u2014 and history, since the source uses a 90-day view",
+          "Gamma per strike, or the inputs to compute it: implied volatility, spot, time to expiry, rate",
+          "Bid/ask per contract, to know what is actually transactable rather than quoted",
+          "Volume per strike, to separate today's positioning from carried open interest"
+        ],
+        "would_unlock": [
+          "Locating max put gamma and max call gamma per session \u2014 the levels the entire strategy rests on",
+          "Building the volatility surface and its skew, which the source names as the institutional read",
+          "Identifying convexity peaks and pockets",
+          "Backtesting the level rules against history rather than only forward-testing them"
+        ],
+        "first_thing_to_check_on_arrival": "Whether the feed carries intraday history or only current snapshots. Snapshots alone allow forward testing but no backtest, and that single fact decides how long this takes to answer."
+      },
+      "paper": {
+        "exists": false
+      }
     }
   ]
 };
@@ -421,6 +450,35 @@ function renderStrategy(s){
     ${risk?card("Risk", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${risk}</dl>`):""}
     ${timing?card("Timing", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${timing}</dl>`):""}
   </div>
+
+  ${(() => {
+    const pp = s.paper||{};
+    const body = !pp.exists
+      ? `<p style="margin:0;color:var(--dim)">No signals logged yet. ${esc((s.blockers_here||["The inputs this needs are not available here yet."])[0])}</p>`
+      : pp.settled===0
+        ? `<p style="margin:0;color:var(--dim)">${pp.signals} signal(s) logged, ${pp.open} still open, none settled — nothing to measure yet.</p>`
+        : `<table><tbody>
+            <tr><td>Settled</td><td class="st num">${pp.settled}</td></tr>
+            <tr><td>Win rate</td><td class="st num">${pp.win_rate}% (${pp.wins}W / ${pp.settled-pp.wins}L)</td></tr>
+            <tr><td>Expectancy per trade, after costs</td><td class="st num" style="color:${pp.expectancy>=0?"var(--ok)":"var(--acc)"}">$${pp.expectancy}</td></tr>
+            <tr><td>Total after costs</td><td class="st num" style="color:${pp.total_usd>=0?"var(--ok)":"var(--acc)"}">$${pp.total_usd}</td></tr>
+            ${pp.unverified?`<tr><td style="color:var(--warn)">Settled without being committed first — hindsight, not evidence</td><td class="st num" style="color:var(--warn)">${pp.unverified}</td></tr>`:""}
+           </tbody></table>
+           ${pp.settled<30?`<div class="note">Only ${pp.settled} settled trades. Too few to tell an edge from noise — read this as a work log, not a result.</div>`:""}`;
+    return card("Paper record — what it would have done", body,
+      pp.exists?`<span class="pill ${pp.settled?"ok":""}">${pp.signals} signal${pp.signals===1?"":"s"}</span>`:`<span class="pill">not started</span>`);
+  })()}
+
+  ${s.evaluation?card("How this gets judged",
+    `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${
+      Object.entries(s.evaluation).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("")
+    }</dl>`):""}
+
+  ${s.data_readiness?card("Ready for a real options feed",
+    `<p style="margin:0 0 12px;color:var(--dim)">${esc(s.data_readiness.note)}</p>
+     <div class="two"><div><div class="lbl" style="margin-bottom:7px">Fields required</div>${list(s.data_readiness.required)}</div>
+     <div><div class="lbl" style="margin-bottom:7px">What it unlocks</div>${list(s.data_readiness.would_unlock)}</div></div>
+     <div class="note"><b style="color:var(--txt)">First thing to check on arrival:</b> ${esc(s.data_readiness.first_thing_to_check_on_arrival)}</div>`):""}
 
   ${claims?card("Claims made by this source",
     `<table><thead><tr><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${claims}</tbody></table>`,

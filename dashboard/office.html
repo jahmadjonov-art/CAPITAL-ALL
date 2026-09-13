@@ -290,6 +290,14 @@ const D = {
       "goal": "A clear, written account of what this connection can actually do \u2014 its account state, permissions, limits, costs and quirks \u2014 so that no future session has to discover any of it twice.",
       "why": "Every research result that assumes an execution path depends on facts nobody here has checked. A strategy designed around options spreads is worthless if the account is not approved for them; a backtest is worthless if its cost assumptions ",
       "missing": "Almost everything. Open questions, roughly in order of usefulness: - What does `get_accounts` report \u2014 permissions, option level, agentic status, buying power, account type? - What do the `review_*` tools reveal about **real costs**? Fees, "
+    },
+    {
+      "file": "strategy-options-flow-gamma.md",
+      "title": "Following: Options Flow / Gamma Levels",
+      "status": "OPEN",
+      "goal": "Follow this strategy as its source describes it, keep a running record of what it would have done, and find out which of its ten claims survive. Not to judge it in advance. **To follow it and see.**",
+      "why": "It is the first source in the library, and the method for evaluating it is the method every later source will be evaluated by. Getting the process right here matters more than the verdict on this particular strategy.",
+      "missing": "1. **A gamma-by-strike source.** Until then no signal can be generated at all \u2014 this is the blocker, not the strategy. 2. A written procedure turning the rules into a decision an agent can execute the same way twice: how max gamma is locate"
     }
   ],
   "counts": {
@@ -320,9 +328,9 @@ const D = {
     "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **Two concrete tasks are queued, both cheap and both decisive:** 1. **The Kalshi maker-fee test** (`B-003`) \u2014 do resting orders on plain `quadratic` series really cost nothing? The demo environment settles it without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place fee-free and liquid overlap. 2. **The regular-hours quote test** (`B-002`) \u2014 one paired call around 10:00 ET says whether the quote feed is broken generally or only after hours."
   },
   "build": {
-    "at": "13 Sep 2026, 19:55",
-    "commit": "1dc4a69",
-    "commits": "25",
+    "at": "13 Sep 2026, 20:00",
+    "commit": "0deaf59",
+    "commits": "26",
     "branch": "claude/greeting-jk8c0j"
   }
 };

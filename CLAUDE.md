@@ -169,9 +169,13 @@ why, rather than quietly ignoring it.
   lines, and every session leaves it better.
 - `MISSION.md` — the goal and the ground rules. Binding.
 - `sandbox/` — work staked out but not built. Open to anyone, no permission needed.
-- `strategies/` — one extraction per source the owner supplies. Every claim
-  starts `untested` and moves only when an experiment says so. Extract
-  faithfully; judgement belongs in the test, not the extraction.
+- `strategies/` — one extraction per source the owner supplies, plus
+  `paper/`, the forward record of what each would have done. Every claim starts
+  `untested` and moves only when an experiment says so. Extract faithfully;
+  judgement belongs in the test. **Log a signal before the market resolves it or
+  it does not count** — `strategies/paper.py` checks the commit and marks
+  hindsight `unverified`. Judge a strategy at the size its source describes;
+  account size is not a filter on what gets studied.
 - `dashboard/` — the office floor plan the owner reads. **Generated** by
   `build.py` from the markdown; never hand-edit `office.html`.
 - `research/` — the whiteboard: every experiment run, and what we believe.

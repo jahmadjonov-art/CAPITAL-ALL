@@ -164,6 +164,35 @@ function renderStrategy(s){
     ${timing?card("Timing", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${timing}</dl>`):""}
   </div>
 
+  ${(() => {
+    const pp = s.paper||{};
+    const body = !pp.exists
+      ? `<p style="margin:0;color:var(--dim)">No signals logged yet. ${esc((s.blockers_here||["The inputs this needs are not available here yet."])[0])}</p>`
+      : pp.settled===0
+        ? `<p style="margin:0;color:var(--dim)">${pp.signals} signal(s) logged, ${pp.open} still open, none settled — nothing to measure yet.</p>`
+        : `<table><tbody>
+            <tr><td>Settled</td><td class="st num">${pp.settled}</td></tr>
+            <tr><td>Win rate</td><td class="st num">${pp.win_rate}% (${pp.wins}W / ${pp.settled-pp.wins}L)</td></tr>
+            <tr><td>Expectancy per trade, after costs</td><td class="st num" style="color:${pp.expectancy>=0?"var(--ok)":"var(--acc)"}">$${pp.expectancy}</td></tr>
+            <tr><td>Total after costs</td><td class="st num" style="color:${pp.total_usd>=0?"var(--ok)":"var(--acc)"}">$${pp.total_usd}</td></tr>
+            ${pp.unverified?`<tr><td style="color:var(--warn)">Settled without being committed first — hindsight, not evidence</td><td class="st num" style="color:var(--warn)">${pp.unverified}</td></tr>`:""}
+           </tbody></table>
+           ${pp.settled<30?`<div class="note">Only ${pp.settled} settled trades. Too few to tell an edge from noise — read this as a work log, not a result.</div>`:""}`;
+    return card("Paper record — what it would have done", body,
+      pp.exists?`<span class="pill ${pp.settled?"ok":""}">${pp.signals} signal${pp.signals===1?"":"s"}</span>`:`<span class="pill">not started</span>`);
+  })()}
+
+  ${s.evaluation?card("How this gets judged",
+    `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${
+      Object.entries(s.evaluation).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("")
+    }</dl>`):""}
+
+  ${s.data_readiness?card("Ready for a real options feed",
+    `<p style="margin:0 0 12px;color:var(--dim)">${esc(s.data_readiness.note)}</p>
+     <div class="two"><div><div class="lbl" style="margin-bottom:7px">Fields required</div>${list(s.data_readiness.required)}</div>
+     <div><div class="lbl" style="margin-bottom:7px">What it unlocks</div>${list(s.data_readiness.would_unlock)}</div></div>
+     <div class="note"><b style="color:var(--txt)">First thing to check on arrival:</b> ${esc(s.data_readiness.first_thing_to_check_on_arrival)}</div>`):""}
+
   ${claims?card("Claims made by this source",
     `<table><thead><tr><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${claims}</tbody></table>`,
     `<span class="pill">${(s.claims||[]).filter(c=>c.status==="untested").length} untested</span>`):""}

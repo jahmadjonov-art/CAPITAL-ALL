@@ -10,52 +10,53 @@
     "credentials_claimed": "20-year market maker; institutional FX derivatives market maker in London (outright swaps); junior broker in Australia through 2008; ~3.5 years retail",
     "venue": "Chart Fanatics podcast",
     "recorded": "22 June (year not stated in transcript)",
-    "tooling_named": "GEX Bot (\"guestbot\") — built by John (options/maths) and Jazz (futures); CBOE raw data available free with ~10-15 minute delay",
+    "tooling_named": "GEX Bot (\"guestbot\") \u2014 built by John (options/maths) and Jazz (futures); CBOE raw data available free with ~10-15 minute delay",
     "others_named": "Jim Carson, Mandy Xu (CBOE research), Fabio Valentini, Imran (IMRA), Carmine Rosato, Andrea"
   },
-
   "thesis": "Institutions are forced to hedge portfolios with index options. Market makers must provide that liquidity and cannot refuse, so they take the other side and then hedge their own exposure in the futures market. That hedging is mechanical, large, and predictable, and it leaves levels where price is magnetised and then rejected. Trade the futures at those levels.",
-
   "mechanism": [
-    "Pension funds, endowments and mutual funds must hedge — described as forced, not discretionary. Driven by 1987, dot-com and 2008.",
+    "Pension funds, endowments and mutual funds must hedge \u2014 described as forced, not discretionary. Driven by 1987, dot-com and 2008.",
     "They hedge through options on indices: SPX, SPY, NDX, QQQ.",
     "Market makers sit in the middle, provide liquidity both ways, charge the spread, and do not take directional positions. They cannot say no to flow.",
     "A market maker short a call has unlimited loss exposure, so must hedge. Delta tells him how much: while delta is zero he is safe.",
-    "To be delta-neutral he buys or sells the underlying futures — ES for SPX, NQ for NDX. Futures are chosen because they are the most liquid hedge.",
-    "Price then moves, so delta changes. Gamma — the change in delta with respect to change in spot — tells him how much more to hedge.",
+    "To be delta-neutral he buys or sells the underlying futures \u2014 ES for SPX, NQ for NDX. Futures are chosen because they are the most liquid hedge.",
+    "Price then moves, so delta changes. Gamma \u2014 the change in delta with respect to change in spot \u2014 tells him how much more to hedge.",
     "This is self-reinforcing: he buys futures, price rises, his delta changes, he must buy more. Described as a snowball, and as the market maker himself moving the market.",
-    "Near the strike, the institution's gamma peaks — this is the point of maximum profit rate. Past the strike, the option's payoff goes roughly one-to-one, so convexity is gone and the same distance earns materially less.",
+    "Near the strike, the institution's gamma peaks \u2014 this is the point of maximum profit rate. Past the strike, the option's payoff goes roughly one-to-one, so convexity is gone and the same distance earns materially less.",
     "Theta decay accelerates through the session (said to explode between roughly midday and 1:30pm), taxing the position further.",
     "So the institution closes and sells the call back to the market maker. The market maker is left with a futures imbalance and must sell those futures. That selling is the reversal seen at the level."
   ],
-
   "why_zero_dte": [
     "The SEC permitted 0DTE trading in 2021. These options open at 9:30 and expire at 4:00 the same day.",
     "Stated to be roughly 60-63% of daily S&P volume now, up from 21% in 2021, on ~$3.3 trillion of daily volume.",
     "Hedging pressure is not slower or faster in volatility terms but in urgency: a monthly option is a car at 80 km/h that can turn easily; 0DTE is a Formula One car at 300 km/h that must brake and steer at speed.",
-    "The delta profile of a 0DTE option steepens sharply as expiry approaches — soft curve with 5 hours left, near-vertical with 1 hour left — so hedging becomes more aggressive as the day runs on.",
+    "The delta profile of a 0DTE option steepens sharply as expiry approaches \u2014 soft curve with 5 hours left, near-vertical with 1 hour left \u2014 so hedging becomes more aggressive as the day runs on.",
     "Speaker's position: 0DTE did not increase volatility; if anything it stabilised markets."
   ],
-
   "markets": {
-    "watch_levels_on": ["SPX", "NDX"],
-    "trade": ["NQ", "ES"],
+    "watch_levels_on": [
+      "SPX",
+      "NDX"
+    ],
+    "trade": [
+      "NQ",
+      "ES"
+    ],
     "speaker_trades": "NQ, full contracts rather than micros",
     "note_on_ndx_vs_qqq": "One at-the-money NDX contract is put at $10,000-$12,000 versus $60-$70 for QQQ, so large participants use NDX. QQQ is now also being examined on the theory that smaller funds position there based on what they see in SPX/NDX.",
     "correlation_note": "SPX, SPY, ES, NDX, QQQ and NQ are said to move together, so a level reached on one is reached on all."
   },
-
   "levels": [
     {
       "name": "Put wall / max put gamma",
       "aka": "peak put gamma",
       "behaviour": "Magnet, then rejection. Price is drawn to it and reverses.",
-      "use": "Support in the model — the side to buy from."
+      "use": "Support in the model \u2014 the side to buy from."
     },
     {
       "name": "Call wall / max call gamma",
       "behaviour": "Magnet, then rejection.",
-      "use": "Resistance in the model — the side to sell from."
+      "use": "Resistance in the model \u2014 the side to sell from."
     },
     {
       "name": "Positive convexity level",
@@ -68,11 +69,10 @@
       "name": "Negative convexity level",
       "display": "purple bars in the tool named",
       "meaning": "Someone sold options there, selling volatility and creating a pocket in the surface.",
-      "behaviour": "Price falls through easily — described as a valley the ball rolls into.",
+      "behaviour": "Price falls through easily \u2014 described as a valley the ball rolls into.",
       "use": "Not traded. Stated as not having a clear enough read."
     }
   ],
-
   "volatility_surface": {
     "definition": "Three-dimensional: implied volatility on the vertical axis, strike prices and time on the other two.",
     "buying_options": "Buying options is buying volatility. It takes liquidity, raises implied volatility, and creates a peak. Price is attracted to the peak, then must come back because there is no more hedging to do.",
@@ -82,24 +82,21 @@
     "skew": "A slice through the surface gives the volatility skew. Cited as telling the speaker that price was not going lower, prompting a profit-take at the bottom of a move.",
     "stated_importance": "Named as the weapon and as how institutions trade, in contrast to moving averages."
   },
-
   "entry_rules": [
     "Do nothing until price reaches a major level. Waiting is the method, and is described as removing the anxiety of missed moves.",
-    "Judge the approach by slope. A steep, fast approach is treated as physics — it will cross the level.",
+    "Judge the approach by slope. A steep, fast approach is treated as physics \u2014 it will cross the level.",
     "On a steep approach, wait for the level to be reclaimed before entering.",
     "On a gentle approach, the level is expected to hold and can be traded directly.",
-    "If the level does not hold as expected, exit quickly — something unseen is happening.",
+    "If the level does not hold as expected, exit quickly \u2014 something unseen is happening.",
     "Take the position in NQ at the level identified on SPX/NDX."
   ],
-
   "exit_rules": [
     "Target the next major gamma level or the next large position on the map.",
     "Positive convexity to positive convexity for the convexity model.",
-    "Take profit at the wall rather than holding through it — gamma levels are rejections.",
+    "Take profit at the wall rather than holding through it \u2014 gamma levels are rejections.",
     "Enter with two or more contracts, take profit on one and move the other to break-even.",
     "Do not hold a winning short into a put wall expecting continuation; take the profit at the level."
   ],
-
   "risk": {
     "stop_loss": "30-50 ticks, placed by structure (below the low that formed at the level)",
     "stop_rationale": "The level either works quickly or does not. The market maker is moving at speed, so if the move is going to happen it happens.",
@@ -107,15 +104,13 @@
     "contrast_drawn": "Set against ATR-based stops of 150-200 ticks",
     "sizing": "Speaker trades 1-2 NQ contracts normally; up to 10 NQ when passing funded-account evaluations, quoted as $6,000 in one move"
   },
-
   "timing": {
     "session": "First two hours after the New York open only",
     "reason_given": "Institutions position themselves in options in the morning. Beyond that the edge is not there for this method.",
     "greeks_traded": "Delta and gamma within the first two hours. Charm is acknowledged as important near expiry but described as difficult and not yet traded. Vanna is set aside because volatility does not change much intraday.",
     "midday_note": "Theta decay is said to explode between roughly midday and 1:30pm.",
-    "lunchtime_claim_rejected": "The common explanation that liquidity dries up because traders go to lunch is rejected — institutional traders eat at the desk. The cause given is different flow and positioning."
+    "lunchtime_claim_rejected": "The common explanation that liquidity dries up because traders go to lunch is rejected \u2014 institutional traders eat at the desk. The cause given is different flow and positioning."
   },
-
   "data_inputs": [
     "0DTE option chain for SPX and NDX by strike",
     "Gamma exposure by strike, converted to a dollar amount, to locate max put gamma and max call gamma",
@@ -124,38 +119,117 @@
     "Convexity levels derived from the surface",
     "Underlying futures price (NQ/ES) for execution"
   ],
-
   "claims": [
-    {"claim": "This model wins about 75% of the time.", "kind": "performance", "status": "untested"},
-    {"claim": "One or two trading opportunities per day for the gamma-level model; other models trade more often.", "kind": "frequency", "status": "untested"},
-    {"claim": "Stop losses of 30-50 ticks are sufficient on NQ when trading these levels.", "kind": "risk", "status": "untested"},
-    {"claim": "0DTE options are about 60-63% of daily S&P volume, on roughly $3.3 trillion daily.", "kind": "market structure", "status": "untested"},
-    {"claim": "A record 110 million contracts traded in October 2025; on September 3rd, 70% of options volume was 0DTE.", "kind": "market structure", "status": "untested"},
-    {"claim": "Net gamma readings translate to the market maker needing to hedge billions per 1% move — $7bn cited, sometimes 200-300bn.", "kind": "market structure", "status": "untested"},
-    {"claim": "Price is magnetised to max gamma levels and then rejected there.", "kind": "mechanism", "status": "untested"},
-    {"claim": "Peaks in the volatility surface act as rejections; pockets are travelled through quickly.", "kind": "mechanism", "status": "untested"},
-    {"claim": "Example trades cited: 420 ticks (~$2,000), 592 ticks (~$3,000), 478 ticks (~$2,300), 636 ticks (~$3,000), 800 ticks, 384 ticks (~$2,000 in 15 minutes).", "kind": "performance", "status": "untested"},
-    {"claim": "Indices move together, so a level hit on SPX is hit on ES, NQ, QQQ and NDX.", "kind": "mechanism", "status": "untested"}
+    {
+      "claim": "This model wins about 75% of the time.",
+      "kind": "performance",
+      "status": "untested"
+    },
+    {
+      "claim": "One or two trading opportunities per day for the gamma-level model; other models trade more often.",
+      "kind": "frequency",
+      "status": "untested"
+    },
+    {
+      "claim": "Stop losses of 30-50 ticks are sufficient on NQ when trading these levels.",
+      "kind": "risk",
+      "status": "untested"
+    },
+    {
+      "claim": "0DTE options are about 60-63% of daily S&P volume, on roughly $3.3 trillion daily.",
+      "kind": "market structure",
+      "status": "untested"
+    },
+    {
+      "claim": "A record 110 million contracts traded in October 2025; on September 3rd, 70% of options volume was 0DTE.",
+      "kind": "market structure",
+      "status": "untested"
+    },
+    {
+      "claim": "Net gamma readings translate to the market maker needing to hedge billions per 1% move \u2014 $7bn cited, sometimes 200-300bn.",
+      "kind": "market structure",
+      "status": "untested"
+    },
+    {
+      "claim": "Price is magnetised to max gamma levels and then rejected there.",
+      "kind": "mechanism",
+      "status": "untested"
+    },
+    {
+      "claim": "Peaks in the volatility surface act as rejections; pockets are travelled through quickly.",
+      "kind": "mechanism",
+      "status": "untested"
+    },
+    {
+      "claim": "Example trades cited: 420 ticks (~$2,000), 592 ticks (~$3,000), 478 ticks (~$2,300), 636 ticks (~$3,000), 800 ticks, 384 ticks (~$2,000 in 15 minutes).",
+      "kind": "performance",
+      "status": "untested"
+    },
+    {
+      "claim": "Indices move together, so a level hit on SPX is hit on ES, NQ, QQQ and NDX.",
+      "kind": "mechanism",
+      "status": "untested"
+    }
   ],
-
   "calendar": [
-    {"event": "Triple witching", "when": "Third Friday of March, June, September, December", "why": "Index options, single-stock options and options on futures all expire the same day.", "action_stated": "Speaker does not trade it — no 0DTE edge that day."},
-    {"event": "OPEX", "when": "Monthly options expiry", "why": "Charm and vanna create pin effects and magnets around expiring longer-dated options."},
-    {"event": "Vixperation", "when": "The Wednesday exactly 30 days before the third Friday", "why": "VIX options expire at 9:30 Eastern, as the market opens. VIX and the indices are inversely related.", "observation_stated": "Trend days — if the market starts down it tends to keep going. Explicitly flagged as having no data behind it."},
-    {"event": "JP Morgan collar", "when": "End of March, June, September, December", "why": "A $22bn hedge fund hedged with a collar — selling a far call, selling a far put, buying a put in the middle — with nodes of 30,000-40,000 contracts.", "effect_stated": "Creates sustained pressure; mean-reversion sellers get run over."}
+    {
+      "event": "Triple witching",
+      "when": "Third Friday of March, June, September, December",
+      "why": "Index options, single-stock options and options on futures all expire the same day.",
+      "action_stated": "Speaker does not trade it \u2014 no 0DTE edge that day."
+    },
+    {
+      "event": "OPEX",
+      "when": "Monthly options expiry",
+      "why": "Charm and vanna create pin effects and magnets around expiring longer-dated options."
+    },
+    {
+      "event": "Vixperation",
+      "when": "The Wednesday exactly 30 days before the third Friday",
+      "why": "VIX options expire at 9:30 Eastern, as the market opens. VIX and the indices are inversely related.",
+      "observation_stated": "Trend days \u2014 if the market starts down it tends to keep going. Explicitly flagged as having no data behind it."
+    },
+    {
+      "event": "JP Morgan collar",
+      "when": "End of March, June, September, December",
+      "why": "A $22bn hedge fund hedged with a collar \u2014 selling a far call, selling a far put, buying a put in the middle \u2014 with nodes of 30,000-40,000 contracts.",
+      "effect_stated": "Creates sustained pressure; mean-reversion sellers get run over."
+    }
   ],
-
   "concepts": [
-    {"term": "Delta", "definition": "First-order derivative. The market maker hedges to delta-zero and is safe while there."},
-    {"term": "Gamma", "definition": "Second-order derivative: the change in delta with respect to change in spot price. Tells the market maker how much more to hedge as price moves."},
-    {"term": "Charm", "definition": "Change with respect to time. Matters near expiry, creates the pin effect where price returns to a level repeatedly."},
-    {"term": "Vanna", "definition": "Change with respect to volatility."},
-    {"term": "Theta decay", "definition": "Time decay. Described as a tax on the position that accelerates through the session."},
-    {"term": "Convexity", "definition": "The exponential payoff of an option before the strike. Past the strike the payoff is roughly one-to-one, so the same move earns materially less."},
-    {"term": "Delta 50", "definition": "At-the-money options have delta 0.5 — a 50% probability of finishing in the money. This is where gamma peaks."},
-    {"term": "Volatility surface", "definition": "Three dimensions: implied volatility, strike, time."}
+    {
+      "term": "Delta",
+      "definition": "First-order derivative. The market maker hedges to delta-zero and is safe while there."
+    },
+    {
+      "term": "Gamma",
+      "definition": "Second-order derivative: the change in delta with respect to change in spot price. Tells the market maker how much more to hedge as price moves."
+    },
+    {
+      "term": "Charm",
+      "definition": "Change with respect to time. Matters near expiry, creates the pin effect where price returns to a level repeatedly."
+    },
+    {
+      "term": "Vanna",
+      "definition": "Change with respect to volatility."
+    },
+    {
+      "term": "Theta decay",
+      "definition": "Time decay. Described as a tax on the position that accelerates through the session."
+    },
+    {
+      "term": "Convexity",
+      "definition": "The exponential payoff of an option before the strike. Past the strike the payoff is roughly one-to-one, so the same move earns materially less."
+    },
+    {
+      "term": "Delta 50",
+      "definition": "At-the-money options have delta 0.5 \u2014 a 50% probability of finishing in the money. This is where gamma peaks."
+    },
+    {
+      "term": "Volatility surface",
+      "definition": "Three dimensions: implied volatility, strike, time."
+    }
   ],
-
   "philosophy": [
     "Enter the market when the big participants enter it. Stated as the edge the speaker arrived at after hedging $1.5bn positions and seeing his own hedging move spot.",
     "Institutions are not hunting retail stops. They are forced into the market to hedge, and retail stops simply sit in the path.",
@@ -163,7 +237,6 @@
     "The method does not require replacing an existing strategy. It is presented as a lens that raises win rate and cuts losses on whatever is already being traded.",
     "Mindfulness and risk management are given equal weight to the method. Stop trading after a loss; the speaker takes about one stop every two or three weeks and closes the platform when it happens."
   ],
-
   "how_agents_should_test_this": [
     "The levels are the testable object. Locate max put gamma and max call gamma per session, then measure what price actually did on arrival.",
     "Measure the rejection claim directly: on reaching a wall, how often does price reverse by more than the 30-50 tick stop before breaking through?",
@@ -172,11 +245,36 @@
     "The 75% claim is a win rate, not a return. Record both, since a 75% win rate with a 1:10 reward and rare large losses is a different thing from what it sounds like.",
     "Gamma exposure by strike is the one input this requires and it is not currently available in this environment. CBOE is named as the free source, delayed 10-15 minutes. Establishing a source is the first blocker."
   ],
-
   "blockers_here": [
-    "No gamma-exposure-by-strike feed is currently wired up. Named free source: CBOE, with a 10-15 minute delay, raw.",
-    "No SPX or NDX option chain is being pulled yet, though Robinhood exposes option chains and the account is approved for level 2.",
-    "The account is $100 in a cash account. One NQ contract is far beyond that, so this cannot be traded here as described even if it works.",
-    "No order has ever been placed from this account and execution is not delegated to agents."
-  ]
+    "**Gamma exposure by strike is the one hard requirement and nothing here pulls it.** The transcript names CBOE as a free source with a 10-15 minute delay, raw. An options data subscription is expected from the owner, which would replace this.",
+    "No SPX or NDX option chain is being pulled yet. Robinhood exposes chains and the account carries level-2 approval, so this is work rather than a wall.",
+    "The 90-day open interest view the source relies on is not available from any source currently wired up.",
+    "Live execution is not delegated to agents and no order has ever been placed. This is studied on paper regardless of that."
+  ],
+  "evaluation": {
+    "capital_is_not_a_filter": "Judge this strategy at the size its source describes \u2014 one NQ contract, $5 a tick. Whether any particular account can carry that is a separate question answered later. Narrowing the study to what is currently affordable would throw away the finding.",
+    "method": "Forward paper record. Log every signal the rules produce before the market resolves it, settle it with what happened, and attribute the result to a rule.",
+    "log": "strategies/paper/options-flow-gamma.jsonl",
+    "tool": "python3 strategies/paper.py",
+    "the_binding_rule": "A signal committed to git before the outcome counts. One written afterwards does not, and the report marks it unverified. Without that, any strategy log shows a strategy that works.",
+    "what_to_attribute": "On every settlement say which it was: the rule was wrong, or the rule was right and the market did something else. That distinction is the whole exercise and is only honest if the reasoning was written at open time.",
+    "read_expectancy_not_win_rate": "The source claims 75% wins. A 75% win rate says nothing on its own \u2014 paired with the stated 1:10 reward it is one thing, paired with a 1:1 it is another, and either can lose money. Record both."
+  },
+  "data_readiness": {
+    "note": "An options data subscription with an unlimited API pool is expected from the owner. These are the fields this strategy actually needs, so it can be wired the moment access arrives.",
+    "required": [
+      "Full SPX and NDX option chain by strike and expiry, including same-day (0DTE)",
+      "Open interest per strike \u2014 and history, since the source uses a 90-day view",
+      "Gamma per strike, or the inputs to compute it: implied volatility, spot, time to expiry, rate",
+      "Bid/ask per contract, to know what is actually transactable rather than quoted",
+      "Volume per strike, to separate today's positioning from carried open interest"
+    ],
+    "would_unlock": [
+      "Locating max put gamma and max call gamma per session \u2014 the levels the entire strategy rests on",
+      "Building the volatility surface and its skew, which the source names as the institutional read",
+      "Identifying convexity peaks and pockets",
+      "Backtesting the level rules against history rather than only forward-testing them"
+    ],
+    "first_thing_to_check_on_arrival": "Whether the feed carries intraday history or only current snapshots. Snapshots alone allow forward testing but no backtest, and that single fact decides how long this takes to answer."
+  }
 }

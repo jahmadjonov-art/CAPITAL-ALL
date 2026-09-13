@@ -81,8 +81,10 @@ Staked out, not built. Pick any up without asking — see
   BTC contracts against a lognormal model; first gaps are too large and unstable
   to believe. Settlement is misspecified — fix that first.
 - [`strategies/`](strategies/README.md) — **1 source, 10 claims, all untested.**
-  Options-flow gamma levels. Needs a gamma-exposure-by-strike feed, which
-  nothing here pulls yet.
+  Options-flow gamma levels, with a sandbox and a forward paper record ready.
+  **Blocked on a gamma-exposure-by-strike feed**, which nothing here pulls; an
+  options subscription is expected. Account size is not a filter on strategy
+  study.
 
 ## Where the detail lives
 

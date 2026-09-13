@@ -40,9 +40,16 @@ Priority order, highest first:
 2. An open unknown in `3-unknown.md` you can actually close.
 3. The obvious next step on the most recent experiment — the out-of-sample test,
    the cost sensitivity, the variant that was parked.
-4. A sandbox from [`sandbox/`](../../sandbox/README.md) — ground already staked
+4. **A strategy the owner has supplied.** Each has a sandbox in `sandbox/` and a
+   forward paper record in `strategies/paper/`. Follow its rules as written,
+   log signals **before** the market resolves them, settle them afterwards, and
+   attribute each result to a rule. `python3 strategies/paper.py` does the
+   bookkeeping and refuses to count a signal that was not committed first.
+   Judge a strategy at the size its source describes — **account size is not a
+   filter on what gets studied.**
+5. A sandbox from [`sandbox/`](../../sandbox/README.md) — ground already staked
    out, with the groundwork done and waiting.
-5. Something new, if the above are genuinely exhausted.
+6. Something new, if the above are genuinely exhausted.
 
 The choice is yours. You do not need permission, and a well-argued unusual
 direction is better than a safe one nobody learns from.

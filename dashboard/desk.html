@@ -1,281 +1,1177 @@
 <title>BTC Fair Value Desk</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
-/* Single-theme by intent: this is a trading desk, it is black. Every colour
-   is painted explicitly so the page holds on any host ground. */
 :root{
-  --bg:#06080B; --panel:#0D1117; --sunk:#12161D; --line:#1E2630; --line-2:#2A3440;
-  --txt:#DCE3EA; --dim:#7B8794; --faint:#4A5561;
-  --mkt:#FF4D8D;      /* what the market says */
-  --mdl:#35D6E8;      /* what the model says */
-  --warn:#F5A524; --ok:#3DD68C; --bad:#FF5C5C;
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#798593; --faint:#49535F;
+  --mkt:#FF3D82; --mkt-dim:#7A1638;
+  --mdl:#2BD4E8; --mdl-dim:#0E5460;
+  --up:#2FD67F; --down:#FF5757; --warn:#F5A524;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);
-  font:400 13px/1.55 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+  font:400 12px/1.5 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:12px;padding-block:10px 40px}
 h1,h2,h3{margin:0}
-.cond{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;letter-spacing:.04em}
-.lbl{font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:600;
-  letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
 .num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
 
-/* masthead */
-.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;
-  justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--line-2)}
-.title{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:26px;letter-spacing:.03em}
-.title span{color:var(--mkt)}
-.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.7}
+/* ticker bar */
+.ticker{display:flex;flex-wrap:wrap;align-items:center;gap:0;
+  background:var(--panel);border:1px solid var(--line-2);border-radius:3px;overflow:hidden}
+.ticker > div{padding:7px 13px;border-right:1px solid var(--line);white-space:nowrap}
+.ticker > div:last-child{border-right:none;margin-left:auto}
+.ticker .k{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+.ticker .v{font-size:14px;font-weight:700;margin-top:1px}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:17px;
+  letter-spacing:.08em;background:var(--mkt);color:#12000A!important}
 
-/* honesty band — the most important element on the page */
-.band{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:12px;
-  padding:9px 12px;background:#1A1207;border:1px solid #3D2B0C;border-radius:3px}
-.chip{font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px;
-  background:#3D2B0C;color:var(--warn);white-space:nowrap}
-.band p{margin:0;font-size:12px;color:#C9A86B;flex:1;min-width:220px}
+/* grid */
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px;align-items:start}
+@media (min-width:1000px){
+  .grid{grid-template-columns:300px 1fr 260px}
+  .span3{grid-column:1/-1}
+}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:3px;min-width:0}
+.card > header{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:7px 11px;border-bottom:1px solid var(--line)}
+.card > .b{padding:11px}
+.glow{border-color:var(--mkt-dim);box-shadow:0 0 0 1px rgba(255,61,130,.18),0 0 26px -8px rgba(255,61,130,.35)}
+.live{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;
+  padding:2px 6px;border-radius:2px;background:var(--mkt);color:#12000A}
+.live.halt{background:var(--warn);color:#1A1000}
 
-/* spot strip */
-.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px;border-radius:3px;overflow:hidden}
-.cell{background:var(--panel);padding:11px 13px}
-.cell .v{font-size:19px;font-weight:500;margin-top:5px}
-.cell .s{font-size:11px;color:var(--faint);margin-top:2px}
+/* status card */
+.big{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.sub{font-size:11px;color:var(--faint);margin-top:3px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:11px;margin-top:11px;
+  padding-top:10px;border-top:1px solid var(--line)}
+.kv dt{color:var(--faint)} .kv dd{margin:0;text-align:right}
 
-/* panels */
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:18px}
-.panel > header{display:flex;justify-content:space-between;align-items:baseline;
-  gap:12px;padding:10px 13px;border-bottom:1px solid var(--line)}
-.panel > .body{padding:13px}
+/* candles */
+svg.chart{display:block;width:100%;height:auto}
 
-/* the ladder — the point of the page */
-.row{padding:11px 0;border-bottom:1px solid var(--line)}
+/* order book */
+.ob{font-size:11px}
+.ob .r{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px 0;position:relative}
+.ob .r span:last-child{text-align:right;color:var(--dim)}
+.ob .bar{position:absolute;top:0;bottom:0;right:0;opacity:.16}
+.ob .ask .bar{background:var(--mkt)} .ob .bid .bar{background:var(--up)}
+.ob .ask span:first-child{color:var(--mkt)} .ob .bid span:first-child{color:var(--up)}
+.ob .mid{margin:6px 0;padding:5px 0;border-block:1px solid var(--line-2);
+  display:flex;justify-content:space-between;font-weight:700}
+
+/* ladder */
+.row{padding:10px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:none}
-.rhead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:9px}
-.tick{font-size:12px;color:var(--dim)}
-.strike{font-size:16px;font-weight:700}
-.mins{font-size:11px;color:var(--faint)}
-.track{position:relative;height:30px;background:var(--sunk);border-radius:2px;overflow:hidden}
-.gapfill{position:absolute;top:0;bottom:0;background:linear-gradient(90deg,rgba(255,77,141,.20),rgba(53,214,232,.20))}
+.rh{display:flex;flex-wrap:wrap;gap:5px 13px;align-items:baseline;margin-bottom:8px}
+.strike{font-size:17px;font-weight:700}
+.tk{font-size:11px;color:var(--dim)} .mins{font-size:10px;color:var(--faint)}
+.track{position:relative;height:32px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.gapfill{position:absolute;top:0;bottom:0;
+  background:linear-gradient(90deg,rgba(255,61,130,.22),rgba(43,212,232,.22))}
 .mark{position:absolute;top:0;bottom:0;width:2px}
-.mark.m{background:var(--mkt)} .mark.f{background:var(--mdl)}
-.mark i{position:absolute;top:50%;transform:translateY(-50%);font-style:normal;
-  font-size:10px;font-weight:700;letter-spacing:.06em;white-space:nowrap;padding:2px 5px;border-radius:2px}
-.mark.m i{background:var(--mkt);color:#1A0410;left:4px}
-.mark.f i{background:var(--mdl);color:#03181B;right:4px}
-.scale{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);margin-top:3px}
-.rfoot{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:11px;color:var(--dim);margin-top:7px}
-.gapv{font-weight:700}
-.gapv.wide{color:var(--warn)}
+.mark.m{background:var(--mkt);box-shadow:0 0 10px rgba(255,61,130,.7)}
+.mark.f{background:var(--mdl);box-shadow:0 0 10px rgba(43,212,232,.7)}
+.mark i{position:absolute;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;
+  font-weight:700;letter-spacing:.05em;white-space:nowrap;padding:2px 5px;border-radius:2px}
+.mark.m i{background:var(--mkt);color:#12000A;left:4px}
+.mark.f i{background:var(--mdl);color:#02171B;right:4px}
+.rf{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:10.5px;color:var(--dim);margin-top:6px}
+.rf b{color:var(--txt)}
+.flag{color:var(--warn);font-weight:700}
 
-/* two-up */
-.duo{display:grid;grid-template-columns:1fr;gap:18px}
-@media (min-width:860px){.duo{grid-template-columns:1fr 1fr}}
-.duo .panel{margin-top:0}
-ul.tight{margin:0;padding-left:17px}
-ul.tight li{margin-bottom:8px;font-size:12px;color:var(--dim)}
-ul.tight li b{color:var(--txt);font-weight:500}
-ul.tight li:last-child{margin-bottom:0}
-dl.kv{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px;font-size:12px}
-dl.kv dt{color:var(--faint)} dl.kv dd{margin:0;text-align:right}
-footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
-  font-size:11px;color:var(--faint);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* log */
+.log{max-height:230px;overflow-y:auto;font-size:11px}
+.log .l{display:grid;grid-template-columns:62px 58px 1fr;gap:9px;padding:2.5px 0;border-bottom:1px solid #121821}
+.log .l:last-child{border-bottom:none}
+.log .t{color:var(--faint)}
+.log .w{font-weight:700;letter-spacing:.04em}
+.w.SPOT{color:var(--mdl)} .w.PRICE{color:var(--mkt)} .w.FLAG,.w.HALT{color:var(--warn)}
+.w.VOL,.w.CHECK,.w.BOOK,.w.FETCH{color:var(--dim)}
+.log .d{color:var(--dim);word-break:break-word}
+
+ul.t{margin:0;padding-left:15px} ul.t li{margin-bottom:7px;font-size:11px;color:var(--dim)}
+ul.t li b{color:var(--txt);font-weight:500} ul.t li:last-child{margin-bottom:0}
+footer{margin-top:16px;font-size:10.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:5px 16px;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 
 <div class="wrap">
-  <header class="top">
-    <div>
-      <h1 class="title">BTC FAIR VALUE <span>DESK</span></h1>
-      <div class="lbl" style="margin-top:3px">Kalshi contracts vs a lognormal model</div>
-    </div>
-    <div class="stamp" id="stamp"></div>
-  </header>
+  <div class="ticker" id="ticker"></div>
 
-  <div class="band">
-    <span class="chip">No orders placed</span>
-    <span class="chip">Nothing simulated</span>
-    <span class="chip">Model unvalidated</span>
-    <p id="bandtext"></p>
-  </div>
-
-  <section class="strip" id="strip" aria-label="Spot prices"></section>
-
-  <section class="panel">
-    <header>
-      <h2 class="lbl">Market price vs model fair value</h2>
-      <span class="lbl" id="ladder-n"></span>
-    </header>
-    <div class="body" id="ladder"></div>
-  </section>
-
-  <div class="duo" style="margin-top:18px">
-    <section class="panel">
-      <header><h2 class="lbl">The model</h2></header>
-      <div class="body">
-        <dl class="kv" id="modelkv"></dl>
-        <p style="font-size:12px;color:var(--dim);margin:12px 0 0">
-          Probability that BTC settles above the strike, under a driftless
-          lognormal walk: <b style="color:var(--txt)">P = &Phi;(d&#8322;)</b> with
-          <b style="color:var(--txt)">d&#8322; = [ln(S/K) &minus; &sigma;&sup2;&tau;/2] / (&sigma;&radic;&tau;)</b>.
-          Volatility is measured from recent one-minute returns, not assumed.
-        </p>
+  <div class="grid">
+    <section class="card glow">
+      <header><h2 class="lbl">Desk</h2><span class="live halt" id="haltchip">No orders</span></header>
+      <div class="b">
+        <div class="lbl">BTC / USD · median</div>
+        <div class="big num" id="bigspot"></div>
+        <div class="sub" id="bigsub"></div>
+        <dl class="kv" id="statkv"></dl>
       </div>
     </section>
 
-    <section class="panel">
-      <header><h2 class="lbl" style="color:var(--warn)">Why the gap is probably the model, not the market</h2></header>
-      <div class="body">
-        <ul class="tight">
-          <li><b>Settlement is not spot.</b> These contracts resolve on a CF
-            Benchmarks index averaged over the final minute. Averaging cuts
-            terminal variance, so the true fair value is pushed toward the
-            extremes relative to this model. <b>This alone can explain several
-            cents</b> and is the first thing to fix.</li>
-          <li><b>Recent volatility is not future volatility.</b> &sigma; comes from
-            the last few hours of one-minute bars. Over a 15-minute horizon that
-            estimate is noisy, and the model is most sensitive to it near the money.</li>
-          <li><b>Zero drift is assumed.</b> Defensible over minutes, but it is an
-            assumption, not a measurement.</li>
-          <li><b>A large persistent gap on a liquid contract is a red flag.</b>
-            The market has more information than this model does. When they
-            disagree by more than a cent or two, the prior should be that the
-            model is wrong.</li>
+    <section class="card">
+      <header><h2 class="lbl">BTC · 1 min · Kraken</h2><span class="lbl" id="candlab"></span></header>
+      <div class="b" style="padding:8px"><svg class="chart" id="candles" role="img" aria-label="BTC one-minute candles"></svg></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">Order book</h2><span class="lbl" id="obticker"></span></header>
+      <div class="b ob" id="ob"></div>
+    </section>
+
+    <section class="card span3">
+      <header>
+        <h2 class="lbl">Market <span style="color:var(--mkt)">&#9632;</span> vs model <span style="color:var(--mdl)">&#9632;</span></h2>
+        <span class="lbl" id="ladn"></span>
+      </header>
+      <div class="b" id="ladder"></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">Model inputs</h2></header>
+      <div class="b"><dl class="kv" id="modelkv" style="margin-top:0;padding-top:0;border-top:none"></dl></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl" style="color:var(--warn)">Why the gap is the model, not the market</h2></header>
+      <div class="b">
+        <ul class="t">
+          <li><b>Settlement is not spot.</b> Resolves on a CF Benchmarks index averaged over
+            the final minute. Averaging cuts terminal variance, so true fair value sits closer
+            to the extremes than this model says. <b>Fix this first.</b></li>
+          <li><b>&sigma; is backward-looking</b> and noisy over a 15-minute horizon.</li>
+          <li><b>Drift assumed zero</b> — defensible over minutes, still an assumption.</li>
+          <li><b>A large gap on a liquid contract is a red flag.</b> The market knows more
+            than this model does.</li>
         </ul>
       </div>
     </section>
-  </div>
 
-  <section class="panel">
-    <header><h2 class="lbl">What would have to be true before any of this is tradable</h2></header>
-    <div class="body">
-      <ul class="tight">
-        <li><b>Venue.</b> Everything here is Kalshi-direct. The funded account is
-          Robinhood, whose event pricing is roughly 4&cent; per round trip against a
-          1&cent; spread. <b>Until that is resolved, a gap this desk finds is not
-          reachable.</b></li>
-        <li><b>Edge must survive costs and queue.</b> A maker fill earns the
-          spread; a forced taker exit costs 1.75&cent; per contract, about 1.75 round
-          trips of profit.</li>
-        <li><b>The model must be calibrated before it is trusted.</b> Record
-          predicted probability against realised outcome over many contracts. If
-          the 30% bucket does not settle yes about 30% of the time, the gap
-          column is noise.</li>
-      </ul>
-    </div>
-  </section>
+    <section class="card">
+      <header><h2 class="lbl">Before any of this is tradable</h2></header>
+      <div class="b">
+        <ul class="t">
+          <li><b>Venue.</b> This is Kalshi-direct; the funded account is Robinhood
+            (~4&cent; round trip vs a 1&cent; spread). Unresolved, and it gates everything.</li>
+          <li><b>Calibration.</b> Log predicted probability against realised outcome. If the
+            30% bucket does not settle yes ~30% of the time, the gap column is noise.</li>
+          <li><b>Costs and queue.</b> A forced taker exit costs 1.75&cent; — about 1.75 round
+            trips of profit.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card span3">
+      <header><h2 class="lbl">Computation log</h2><span class="lbl">what this build actually did</span></header>
+      <div class="b log" id="log"></div>
+    </section>
+  </div>
 
   <footer>
     <span id="foot"></span>
-    <span>Every figure fetched live and computed at build time. No trade has been placed from this account.</span>
+    <span>Every figure fetched live and computed at build time. Nothing simulated. No order has ever been placed from this account.</span>
   </footer>
 </div>
 
 <script>
 const D = {
-  "built": "13 Sep 2026  09:19:55",
-  "built_utc": "2026-09-13T09:19:55Z",
+  "built": "13 Sep 2026  09:24:28",
+  "built_utc": "2026-09-13T09:24:27Z",
   "spot": {
-    "Kraken": 76772.8,
-    "Coinbase": 76750.11,
+    "Kraken": 76751.3,
+    "Coinbase": 76754.51,
     "Binance.US": 76783.62
   },
-  "median": 76772.8,
-  "disagree": 33.50999999999476,
-  "sd_min": 0.0002294923398524551,
-  "ann_vol": 0.1663779895815003,
+  "median": 76754.51,
+  "disagree": 32.31999999999243,
+  "sd_min": 0.00023610275919799502,
+  "ann_vol": 0.17117042963291415,
   "nbars": 179,
   "rows": [
     {
       "series": "KXBTC15M",
       "ticker": "KXBTC15M-26SEP130530-30",
       "strike": 76797.37,
-      "mins": 10.1,
-      "bid": 0.25,
-      "ask": 0.26,
-      "mid": 0.255,
-      "fair": 0.3301,
-      "gap": 0.0751,
-      "vol": 0.0,
+      "mins": 5.5,
+      "bid": 0.24,
+      "ask": 0.25,
+      "mid": 0.245,
+      "fair": 0.1574,
+      "gap": -0.0876,
+      "vol": 307793.45,
       "spread": 1.0
     }
   ],
-  "errors": []
+  "errors": [],
+  "candles": [
+    {
+      "t": 1789286100,
+      "o": 77103.0,
+      "h": 77103.1,
+      "l": 77070.6,
+      "c": 77070.9,
+      "v": 0.52478027
+    },
+    {
+      "t": 1789286160,
+      "o": 77070.9,
+      "h": 77088.4,
+      "l": 77070.9,
+      "c": 77088.3,
+      "v": 0.06949908
+    },
+    {
+      "t": 1789286220,
+      "o": 77088.4,
+      "h": 77092.4,
+      "l": 77088.3,
+      "c": 77092.1,
+      "v": 0.14692092
+    },
+    {
+      "t": 1789286280,
+      "o": 77092.0,
+      "h": 77092.6,
+      "l": 77089.7,
+      "c": 77092.6,
+      "v": 0.14414135
+    },
+    {
+      "t": 1789286340,
+      "o": 77092.6,
+      "h": 77103.4,
+      "l": 77092.5,
+      "c": 77103.4,
+      "v": 0.01127589
+    },
+    {
+      "t": 1789286400,
+      "o": 77103.6,
+      "h": 77103.6,
+      "l": 77075.9,
+      "c": 77098.8,
+      "v": 4.27885028
+    },
+    {
+      "t": 1789286460,
+      "o": 77098.9,
+      "h": 77102.8,
+      "l": 77098.8,
+      "c": 77102.8,
+      "v": 0.08464529
+    },
+    {
+      "t": 1789286520,
+      "o": 77102.2,
+      "h": 77135.8,
+      "l": 77102.2,
+      "c": 77135.8,
+      "v": 0.11147238
+    },
+    {
+      "t": 1789286580,
+      "o": 77135.8,
+      "h": 77149.4,
+      "l": 77135.8,
+      "c": 77149.4,
+      "v": 0.04301591
+    },
+    {
+      "t": 1789286640,
+      "o": 77149.5,
+      "h": 77149.5,
+      "l": 77149.1,
+      "c": 77149.2,
+      "v": 0.03346363
+    },
+    {
+      "t": 1789286700,
+      "o": 77149.1,
+      "h": 77149.2,
+      "l": 77104.8,
+      "c": 77104.9,
+      "v": 0.29997897
+    },
+    {
+      "t": 1789286760,
+      "o": 77104.9,
+      "h": 77104.9,
+      "l": 77104.8,
+      "c": 77104.9,
+      "v": 0.02152411
+    },
+    {
+      "t": 1789286820,
+      "o": 77104.9,
+      "h": 77118.0,
+      "l": 77104.9,
+      "c": 77118.0,
+      "v": 0.0958427
+    },
+    {
+      "t": 1789286880,
+      "o": 77118.0,
+      "h": 77118.1,
+      "l": 77117.9,
+      "c": 77118.1,
+      "v": 0.04312663
+    },
+    {
+      "t": 1789286940,
+      "o": 77118.1,
+      "h": 77129.8,
+      "l": 77106.1,
+      "c": 77106.2,
+      "v": 0.36181128
+    },
+    {
+      "t": 1789287000,
+      "o": 77106.1,
+      "h": 77106.1,
+      "l": 77056.7,
+      "c": 77056.8,
+      "v": 0.10558955
+    },
+    {
+      "t": 1789287060,
+      "o": 77056.8,
+      "h": 77056.8,
+      "l": 77052.6,
+      "c": 77052.6,
+      "v": 0.01958591
+    },
+    {
+      "t": 1789287120,
+      "o": 77052.6,
+      "h": 77052.6,
+      "l": 77049.5,
+      "c": 77049.6,
+      "v": 0.05420418
+    },
+    {
+      "t": 1789287180,
+      "o": 77049.6,
+      "h": 77049.6,
+      "l": 77021.3,
+      "c": 77033.1,
+      "v": 0.45238892
+    },
+    {
+      "t": 1789287240,
+      "o": 77036.9,
+      "h": 77043.2,
+      "l": 77036.9,
+      "c": 77043.1,
+      "v": 0.00920456
+    },
+    {
+      "t": 1789287300,
+      "o": 77043.2,
+      "h": 77043.2,
+      "l": 77043.1,
+      "c": 77043.1,
+      "v": 0.00671998
+    },
+    {
+      "t": 1789287360,
+      "o": 77043.2,
+      "h": 77043.2,
+      "l": 77036.3,
+      "c": 77036.4,
+      "v": 0.80812157
+    },
+    {
+      "t": 1789287420,
+      "o": 77036.3,
+      "h": 77036.4,
+      "l": 77000.0,
+      "c": 77000.0,
+      "v": 11.71361002
+    },
+    {
+      "t": 1789287480,
+      "o": 77000.0,
+      "h": 77000.1,
+      "l": 77000.0,
+      "c": 77000.0,
+      "v": 4.15115279
+    },
+    {
+      "t": 1789287540,
+      "o": 77000.1,
+      "h": 77000.1,
+      "l": 77000.0,
+      "c": 77000.1,
+      "v": 0.61180374
+    },
+    {
+      "t": 1789287600,
+      "o": 77000.1,
+      "h": 77020.1,
+      "l": 77000.0,
+      "c": 77020.1,
+      "v": 0.20534657
+    },
+    {
+      "t": 1789287660,
+      "o": 77020.0,
+      "h": 77020.1,
+      "l": 77018.5,
+      "c": 77018.6,
+      "v": 0.23318973
+    },
+    {
+      "t": 1789287720,
+      "o": 77018.6,
+      "h": 77018.6,
+      "l": 77008.3,
+      "c": 77008.3,
+      "v": 0.45193319
+    },
+    {
+      "t": 1789287780,
+      "o": 77008.3,
+      "h": 77011.8,
+      "l": 77008.3,
+      "c": 77010.1,
+      "v": 0.55899108
+    },
+    {
+      "t": 1789287840,
+      "o": 77010.2,
+      "h": 77010.2,
+      "l": 77000.0,
+      "c": 77006.9,
+      "v": 2.84071588
+    },
+    {
+      "t": 1789287900,
+      "o": 77006.9,
+      "h": 77011.8,
+      "l": 77006.9,
+      "c": 77011.7,
+      "v": 0.9233514
+    },
+    {
+      "t": 1789287960,
+      "o": 77011.8,
+      "h": 77014.7,
+      "l": 77011.4,
+      "c": 77011.6,
+      "v": 0.04652301
+    },
+    {
+      "t": 1789288020,
+      "o": 77011.7,
+      "h": 77011.7,
+      "l": 77009.7,
+      "c": 77010.0,
+      "v": 0.27606995
+    },
+    {
+      "t": 1789288080,
+      "o": 77009.9,
+      "h": 77010.0,
+      "l": 77009.9,
+      "c": 77010.0,
+      "v": 0.02732544
+    },
+    {
+      "t": 1789288140,
+      "o": 77009.9,
+      "h": 77009.9,
+      "l": 77000.1,
+      "c": 77000.2,
+      "v": 1.21499275
+    },
+    {
+      "t": 1789288200,
+      "o": 77000.3,
+      "h": 77000.3,
+      "l": 76980.1,
+      "c": 76980.1,
+      "v": 54.72938519
+    },
+    {
+      "t": 1789288260,
+      "o": 76980.1,
+      "h": 76980.1,
+      "l": 76923.2,
+      "c": 76956.7,
+      "v": 4.11596258
+    },
+    {
+      "t": 1789288320,
+      "o": 76956.6,
+      "h": 76956.7,
+      "l": 76928.1,
+      "c": 76928.1,
+      "v": 0.28167864
+    },
+    {
+      "t": 1789288380,
+      "o": 76928.2,
+      "h": 76928.2,
+      "l": 76851.7,
+      "c": 76888.3,
+      "v": 21.48915102
+    },
+    {
+      "t": 1789288440,
+      "o": 76888.3,
+      "h": 76890.6,
+      "l": 76860.1,
+      "c": 76878.5,
+      "v": 0.20663558
+    },
+    {
+      "t": 1789288500,
+      "o": 76878.6,
+      "h": 76902.6,
+      "l": 76845.9,
+      "c": 76886.5,
+      "v": 0.42021713
+    },
+    {
+      "t": 1789288560,
+      "o": 76866.0,
+      "h": 76866.0,
+      "l": 76839.0,
+      "c": 76860.9,
+      "v": 0.4256354
+    },
+    {
+      "t": 1789288620,
+      "o": 76860.9,
+      "h": 76870.8,
+      "l": 76847.9,
+      "c": 76851.8,
+      "v": 0.12430101
+    },
+    {
+      "t": 1789288680,
+      "o": 76851.8,
+      "h": 76851.8,
+      "l": 76829.0,
+      "c": 76829.0,
+      "v": 0.53707932
+    },
+    {
+      "t": 1789288740,
+      "o": 76829.1,
+      "h": 76829.1,
+      "l": 76759.2,
+      "c": 76763.8,
+      "v": 8.06476367
+    },
+    {
+      "t": 1789288800,
+      "o": 76763.7,
+      "h": 76792.5,
+      "l": 76733.6,
+      "c": 76792.1,
+      "v": 0.39055151
+    },
+    {
+      "t": 1789288860,
+      "o": 76794.7,
+      "h": 76845.6,
+      "l": 76794.7,
+      "c": 76836.1,
+      "v": 0.92178591
+    },
+    {
+      "t": 1789288920,
+      "o": 76836.1,
+      "h": 76836.1,
+      "l": 76799.5,
+      "c": 76799.8,
+      "v": 0.20433212
+    },
+    {
+      "t": 1789288980,
+      "o": 76805.2,
+      "h": 76826.3,
+      "l": 76804.4,
+      "c": 76804.5,
+      "v": 0.09361476
+    },
+    {
+      "t": 1789289040,
+      "o": 76804.5,
+      "h": 76804.5,
+      "l": 76784.9,
+      "c": 76804.1,
+      "v": 0.63263037
+    },
+    {
+      "t": 1789289100,
+      "o": 76804.1,
+      "h": 76804.1,
+      "l": 76802.7,
+      "c": 76804.1,
+      "v": 0.21239251
+    },
+    {
+      "t": 1789289160,
+      "o": 76804.1,
+      "h": 76816.9,
+      "l": 76769.4,
+      "c": 76816.9,
+      "v": 0.27209813
+    },
+    {
+      "t": 1789289220,
+      "o": 76820.7,
+      "h": 76822.2,
+      "l": 76817.2,
+      "c": 76819.2,
+      "v": 0.01797291
+    },
+    {
+      "t": 1789289280,
+      "o": 76819.2,
+      "h": 76825.5,
+      "l": 76819.1,
+      "c": 76825.4,
+      "v": 1.23147681
+    },
+    {
+      "t": 1789289340,
+      "o": 76825.4,
+      "h": 76865.9,
+      "l": 76825.4,
+      "c": 76851.6,
+      "v": 1.59976884
+    },
+    {
+      "t": 1789289400,
+      "o": 76851.5,
+      "h": 76851.5,
+      "l": 76838.7,
+      "c": 76838.8,
+      "v": 3.56666547
+    },
+    {
+      "t": 1789289460,
+      "o": 76838.8,
+      "h": 76856.6,
+      "l": 76838.7,
+      "c": 76852.1,
+      "v": 0.66744411
+    },
+    {
+      "t": 1789289520,
+      "o": 76852.1,
+      "h": 76852.1,
+      "l": 76796.9,
+      "c": 76798.8,
+      "v": 1.72513691
+    },
+    {
+      "t": 1789289580,
+      "o": 76799.6,
+      "h": 76820.9,
+      "l": 76799.6,
+      "c": 76812.8,
+      "v": 0.72814078
+    },
+    {
+      "t": 1789289640,
+      "o": 76812.7,
+      "h": 76814.5,
+      "l": 76788.0,
+      "c": 76803.0,
+      "v": 1.73949629
+    },
+    {
+      "t": 1789289700,
+      "o": 76803.0,
+      "h": 76803.0,
+      "l": 76800.6,
+      "c": 76803.0,
+      "v": 0.72380627
+    },
+    {
+      "t": 1789289760,
+      "o": 76803.0,
+      "h": 76803.0,
+      "l": 76744.4,
+      "c": 76744.4,
+      "v": 0.86990048
+    },
+    {
+      "t": 1789289820,
+      "o": 76744.4,
+      "h": 76782.0,
+      "l": 76732.4,
+      "c": 76782.0,
+      "v": 1.21646065
+    },
+    {
+      "t": 1789289880,
+      "o": 76781.9,
+      "h": 76797.3,
+      "l": 76777.3,
+      "c": 76793.0,
+      "v": 0.15982539
+    },
+    {
+      "t": 1789289940,
+      "o": 76793.0,
+      "h": 76793.0,
+      "l": 76782.0,
+      "c": 76782.1,
+      "v": 0.78383334
+    },
+    {
+      "t": 1789290000,
+      "o": 76782.1,
+      "h": 76803.4,
+      "l": 76782.1,
+      "c": 76794.5,
+      "v": 0.20592062
+    },
+    {
+      "t": 1789290060,
+      "o": 76794.5,
+      "h": 76804.4,
+      "l": 76794.5,
+      "c": 76804.4,
+      "v": 0.27460418
+    },
+    {
+      "t": 1789290120,
+      "o": 76805.1,
+      "h": 76819.6,
+      "l": 76805.1,
+      "c": 76816.8,
+      "v": 0.40799559
+    },
+    {
+      "t": 1789290180,
+      "o": 76816.8,
+      "h": 76816.8,
+      "l": 76790.8,
+      "c": 76790.9,
+      "v": 0.89126171
+    },
+    {
+      "t": 1789290240,
+      "o": 76790.8,
+      "h": 76825.6,
+      "l": 76790.8,
+      "c": 76825.6,
+      "v": 0.65480271
+    },
+    {
+      "t": 1789290300,
+      "o": 76827.3,
+      "h": 76851.7,
+      "l": 76827.2,
+      "c": 76837.1,
+      "v": 0.28939721
+    },
+    {
+      "t": 1789290360,
+      "o": 76837.2,
+      "h": 76873.6,
+      "l": 76837.2,
+      "c": 76868.6,
+      "v": 0.07594023
+    },
+    {
+      "t": 1789290420,
+      "o": 76868.7,
+      "h": 76868.7,
+      "l": 76827.3,
+      "c": 76832.8,
+      "v": 0.77686804
+    },
+    {
+      "t": 1789290480,
+      "o": 76830.7,
+      "h": 76832.9,
+      "l": 76827.4,
+      "c": 76827.4,
+      "v": 0.83475787
+    },
+    {
+      "t": 1789290540,
+      "o": 76827.4,
+      "h": 76827.5,
+      "l": 76823.1,
+      "c": 76823.1,
+      "v": 1.11880223
+    },
+    {
+      "t": 1789290600,
+      "o": 76821.3,
+      "h": 76821.3,
+      "l": 76816.0,
+      "c": 76816.1,
+      "v": 0.05353033
+    },
+    {
+      "t": 1789290660,
+      "o": 76816.0,
+      "h": 76816.1,
+      "l": 76776.0,
+      "c": 76783.7,
+      "v": 0.62659327
+    },
+    {
+      "t": 1789290720,
+      "o": 76783.7,
+      "h": 76803.9,
+      "l": 76783.7,
+      "c": 76786.2,
+      "v": 1.02612802
+    },
+    {
+      "t": 1789290780,
+      "o": 76786.2,
+      "h": 76804.6,
+      "l": 76786.2,
+      "c": 76803.8,
+      "v": 1.57319646
+    },
+    {
+      "t": 1789290840,
+      "o": 76803.9,
+      "h": 76809.0,
+      "l": 76790.0,
+      "c": 76792.4,
+      "v": 0.05812082
+    },
+    {
+      "t": 1789290900,
+      "o": 76790.2,
+      "h": 76790.2,
+      "l": 76756.5,
+      "c": 76759.4,
+      "v": 0.63869046
+    },
+    {
+      "t": 1789290960,
+      "o": 76759.4,
+      "h": 76759.4,
+      "l": 76733.5,
+      "c": 76759.4,
+      "v": 0.2160399
+    },
+    {
+      "t": 1789291020,
+      "o": 76759.4,
+      "h": 76759.4,
+      "l": 76759.0,
+      "c": 76759.1,
+      "v": 0.04801997
+    },
+    {
+      "t": 1789291080,
+      "o": 76759.1,
+      "h": 76778.5,
+      "l": 76759.1,
+      "c": 76775.4,
+      "v": 0.14339461
+    },
+    {
+      "t": 1789291140,
+      "o": 76775.4,
+      "h": 76775.4,
+      "l": 76738.7,
+      "c": 76738.7,
+      "v": 1.10116176
+    },
+    {
+      "t": 1789291200,
+      "o": 76743.1,
+      "h": 76769.2,
+      "l": 76743.0,
+      "c": 76766.3,
+      "v": 0.27983517
+    },
+    {
+      "t": 1789291260,
+      "o": 76766.3,
+      "h": 76786.2,
+      "l": 76766.3,
+      "c": 76786.2,
+      "v": 0.52938465
+    },
+    {
+      "t": 1789291320,
+      "o": 76786.2,
+      "h": 76786.2,
+      "l": 76759.1,
+      "c": 76759.2,
+      "v": 0.98438567
+    },
+    {
+      "t": 1789291380,
+      "o": 76759.1,
+      "h": 76759.1,
+      "l": 76747.0,
+      "c": 76752.3,
+      "v": 0.05073548
+    },
+    {
+      "t": 1789291440,
+      "o": 76752.2,
+      "h": 76757.5,
+      "l": 76739.6,
+      "c": 76739.6,
+      "v": 0.13413599
+    }
+  ],
+  "book": {
+    "ticker": "KXBTC15M-26SEP130530-30",
+    "bids": [
+      [
+        0.1,
+        7864.41
+      ],
+      [
+        0.099,
+        1.0
+      ],
+      [
+        0.098,
+        47.0
+      ],
+      [
+        0.097,
+        1011.0
+      ],
+      [
+        0.096,
+        1.0
+      ],
+      [
+        0.095,
+        1.0
+      ],
+      [
+        0.094,
+        1001.0
+      ],
+      [
+        0.093,
+        2.0
+      ],
+      [
+        0.092,
+        1001.0
+      ]
+    ],
+    "asks": [
+      [
+        0.11,
+        1546.92
+      ],
+      [
+        0.12,
+        1404.73
+      ],
+      [
+        0.13,
+        1105.0
+      ],
+      [
+        0.14,
+        1046.31
+      ],
+      [
+        0.15,
+        949.67
+      ],
+      [
+        0.16,
+        1036.0
+      ],
+      [
+        0.17,
+        1415.0
+      ],
+      [
+        0.18,
+        1597.8
+      ],
+      [
+        0.19,
+        1007.0
+      ]
+    ],
+    "depth_bid": 459913.0500000001,
+    "depth_ask": 395981.22
+  },
+  "log": [
+    {
+      "t": "09:24:28",
+      "what": "SPOT",
+      "detail": "Kraken BTC/USD 76,751.30"
+    },
+    {
+      "t": "09:24:28",
+      "what": "SPOT",
+      "detail": "Coinbase BTC/USD 76,754.51"
+    },
+    {
+      "t": "09:24:28",
+      "what": "SPOT",
+      "detail": "Binance.US BTC/USD 76,783.62"
+    },
+    {
+      "t": "09:24:28",
+      "what": "CHECK",
+      "detail": "venue disagreement $32.32 across 3 sources"
+    },
+    {
+      "t": "09:24:28",
+      "what": "VOL",
+      "detail": "sigma 0.0236%/min from 179 bars -> 17.1% annualised"
+    },
+    {
+      "t": "09:24:28",
+      "what": "FETCH",
+      "detail": "1 open contracts with a two-sided book"
+    },
+    {
+      "t": "09:24:28",
+      "what": "PRICE",
+      "detail": "KXBTC15M-26SEP130530-30 K=76,797 mkt 24.5c model 15.7c gap -8.8c"
+    },
+    {
+      "t": "09:24:28",
+      "what": "FLAG",
+      "detail": "gap 8.8c exceeds believable range - model suspect, not market"
+    },
+    {
+      "t": "09:24:28",
+      "what": "BOOK",
+      "detail": "KXBTC15M-26SEP130530-30 depth 459,913 bid / 395,981 ask"
+    },
+    {
+      "t": "09:24:28",
+      "what": "HALT",
+      "detail": "no order placed - execution not delegated to agents"
+    }
+  ]
 };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const usd = n => "$" + Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const c2 = n => (n*100).toFixed(1) + "¢";
 
-$("stamp").innerHTML = `built ${esc(D.built)}<br>${esc(D.built_utc)}`;
-$("foot").textContent = "Built " + D.built;
-$("bandtext").textContent =
-  "Every number below was fetched from public APIs moments ago and computed here. "
-  + "Where the model is known to be wrong, it says so rather than hiding it.";
+/* ticker */
+const tk = [`<div class="brand">FAIR VALUE DESK</div>`];
+for (const [k,v] of Object.entries(D.spot)) tk.push(`<div><div class="k">${esc(k)}</div><div class="v num">${usd(v)}</div></div>`);
+tk.push(`<div><div class="k">Realised vol</div><div class="v num" style="color:var(--mdl)">${(D.ann_vol*100).toFixed(1)}%</div></div>`);
+tk.push(`<div><div class="k">Contracts</div><div class="v num">${D.rows.length}</div></div>`);
+tk.push(`<div><div class="k">Built</div><div class="v num" style="font-size:12px">${esc(D.built_utc.slice(11,19))}Z</div></div>`);
+$("ticker").innerHTML = tk.join("");
 
-/* spot strip */
-const cells = Object.entries(D.spot).map(([k,v]) =>
-  `<div class="cell"><div class="lbl">${esc(k)}</div><div class="v num">${usd(v)}</div>
-   <div class="s">BTC spot</div></div>`);
-cells.push(`<div class="cell"><div class="lbl">Median</div>
-  <div class="v num" style="color:var(--mkt)">${usd(D.median)}</div>
-  <div class="s">venues differ by ${D.disagree!=null?usd(D.disagree):"n/a"}</div></div>`);
-cells.push(`<div class="cell"><div class="lbl">Realised vol</div>
-  <div class="v num" style="color:var(--mdl)">${(D.ann_vol*100).toFixed(1)}%</div>
-  <div class="s">annualised, ${D.nbars} one-minute bars</div></div>`);
-$("strip").innerHTML = cells.join("");
+/* status */
+$("bigspot").textContent = usd(D.median);
+$("bigsub").textContent = `${Object.keys(D.spot).length} venues · spread ${D.disagree!=null?usd(D.disagree):"n/a"}`;
+const last = D.candles.length ? D.candles[D.candles.length-1] : null;
+const first = D.candles.length ? D.candles[0] : null;
+const chg = (last&&first) ? (last.c-first.o)/first.o*100 : null;
+$("statkv").innerHTML = [
+  ["Window move", chg==null?"n/a":`<span style="color:${chg>=0?"var(--up)":"var(--down)"}">${chg>=0?"+":""}${chg.toFixed(2)}%</span>`],
+  ["&sigma; / minute", (D.sd_min*100).toFixed(4)+"%"],
+  ["Open positions", "0"],
+  ["Realised P&amp;L", "$0.00"],
+  ["Orders placed", "<span style='color:var(--warn)'>0 — ever</span>"],
+  ["Venues polled", Object.keys(D.spot).length],
+  ["Bars sampled", D.nbars],
+  ["Contracts priced", D.rows.length],
+].map(([k,v])=>`<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
+$("bigsub").insertAdjacentHTML("afterend",
+  `<p style="font-size:10.5px;color:var(--faint);margin:9px 0 0;line-height:1.45">
+   Every figure on this page was fetched seconds ago and computed here. No fills,
+   no P&amp;L curve, no win rate — there is nothing to simulate, because nothing
+   has been traded.</p>`);
+
+/* candles */
+(function(){
+  const C = D.candles; if (!C.length) return;
+  const W=760,H=210,PL=6,PR=52,PT=8,PB=16;
+  const lo=Math.min(...C.map(c=>c.l)), hi=Math.max(...C.map(c=>c.h)), rng=(hi-lo)||1;
+  const x=i=>PL+(i/(C.length-1))*(W-PL-PR), y=v=>PT+(1-(v-lo)/rng)*(H-PT-PB);
+  const bw=Math.max(1.6,(W-PL-PR)/C.length*0.62);
+  let g="";
+  C.forEach((c,i)=>{
+    const up=c.c>=c.o, col=up?"var(--up)":"var(--down)";
+    const yo=y(c.o), yc=y(c.c), top=Math.min(yo,yc), h=Math.max(1,Math.abs(yc-yo));
+    g+=`<line x1="${x(i).toFixed(1)}" y1="${y(c.h).toFixed(1)}" x2="${x(i).toFixed(1)}" y2="${y(c.l).toFixed(1)}" stroke="${col}" stroke-width="1" opacity=".75"/>`;
+    g+=`<rect x="${(x(i)-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${col}"/>`;
+  });
+  const lastC=C[C.length-1];
+  g+=`<line x1="${PL}" y1="${y(lastC.c).toFixed(1)}" x2="${W-PR}" y2="${y(lastC.c).toFixed(1)}" stroke="var(--mkt)" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>`;
+  g+=`<rect x="${W-PR+2}" y="${(y(lastC.c)-8).toFixed(1)}" width="48" height="16" rx="2" fill="var(--mkt)"/>`;
+  g+=`<text x="${W-PR+26}" y="${(y(lastC.c)+4).toFixed(1)}" text-anchor="middle" fill="#12000A" font-size="10" font-weight="700" font-family="JetBrains Mono,monospace">${lastC.c.toFixed(0)}</text>`;
+  // strike lines for open contracts
+  D.rows.forEach(r=>{ if(r.strike>=lo&&r.strike<=hi){
+    g+=`<line x1="${PL}" y1="${y(r.strike).toFixed(1)}" x2="${W-PR}" y2="${y(r.strike).toFixed(1)}" stroke="var(--mdl)" stroke-width="1" opacity=".5"/>`;
+    g+=`<text x="${W-PR-4}" y="${(y(r.strike)-3).toFixed(1)}" text-anchor="end" fill="var(--mdl)" font-size="9" font-family="JetBrains Mono,monospace">K ${r.strike.toLocaleString("en-US")}</text>`;}});
+  $("candles").setAttribute("viewBox",`0 0 ${W} ${H}`);
+  $("candles").innerHTML=g;
+  $("candlab").textContent = `${C.length} bars · ${lo.toFixed(0)}–${hi.toFixed(0)}`;
+})();
+
+/* order book */
+(function(){
+  const b=D.book;
+  if(!b){ $("ob").innerHTML=`<p style="color:var(--faint);margin:0">No book — between expiries.</p>`; return; }
+  $("obticker").textContent=b.ticker.split("-").slice(-1)[0];
+  const mx=Math.max(...b.asks.map(a=>a[1]),...b.bids.map(x=>x[1]),1);
+  const line=(p,q,cls)=>`<div class="r ${cls}"><div class="bar" style="width:${(q/mx*100).toFixed(1)}%"></div>
+    <span class="num">${c2(p)}</span><span class="num">${q.toLocaleString("en-US")}</span></div>`;
+  const asks=b.asks.slice().reverse().map(a=>line(a[0],a[1],"ask")).join("");
+  const bids=b.bids.map(x=>line(x[0],x[1],"bid")).join("");
+  const sp=b.asks.length&&b.bids.length?(b.asks[0][0]-b.bids[0][0]):null;
+  $("ob").innerHTML=asks+
+    `<div class="mid"><span class="num">spread</span><span class="num">${sp!=null?c2(sp):"n/a"}</span></div>`+bids+
+    `<div style="margin-top:8px;font-size:10px;color:var(--faint)">depth ${b.depth_bid.toLocaleString("en-US")} bid / ${b.depth_ask.toLocaleString("en-US")} ask</div>`;
+})();
 
 /* ladder */
-$("ladder-n").textContent = D.rows.length + (D.rows.length === 1 ? " contract open" : " contracts open");
-if (!D.rows.length){
-  $("ladder").innerHTML = `<p style="color:var(--dim);font-size:12px;margin:0">
-    No open contracts with a two-sided book right now. These series are
-    short-dated, so this is normal between expiries rather than a failure.</p>`;
-} else {
-  $("ladder").innerHTML = D.rows.map(r => {
-    const lo = Math.max(0, Math.min(r.mid, r.fair) - 0.10);
-    const hi = Math.min(1, Math.max(r.mid, r.fair) + 0.10);
-    const pos = v => ((v - lo) / (hi - lo)) * 100;
-    const pm = pos(r.mid), pf = pos(r.fair);
-    const wide = Math.abs(r.gap) > 0.02;
-    return `<div class="row">
-      <div class="rhead">
-        <span class="strike num">${r.strike.toLocaleString("en-US")}</span>
-        <span class="tick">${esc(r.ticker)}</span>
-        <span class="mins num">${r.mins} min left</span>
-      </div>
-      <div class="track">
-        <div class="gapfill" style="left:${Math.min(pm,pf)}%;width:${Math.abs(pf-pm)}%"></div>
-        <div class="mark m" style="left:${pm}%"><i>MKT ${(r.mid*100).toFixed(1)}&cent;</i></div>
-        <div class="mark f" style="left:${pf}%"><i>MODEL ${(r.fair*100).toFixed(1)}&cent;</i></div>
-      </div>
-      <div class="scale"><span>${(lo*100).toFixed(0)}&cent;</span><span>${(hi*100).toFixed(0)}&cent;</span></div>
-      <div class="rfoot">
-        <span>bid <b class="num">${(r.bid*100).toFixed(0)}&cent;</b> / ask <b class="num">${(r.ask*100).toFixed(0)}&cent;</b></span>
-        <span>spread <b class="num">${r.spread}&cent;</b></span>
-        <span>24h vol <b class="num">${r.vol.toLocaleString("en-US")}</b></span>
-        <span>gap <b class="num gapv ${wide?"wide":""}">${(r.gap*100>=0?"+":"")}${(r.gap*100).toFixed(1)}&cent;</b>
-          ${wide?'<span style="color:var(--warn)"> &mdash; too large to believe</span>':""}</span>
-      </div>
-    </div>`;
-  }).join("");
-}
+$("ladn").textContent = D.rows.length ? D.rows.length+" open" : "none open";
+$("ladder").innerHTML = D.rows.length ? D.rows.map(r=>{
+  const lo=Math.max(0,Math.min(r.mid,r.fair)-0.10), hi=Math.min(1,Math.max(r.mid,r.fair)+0.10);
+  const pos=v=>((v-lo)/(hi-lo))*100, pm=pos(r.mid), pf=pos(r.fair), wide=Math.abs(r.gap)>0.02;
+  return `<div class="row">
+    <div class="rh"><span class="strike num">${r.strike.toLocaleString("en-US")}</span>
+      <span class="tk">${esc(r.ticker)}</span><span class="mins num">${r.mins} min left</span></div>
+    <div class="track">
+      <div class="gapfill" style="left:${Math.min(pm,pf)}%;width:${Math.abs(pf-pm)}%"></div>
+      <div class="mark m" style="left:${pm}%"><i>MKT ${c2(r.mid)}</i></div>
+      <div class="mark f" style="left:${pf}%"><i>MODEL ${c2(r.fair)}</i></div>
+    </div>
+    <div class="rf"><span>bid <b>${c2(r.bid)}</b> / ask <b>${c2(r.ask)}</b></span>
+      <span>spread <b>${r.spread}¢</b></span><span>24h vol <b>${r.vol.toLocaleString("en-US")}</b></span>
+      <span>gap <b class="${wide?"flag":""}">${r.gap>=0?"+":""}${c2(r.gap)}</b>${wide?' <span class="flag">— too large to believe</span>':""}</span></div>
+  </div>`;}).join("")
+  : `<p style="color:var(--faint);margin:0">No contracts with a two-sided book right now. These series are short-dated, so this is normal between expiries.</p>`;
 
-/* model panel */
-$("modelkv").innerHTML = [
-  ["Spot used (median)", usd(D.median)],
-  ["Venue disagreement", D.disagree!=null ? usd(D.disagree) : "n/a"],
-  ["&sigma; per minute", (D.sd_min*100).toFixed(4) + "%"],
-  ["&sigma; annualised", (D.ann_vol*100).toFixed(1) + "%"],
-  ["Sample", D.nbars + " one-minute returns"],
-  ["Drift assumed", "zero"],
-  ["Settlement modelled as", "spot at close <b style='color:var(--warn)'>(wrong)</b>"],
-].map(([k,v]) => `<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
-if (D.errors && D.errors.length){
-  $("modelkv").insertAdjacentHTML("afterend",
-    `<p style="font-size:12px;color:var(--bad);margin:10px 0 0">Fetch errors: ${esc(D.errors.join(", "))}</p>`);
-}
+/* model + log */
+$("modelkv").innerHTML=[
+  ["Spot (median)",usd(D.median)],["Venue spread",D.disagree!=null?usd(D.disagree):"n/a"],
+  ["&sigma; / min",(D.sd_min*100).toFixed(4)+"%"],["&sigma; annualised",(D.ann_vol*100).toFixed(1)+"%"],
+  ["Sample",D.nbars+" bars"],["Drift","zero (assumed)"],
+  ["Settlement","<span style='color:var(--warn)'>spot — wrong</span>"],
+].map(([k,v])=>`<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
+
+$("log").innerHTML = D.log.map(l=>
+  `<div class="l"><span class="t num">${esc(l.t)}</span><span class="w ${esc(l.what)}">${esc(l.what)}</span><span class="d">${esc(l.detail)}</span></div>`).join("");
+$("foot").textContent="Built "+D.built+(D.errors&&D.errors.length?"  ·  fetch errors: "+D.errors.join(", "):"");
 </script>

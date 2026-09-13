@@ -54,6 +54,16 @@ try:
 except Exception as e:
     errs.append(f"vol: {type(e).__name__}")
 
+# --------------------------------------------------------- candles ------
+candles = []
+try:
+    o = j("https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1")
+    for b in list(o["result"].values())[0][-90:]:
+        candles.append({"t": int(b[0]), "o": float(b[1]), "h": float(b[2]),
+                        "l": float(b[3]), "c": float(b[4]), "v": float(b[6])})
+except Exception as e:
+    errs.append(f"candles: {type(e).__name__}")
+
 # ------------------------------------------------------- contracts ------
 now = dt.datetime.now(dt.timezone.utc)
 rows = []
@@ -88,15 +98,53 @@ for series in ("KXBTC15M", "KXBTCD"):
             continue
 rows.sort(key=lambda r: (r["series"], r["strike"]))
 
+# ------------------------------------------------------- order book -----
+book = None
+if rows:
+    focus = min(rows, key=lambda r: r["mins"])
+    try:
+        ob = j(f"{KAL}/markets/{focus['ticker']}/orderbook").get("orderbook_fp", {})
+        yes = [(float(p), float(q)) for p, q in (ob.get("yes_dollars") or [])]
+        no = [(float(p), float(q)) for p, q in (ob.get("no_dollars") or [])]
+        # NO bids at price p are YES offers at 1-p
+        asks = sorted(((round(1 - p, 4), q) for p, q in no), key=lambda x: x[0])[:9]
+        bids = sorted(yes, key=lambda x: -x[0])[:9]
+        book = {"ticker": focus["ticker"], "bids": bids, "asks": asks,
+                "depth_bid": sum(q for _, q in yes), "depth_ask": sum(q for _, q in no)}
+    except Exception as e:
+        errs.append(f"book: {type(e).__name__}")
+
+# a real log of what this build actually did, with timestamps
+log = []
+def note(what, detail):
+    log.append({"t": dt.datetime.now(dt.timezone.utc).strftime("%H:%M:%S"),
+                "what": what, "detail": detail})
+for name, px in spot.items():
+    note("SPOT", f"{name} BTC/USD {px:,.2f}")
+if disagree is not None:
+    note("CHECK", f"venue disagreement ${disagree:,.2f} across {len(spot)} sources")
+if sd_min:
+    note("VOL", f"sigma {sd_min*100:.4f}%/min from {nbars} bars -> {sd_min*math.sqrt(525600)*100:.1f}% annualised")
+note("FETCH", f"{len(rows)} open contracts with a two-sided book")
+for r in rows:
+    note("PRICE", f"{r['ticker']} K={r['strike']:,.0f} mkt {r['mid']*100:.1f}c model {r['fair']*100:.1f}c gap {r['gap']*100:+.1f}c")
+    if abs(r["gap"]) > 0.02:
+        note("FLAG", f"gap {abs(r['gap'])*100:.1f}c exceeds believable range - model suspect, not market")
+if book:
+    note("BOOK", f"{book['ticker']} depth {book['depth_bid']:,.0f} bid / {book['depth_ask']:,.0f} ask")
+note("HALT", "no order placed - execution not delegated to agents")
+
 DATA = {
     "built": dt.datetime.now().strftime("%d %b %Y  %H:%M:%S"),
     "built_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
     "spot": spot, "median": S, "disagree": disagree,
     "sd_min": sd_min, "ann_vol": (sd_min * math.sqrt(525600)) if sd_min else None,
     "nbars": nbars, "rows": rows, "errors": errs,
+    "candles": candles, "book": book, "log": log,
 }
 tpl = (ROOT / "dashboard" / "desk_template.html").read_text()
 OUT.write_text(tpl.replace("/*__DESK__*/null", json.dumps(DATA, indent=2)))
 print(f"built {OUT.relative_to(ROOT)}")
 print(f"  spot ${S:,.2f}  vol {DATA['ann_vol']*100:.1f}%  contracts {len(rows)}"
+      f"  candles {len(candles)}  book {'yes' if book else 'no'}  log {len(log)}"
       + (f"  errors: {errs}" if errs else ""))

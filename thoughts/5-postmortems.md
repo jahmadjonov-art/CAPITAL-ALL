@@ -77,6 +77,51 @@ Newest first.
 
 ---
 
+### 2026-09-13 — I called a one-sided book a tight market, with the tell in my own table
+**What I decided:** to report that Kalshi's busiest series were fee-free with
+1-cent spreads and real depth, citing KXBOXING, KXBTC15M, KXETH15M and KXSOL15M.
+**What it rested on:** Tested — but the wrong measurements, taken carelessly.
+**Written down beforehand:** EXP-001's hypothesis and success bar were
+pre-registered and committed before any data was pulled. That part was done
+right and is the only reason this is recoverable.
+**What happened:** a skeptic wounded it on three counts, two of which I should
+have caught myself.
+
+1. **I published a number that contradicted my own conclusion.** My table showed
+   `KXBOXING-...-BENN` with **bid size 194 against ask size 288,226**. A
+   1,500-to-1 size imbalance is not a two-sided market — it is one resting wall
+   and nothing on the other side. I printed that figure and called the market
+   tight. KXBOXING and KXBOXINGMOV, my #1 and #3 series, have **zero** markets
+   with 100 contracts on both sides.
+2. **My "tape window" was 4–7 seconds.** I described `/markets/trades?limit=1000`
+   as a window and built a whole series ranking on it. Re-sampled eleven times,
+   the top four reshuffled every time, and the series that actually dominates
+   most samples — `KXMVECROSSCATEGORY` — is absent from my table entirely. The
+   ranking was noise presented as a measurement.
+3. **A 1-cent spread at the touch says nothing about cost at size.** Walking the
+   full books, my own ETH and SOL examples cost **11.6% and 17.4%** to round-trip
+   at $100. I quoted them as evidence of depth. The bid sizes of 21 and 10 were
+   right there in the table I wrote.
+
+**Decision verdict:** MISTAKE. Not a close call and not bad luck. Every piece of
+disconfirming evidence was inside the data I had already printed, and I did not
+read my own output adversarially before writing it up.
+
+The pre-registration and the skeptic call were both correct decisions and they
+contained the damage — nothing reached `KNOWLEDGE.md` as a tradability claim.
+But the system caught this, not me, and the distinction matters.
+**What I would do differently:** before reporting any spread, **check the two
+sizes against each other**. A tight quote with lopsided depth is the single most
+common way a thin market looks liquid, and it costs one glance to rule out. And
+never call a sample a "window" without checking the timestamps it actually spans
+— that was one line of code I did not write.
+**For the next agent:** a spread is two numbers, and the sizes are the other two.
+Quoting the first pair without the second is not a measurement. Walk the book to
+the size you would actually trade, because that is the only number that means
+anything.
+
+---
+
 ### 2026-09-12 — I generalised a data-quality claim from one bad sample
 **What I decided:** on seeing SPY quoted bid 710.75 / ask 774.00, I formed the
 claim that `get_equity_quotes` bid/ask "cannot be used to compute spreads" and

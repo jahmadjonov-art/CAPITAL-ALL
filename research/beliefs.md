@@ -15,9 +15,70 @@ Strongest evidence first. Format is in [`README.md`](README.md).
 
 ---
 
+### B-004 · The fee-free route is real on Kalshi — but probably unreachable from our account
+**Tier:** T2 — fee schedule now cited from source; liquidity measured by walking
+full order books; the venue question unresolved.
+**Basis:** Cited (fee schedule) + Tested (books, flow, slippage)
+
+**The good news, now cited rather than assumed.** Kalshi's published Fee
+Schedule (effective 2026-02-05) states it outright: *"Trading fees are not
+charged for orders placed that are not immediately matched and are instead left
+as resting orders on the orderbook, unless they are included in our 'Maker Fees'
+section."* So on a plain `quadratic` series, **a resting order that fills pays
+zero exchange fee.** This was the load-bearing assumption behind `B-003` and it
+holds.
+
+**The earlier "fee-free and liquid are disjoint" claim is retired.** It failed
+for a reason that has nothing to do with the weekend: **it only sampled `*GAME`
+series.** Within MLB alone, `KXMLBGAME` charges maker fees while `KXMLBTOTAL`,
+`KXMLBSPREAD`, `KXMLBRFI`, `KXMLBEXTRAS`, `KXMLBF5` and `KXMLBF7` are all plain
+`quadratic`. The overlap was there on weekdays the whole time. Verified against
+history: `KXBTCD` held a ≤2c spread in **100% of interior minutes on Friday 2pm
+ET with 1.56M contracts traded** — higher volume than the Saturday window, same
+spread.
+
+**Now the damage.** A 1-cent spread is not the same as a tradable market:
+
+- **34% of markets sit at a penny boundary** (bid ≤ 1c or ask ≥ 99c) where a
+  "1-cent spread" is tautological and one side holds zero size.
+- **Walking the full book at $100 size (200 contracts at 50c)**: KXMLSGAME 1.48%
+  round trip, KXBTCD 2.06%, KXBTC15M 2.35% — but **KXETH15M 11.58%, KXSOL15M
+  17.39%, KXXRP15M 22.48%.**
+- **Deep quotes are not tradable quotes.** Over a 7-minute live monitor, KXBTCD's
+  most active strike showed **3 contracts/minute and zero sell-side flow**;
+  KXUFCFIGHT quoted 11,834 × 190,846 with essentially no flow at all. The only
+  fee-free markets with genuine two-sided flow were **in-play soccer**, which
+  clears its bid queue in **0.3 minutes** — far too fast to rest in.
+- **Price moves faster than the spread.** Median absolute mid move per minute on
+  KXBTCD is **2.0c against a 1.0c spread.**
+- **A forced taker exit costs 1.75 round trips of profit.** Making 1c on a 50c
+  contract earns 2% of notional; exiting as a taker costs 1.75c. **Over 64% of
+  exits must be passive just to break even**, before adverse selection.
+
+**The finding that matters most, and it is about us, not the venue:** all of the
+above is **Kalshi-direct**. Our funded account is **Robinhood**, and Kalshi's own
+fee schedule explicitly carves out FCM customers: *"Users accessing Kalshi via a
+third-party Futures Commission Merchant may be charged fees by their FCM that
+vary from the above fee schedule."* Reported Robinhood event-contract pricing is
+**$0.01 commission + $0.01 exchange fee per contract per side — 4c per round
+trip against a 1c spread.** That is **four times worse than the exchange fee this
+entire thesis existed to avoid**, and it is not established that Robinhood even
+exposes resting limit orders on the book.
+
+**What would falsify it:** confirmation that Robinhood does expose passive orders
+at competitive fees (revives the route), or confirmation that it does not (kills
+it from this account entirely and makes a direct Kalshi account the only path).
+**Settle the venue question before any further market scanning** — more data
+about a venue we cannot trade is worth nothing.
+**Last reviewed:** 2026-09-13
+
+---
+
 ### B-003 · Kalshi is not viable for taking liquidity at $100 — fees are ~3.5x the spread
-**Tier:** T2 — the fee formula is cited from a regulatory filing and applied to
-live order books measured today. No trade was executed.
+**Tier:** T2 — **substantially revised by `B-004` above; read that first.** The
+maker-fee assumption is now confirmed from Kalshi's published schedule, and the
+"fee-free and liquid are disjoint" warning below is **retired** — it sampled only
+`*GAME` series and missed that most non-`*GAME` markets are plain `quadratic`.
 **Basis:** Cited (fee formula) + Tested (live spreads and series data) + Reasoned
 (the arithmetic between them)
 **Why we think this:** the taker fee is `ceil(0.07 x contracts x P x (1-P))`. At a

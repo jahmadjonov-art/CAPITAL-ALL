@@ -106,8 +106,18 @@ test was simply the wrong instrument for it.
   2022 filing, never from a filled order. **If it is false, everything above is
   irrelevant.**
 
-**Status:** T1 — real measurement, single snapshot, weekend. Sent to a `skeptic`.
-Not promoted to any belief about tradability until the maker-fee assumption is
-tested on the demo environment.
+**Status: WOUNDED by a skeptic — read `B-004`, not this entry, for what stands.**
+
+What survived: fee-free and liquid genuinely do overlap, and not because of the
+weekend — KXBTCD holds the same spread on **higher** Friday-afternoon volume.
+
+What did not: the series ranking above came from a tape sample spanning **4–7
+seconds**, not a window, and reshuffles completely on re-sampling. KXBOXING and
+KXBOXINGMOV have **one-sided books** (bid size 194 against ask size 288,226 — the
+tell was in the table above and went unread). And the ETH/SOL examples cost
+**11.6%** and **17.4%** to round-trip at $100 once the book is walked properly.
+
+The honest lesson is in `thoughts/5-postmortems.md`. The measurement was sound in
+method and careless in reading.
 
 ---

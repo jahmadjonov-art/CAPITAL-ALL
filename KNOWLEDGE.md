@@ -19,23 +19,28 @@ tier, and names the experiments behind it so the detail can be pulled on demand.
   covers 100 shares, capping puts and covered calls at a $1 underlying. Equities
   (fractional works) and crypto remain; T+1 settlement allows ~one round trip
   per dollar per day. — `B-001`
-- **Kalshi: fees are ~3.5× the spread, so active taking is dead at $100.** A
-  round trip near 50¢ costs 7% of the account. The fee-free series and the
-  liquid series are **mostly different series** — the cheap route is the thin
-  one. **The one overlap worth a look: Kalshi's crypto markets are fee-free type
-  *and* had real volume at 1–2¢.** Fee multipliers are per-market; never
-  hard-code them. — `B-003`
+- **Kalshi: taking liquidity is dead at $100** (fees ~3.5× the spread, 7% of the
+  account per round trip). **Resting orders genuinely are free** on plain
+  `quadratic` series — now cited from Kalshi's published schedule, not inferred.
+  Fee-free *and* liquid markets do exist and are not a weekend artifact. — `B-003`
+- **But the fee-free route is probably unreachable from our account, and that is
+  the blocker.** All of it is Kalshi-direct; we hold a **Robinhood** account,
+  which Kalshi's schedule explicitly carves out. Robinhood's reported event
+  pricing is ~4¢ per round trip against a 1¢ spread — **four times worse than the
+  fee we were avoiding** — and it may not expose resting orders at all.
+  **Settle this before scanning any more markets.** — `B-004`
+- **A tight spread is not a tradable market.** 34% of Kalshi markets sit at a
+  penny boundary where 1¢ is tautological; walking real books at $100 size costs
+  1.5% on the best and **11–22%** on crypto alts. Deep quotes ≠ flow: the series
+  previously called our best overlap traded **3 contracts/minute with zero
+  sell-side flow**. — `B-004`
 - **Never price a spread from `get_equity_quotes` after hours** — 487× wrong on
-  SPY, and the symbols that looked tight were the most misleading. Use
+  SPY; the symbols that looked tight were the most misleading. Use
   `review_equity_order`'s disclosure. Untested in regular hours. — `B-002`
-- **A weekday research run fires automatically at 15:10 UTC** — but those
-  sessions get **no broker tools**, so they cannot read the account or quote
-  equities. Broker-shaped work needs an interactive session. — measured
-  2026-09-12
-- **Only one brokerage account is agent-reachable** (`••••6622`); the owner's
-  default is closed by the broker itself. **Subagents cannot reach the Robinhood
-  tools at all** — the lead must fetch broker data and paste it into their brief.
-  — measured 2026-09-12
+- **Broker access is narrow.** Only account `••••6622` is agent-reachable;
+  **subagents and scheduled runs get no broker tools at all**, so the lead must
+  fetch and paste. Kalshi's API silently returns nothing for pre-migration field
+  names — see `handoff.md` before writing any script against it.
 
 ## What is dead
 

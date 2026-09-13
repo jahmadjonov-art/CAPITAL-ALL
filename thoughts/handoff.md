@@ -448,3 +448,36 @@ a flattering number will eventually show one.
 Crypto spot sources: **Binance.com returns 451** (geo-blocked from here).
 Binance.US, Coinbase and Kraken all work; they disagreed by $33.51 on one
 reading, which matters when strikes sit $100 apart.
+
+---
+
+## The three published pages
+
+| Page | URL |
+|---|---|
+| **Office floor plan** — the firm at a glance | https://claude.ai/code/artifact/7b709ccd-35aa-4f97-a096-26026bf8573b |
+| **Fair value desk** — live BTC contracts vs model | https://claude.ai/code/artifact/a0aa3e0b-1fe1-420e-99b1-fc9103ac170d |
+| **Strategy library** — one tab per source | https://claude.ai/code/artifact/d39ab618-439a-48aa-a40e-d3fe756ec966 |
+
+Each is generated: `dashboard/build.py`, `desk.py`, `strategies.py`. Republish
+by passing the URL above as `url` to the Artifact tool so the owner's links keep
+working. **Never hand-edit the generated HTML.**
+
+## The strategy library
+
+`strategies/*.json` holds one extraction per source. The owner will paste more
+transcripts over time; each becomes a file and a tab with no other change.
+
+**The rule that makes it worth having:** every claim carries a `status`, starting
+at `untested`, and moves only when an experiment in `research/experiments.md`
+says what happened and the entry cites the id. A credible-sounding source is not
+evidence. The whole point is to eventually compare several strategies on the
+same footing.
+
+Extraction is faithful, including parts that look wrong — judgement belongs in
+the experiment, not the extraction. See `strategies/README.md`.
+
+**First source in:** Freddy Siento on options flow and gamma levels. 10 claims,
+all untested. Its own stated blocker is that it needs gamma-exposure-by-strike,
+which nothing here currently pulls; CBOE is named as a free source with a
+10-15 minute delay.

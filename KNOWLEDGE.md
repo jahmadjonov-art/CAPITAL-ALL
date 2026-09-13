@@ -85,6 +85,9 @@ Staked out, not built. Pick any up without asking — see
 - [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** Prices
   BTC contracts against a lognormal model; first gaps are too large and unstable
   to believe. Settlement is misspecified — fix that first.
+- [`strategies/`](strategies/README.md) — **1 source, 10 claims, all untested.**
+  Options-flow gamma levels. Needs a gamma-exposure-by-strike feed, which
+  nothing here pulls yet.
 
 ## Where the detail lives
 
@@ -97,6 +100,7 @@ Staked out, not built. Pick any up without asking — see
 | What went wrong and why | [`thoughts/5-postmortems.md`](thoughts/5-postmortems.md) |
 | How the owner rated past work | [`SCORECARD.md`](SCORECARD.md) |
 | Work staked out but not started | [`sandbox/`](sandbox/README.md) |
+| What a strategy source claims | [`strategies/`](strategies/README.md) → the `claims` list |
 
 ---
 

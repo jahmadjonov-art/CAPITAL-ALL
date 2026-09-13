@@ -1,0 +1,210 @@
+<title>Strategy Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#8A96A4; --faint:#49535F;
+  --acc:#FF3D82; --acc-dim:#7A1638; --alt:#2BD4E8;
+  --ok:#2FD67F; --warn:#F5A524;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 13px/1.65 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+h1,h2,h3{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+
+.top{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between;
+  padding-bottom:13px;border-bottom:1px solid var(--line-2)}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:25px;letter-spacing:.05em}
+.brand b{color:var(--acc);font-weight:700}
+.stamp{font-size:11px;color:var(--faint)}
+
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tab{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;padding:7px 14px;border:1px solid var(--line-2);border-radius:3px;
+  background:var(--panel);color:var(--dim);cursor:pointer;font-variant-numeric:tabular-nums}
+.tab:hover{color:var(--txt);border-color:var(--faint)}
+.tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#12000A}
+.tab:focus-visible{outline:2px solid var(--alt);outline-offset:2px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:14px}
+.card > header{padding:9px 14px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:10px}
+.card > .b{padding:14px}
+.pill{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;padding:3px 8px;border-radius:2px;background:#3D2B0C;color:var(--warn);white-space:nowrap}
+.pill.ok{background:#0C2E1D;color:var(--ok)}
+
+.hero{font-family:"Barlow Condensed",sans-serif;font-size:29px;font-weight:700;letter-spacing:.02em;line-height:1.15}
+.short{color:var(--dim);margin-top:6px;max-width:66ch}
+.src{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11.5px;margin-top:14px;
+  padding-top:12px;border-top:1px solid var(--line)}
+.src dt{color:var(--faint);white-space:nowrap} .src dd{margin:0;color:var(--dim)}
+
+ol.steps{margin:0;padding-left:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding-left:34px;margin-bottom:11px;color:var(--dim)}
+ol.steps li:last-child{margin-bottom:0}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:0;
+  font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.05em}
+
+ul.t{margin:0;padding-left:17px} ul.t li{margin-bottom:8px;color:var(--dim)}
+ul.t li:last-child{margin-bottom:0}
+.two{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:820px){.two{grid-template-columns:1fr 1fr}}
+.two .card{margin-top:0}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:0 10px 8px 0;border-bottom:1px solid var(--line-2)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.st{white-space:nowrap;text-align:right;padding-right:0}
+.lv{border-left:2px solid var(--alt);padding:9px 0 9px 12px;margin-bottom:12px}
+.lv:last-child{margin-bottom:0}
+.lv.no{border-left-color:var(--faint)}
+.lv b{color:var(--txt)} .lv .m{font-size:11.5px;color:var(--faint);margin-top:3px}
+dl.gl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:12px}
+dl.gl dt{color:var(--alt);white-space:nowrap} dl.gl dd{margin:0;color:var(--dim)}
+.note{background:var(--sunk);border-left:3px solid var(--warn);padding:11px 13px;border-radius:0 3px 3px 0;
+  font-size:12px;color:var(--dim);margin-top:14px}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 class="brand">STRATEGY <b>LIBRARY</b></h1>
+      <div class="lbl" style="margin-top:3px">What each source says, kept separate so they can be compared</div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="panel" role="tabpanel"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = /*__STRATS__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+$("stamp").textContent = "built " + D.built;
+$("foot").textContent =
+  `${D.strategies.length} source${D.strategies.length===1?"":"s"} · ` +
+  `${D.strategies.reduce((n,s)=>n+(s.claims||[]).length,0)} claims tracked · ` +
+  `Extraction only — each entry states what its source said. Claim status changes when an experiment says so, not before.`;
+
+const card = (title, body, pill) => !body ? "" :
+  `<section class="card"><header><h2 class="lbl">${title}</h2>${pill||""}</header><div class="b">${body}</div></section>`;
+const list = (arr, cls="t") => !arr||!arr.length ? "" :
+  `<ul class="${cls}">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+const steps = arr => !arr||!arr.length ? "" :
+  `<ol class="steps">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+
+function renderStrategy(s){
+  const srcRows = Object.entries(s.source||{}).map(([k,v]) =>
+    `<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+
+  const levels = (s.levels||[]).map(l =>
+    `<div class="lv ${/not traded/i.test(l.use||"")?"no":""}">
+      <b>${esc(l.name)}</b>${l.aka?` <span class="m" style="display:inline">· ${esc(l.aka)}</span>`:""}
+      ${l.meaning?`<div class="m">${esc(l.meaning)}</div>`:""}
+      <div style="margin-top:5px">${esc(l.behaviour||"")}</div>
+      ${l.use?`<div class="m"><b style="color:var(--faint)">Use:</b> ${esc(l.use)}</div>`:""}
+    </div>`).join("");
+
+  const claims = (s.claims||[]).map(c =>
+    `<tr><td>${esc(c.claim)}</td><td style="white-space:nowrap;color:var(--faint)">${esc(c.kind)}</td>
+     <td class="st"><span class="pill ${c.status==="untested"?"":"ok"}">${esc(c.status)}</span></td></tr>`).join("");
+
+  const cal = (s.calendar||[]).map(c =>
+    `<tr><td><b style="color:var(--txt)">${esc(c.event)}</b><div class="m" style="color:var(--faint)">${esc(c.when)}</div></td>
+     <td>${esc(c.why)}${c.action_stated?`<div style="color:var(--warn);margin-top:4px">${esc(c.action_stated)}</div>`:""}
+     ${c.effect_stated?`<div style="margin-top:4px">${esc(c.effect_stated)}</div>`:""}
+     ${c.observation_stated?`<div style="margin-top:4px">${esc(c.observation_stated)}</div>`:""}</td></tr>`).join("");
+
+  const gloss = (s.concepts||[]).map(c=>`<dt>${esc(c.term)}</dt><dd>${esc(c.definition)}</dd>`).join("");
+  const vs = s.volatility_surface||{};
+  const vsRows = Object.entries(vs).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+  const mk = s.markets||{};
+  const mkRows = Object.entries(mk).map(([k,v])=>
+    `<dt>${esc(k.replace(/_/g," "))}</dt><dd>${Array.isArray(v)?esc(v.join(", ")):esc(v)}</dd>`).join("");
+  const risk = Object.entries(s.risk||{}).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+  const timing = Object.entries(s.timing||{}).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+
+  return `
+  <section class="card"><div class="b">
+    <div class="hero">${esc(s.name)}</div>
+    <p class="short">${esc(s.short||"")}</p>
+    <dl class="src">${srcRows}</dl>
+  </div></section>
+
+  ${card("Thesis", `<p style="margin:0;color:var(--dim)">${esc(s.thesis||"")}</p>`)}
+  ${card("Mechanism — how the move is said to happen", steps(s.mechanism))}
+  ${card("Why 0DTE changed it", list(s.why_zero_dte))}
+  ${mkRows?card("Markets", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${mkRows}</dl>`):""}
+  ${levels?card("Levels", levels):""}
+  ${vsRows?card("The volatility surface", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${vsRows}</dl>`):""}
+
+  <div class="two" style="margin-top:14px">
+    ${card("Entry rules", list(s.entry_rules))}
+    ${card("Exit rules", list(s.exit_rules))}
+  </div>
+  <div class="two" style="margin-top:14px">
+    ${risk?card("Risk", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${risk}</dl>`):""}
+    ${timing?card("Timing", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${timing}</dl>`):""}
+  </div>
+
+  ${claims?card("Claims made by this source",
+    `<table><thead><tr><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${claims}</tbody></table>`,
+    `<span class="pill">${(s.claims||[]).filter(c=>c.status==="untested").length} untested</span>`):""}
+
+  ${card("Data this needs", list(s.data_inputs))}
+  ${card("How to test it here", list(s.how_agents_should_test_this))}
+  ${s.blockers_here?card("What blocks it in this environment", list(s.blockers_here)):""}
+  ${cal?card("Calendar", `<table><thead><tr><th>Event</th><th>Why it matters</th></tr></thead><tbody>${cal}</tbody></table>`):""}
+  ${gloss?card("Terms as this source defines them", `<dl class="gl">${gloss}</dl>`):""}
+  ${card("Stated philosophy", list(s.philosophy))}`;
+}
+
+function renderCompare(){
+  const rows = [];
+  D.strategies.forEach(s => (s.claims||[]).forEach(c =>
+    rows.push(`<tr><td style="white-space:nowrap;color:var(--acc)">${esc(s.name)}</td>
+      <td>${esc(c.claim)}</td><td style="white-space:nowrap;color:var(--faint)">${esc(c.kind)}</td>
+      <td class="st"><span class="pill ${c.status==="untested"?"":"ok"}">${esc(c.status)}</span></td></tr>`)));
+  const summary = D.strategies.map(s=>{
+    const cs=s.claims||[], un=cs.filter(c=>c.status==="untested").length;
+    return `<tr><td><b style="color:var(--txt)">${esc(s.name)}</b><div class="m" style="color:var(--faint)">${esc((s.source||{}).speaker||"")}</div></td>
+      <td>${esc(s.short||"")}</td><td class="st num">${cs.length-un} / ${cs.length}</td></tr>`;}).join("");
+  return `
+  ${card("Sources in the library",
+    `<table><thead><tr><th>Strategy</th><th>In one line</th><th style="text-align:right">Claims tested</th></tr></thead><tbody>${summary}</tbody></table>`)}
+  ${card("Every claim, across every source",
+    `<table><thead><tr><th>Source</th><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${rows.join("")}</tbody></table>`)}
+  <div class="note"><b style="color:var(--txt)">This table is the point of the library.</b> Each strategy arrives as a set of
+  claims about how markets behave. Nothing here is endorsed or rejected on arrival — a claim moves off
+  <b>untested</b> only when an experiment in <code>research/experiments.md</code> says what happened. When a second
+  source lands, the two can be compared on the same evidence rather than on how convincing they sounded.</div>`;
+}
+
+const TABS = [...D.strategies.map((s,i)=>({label:s.name, i})), {label:"Compare", i:-1}];
+function show(i){
+  [...$("tabs").children].forEach((b,n)=>b.setAttribute("aria-selected", String(TABS[n].i===i)));
+  $("panel").innerHTML = i===-1 ? renderCompare() : renderStrategy(D.strategies[i]);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("tabs").innerHTML = TABS.map(t=>
+  `<button class="tab" role="tab" aria-selected="false">${esc(t.label)}</button>`).join("");
+[...$("tabs").children].forEach((b,n)=>b.addEventListener("click",()=>show(TABS[n].i)));
+show(D.strategies.length ? 0 : -1);
+</script>

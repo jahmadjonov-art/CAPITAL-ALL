@@ -1,0 +1,468 @@
+<title>Strategy Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#8A96A4; --faint:#49535F;
+  --acc:#FF3D82; --acc-dim:#7A1638; --alt:#2BD4E8;
+  --ok:#2FD67F; --warn:#F5A524;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 13px/1.65 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+h1,h2,h3{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+
+.top{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between;
+  padding-bottom:13px;border-bottom:1px solid var(--line-2)}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:25px;letter-spacing:.05em}
+.brand b{color:var(--acc);font-weight:700}
+.stamp{font-size:11px;color:var(--faint)}
+
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tab{font-family:"Barlow Condensed",sans-serif;font-size:14px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;padding:7px 14px;border:1px solid var(--line-2);border-radius:3px;
+  background:var(--panel);color:var(--dim);cursor:pointer;font-variant-numeric:tabular-nums}
+.tab:hover{color:var(--txt);border-color:var(--faint)}
+.tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#12000A}
+.tab:focus-visible{outline:2px solid var(--alt);outline-offset:2px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:14px}
+.card > header{padding:9px 14px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:10px}
+.card > .b{padding:14px}
+.pill{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;padding:3px 8px;border-radius:2px;background:#3D2B0C;color:var(--warn);white-space:nowrap}
+.pill.ok{background:#0C2E1D;color:var(--ok)}
+
+.hero{font-family:"Barlow Condensed",sans-serif;font-size:29px;font-weight:700;letter-spacing:.02em;line-height:1.15}
+.short{color:var(--dim);margin-top:6px;max-width:66ch}
+.src{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:11.5px;margin-top:14px;
+  padding-top:12px;border-top:1px solid var(--line)}
+.src dt{color:var(--faint);white-space:nowrap} .src dd{margin:0;color:var(--dim)}
+
+ol.steps{margin:0;padding-left:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding-left:34px;margin-bottom:11px;color:var(--dim)}
+ol.steps li:last-child{margin-bottom:0}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:0;
+  font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.05em}
+
+ul.t{margin:0;padding-left:17px} ul.t li{margin-bottom:8px;color:var(--dim)}
+ul.t li:last-child{margin-bottom:0}
+.two{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:820px){.two{grid-template-columns:1fr 1fr}}
+.two .card{margin-top:0}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:0 10px 8px 0;border-bottom:1px solid var(--line-2)}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.st{white-space:nowrap;text-align:right;padding-right:0}
+.lv{border-left:2px solid var(--alt);padding:9px 0 9px 12px;margin-bottom:12px}
+.lv:last-child{margin-bottom:0}
+.lv.no{border-left-color:var(--faint)}
+.lv b{color:var(--txt)} .lv .m{font-size:11.5px;color:var(--faint);margin-top:3px}
+dl.gl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:12px}
+dl.gl dt{color:var(--alt);white-space:nowrap} dl.gl dd{margin:0;color:var(--dim)}
+.note{background:var(--sunk);border-left:3px solid var(--warn);padding:11px 13px;border-radius:0 3px 3px 0;
+  font-size:12px;color:var(--dim);margin-top:14px}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 class="brand">STRATEGY <b>LIBRARY</b></h1>
+      <div class="lbl" style="margin-top:3px">What each source says, kept separate so they can be compared</div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div id="panel" role="tabpanel"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = {
+  "built": "13 Sep 2026  19:53",
+  "strategies": [
+    {
+      "id": "options-flow-gamma",
+      "name": "Options Flow / Gamma Levels",
+      "short": "Trade index futures off the levels where market makers are forced to hedge 0DTE options.",
+      "added": "2026-09-13",
+      "status": "untested",
+      "source": {
+        "type": "interview transcript",
+        "speaker": "Freddy Siento",
+        "credentials_claimed": "20-year market maker; institutional FX derivatives market maker in London (outright swaps); junior broker in Australia through 2008; ~3.5 years retail",
+        "venue": "Chart Fanatics podcast",
+        "recorded": "22 June (year not stated in transcript)",
+        "tooling_named": "GEX Bot (\"guestbot\") \u2014 built by John (options/maths) and Jazz (futures); CBOE raw data available free with ~10-15 minute delay",
+        "others_named": "Jim Carson, Mandy Xu (CBOE research), Fabio Valentini, Imran (IMRA), Carmine Rosato, Andrea"
+      },
+      "thesis": "Institutions are forced to hedge portfolios with index options. Market makers must provide that liquidity and cannot refuse, so they take the other side and then hedge their own exposure in the futures market. That hedging is mechanical, large, and predictable, and it leaves levels where price is magnetised and then rejected. Trade the futures at those levels.",
+      "mechanism": [
+        "Pension funds, endowments and mutual funds must hedge \u2014 described as forced, not discretionary. Driven by 1987, dot-com and 2008.",
+        "They hedge through options on indices: SPX, SPY, NDX, QQQ.",
+        "Market makers sit in the middle, provide liquidity both ways, charge the spread, and do not take directional positions. They cannot say no to flow.",
+        "A market maker short a call has unlimited loss exposure, so must hedge. Delta tells him how much: while delta is zero he is safe.",
+        "To be delta-neutral he buys or sells the underlying futures \u2014 ES for SPX, NQ for NDX. Futures are chosen because they are the most liquid hedge.",
+        "Price then moves, so delta changes. Gamma \u2014 the change in delta with respect to change in spot \u2014 tells him how much more to hedge.",
+        "This is self-reinforcing: he buys futures, price rises, his delta changes, he must buy more. Described as a snowball, and as the market maker himself moving the market.",
+        "Near the strike, the institution's gamma peaks \u2014 this is the point of maximum profit rate. Past the strike, the option's payoff goes roughly one-to-one, so convexity is gone and the same distance earns materially less.",
+        "Theta decay accelerates through the session (said to explode between roughly midday and 1:30pm), taxing the position further.",
+        "So the institution closes and sells the call back to the market maker. The market maker is left with a futures imbalance and must sell those futures. That selling is the reversal seen at the level."
+      ],
+      "why_zero_dte": [
+        "The SEC permitted 0DTE trading in 2021. These options open at 9:30 and expire at 4:00 the same day.",
+        "Stated to be roughly 60-63% of daily S&P volume now, up from 21% in 2021, on ~$3.3 trillion of daily volume.",
+        "Hedging pressure is not slower or faster in volatility terms but in urgency: a monthly option is a car at 80 km/h that can turn easily; 0DTE is a Formula One car at 300 km/h that must brake and steer at speed.",
+        "The delta profile of a 0DTE option steepens sharply as expiry approaches \u2014 soft curve with 5 hours left, near-vertical with 1 hour left \u2014 so hedging becomes more aggressive as the day runs on.",
+        "Speaker's position: 0DTE did not increase volatility; if anything it stabilised markets."
+      ],
+      "markets": {
+        "watch_levels_on": [
+          "SPX",
+          "NDX"
+        ],
+        "trade": [
+          "NQ",
+          "ES"
+        ],
+        "speaker_trades": "NQ, full contracts rather than micros",
+        "note_on_ndx_vs_qqq": "One at-the-money NDX contract is put at $10,000-$12,000 versus $60-$70 for QQQ, so large participants use NDX. QQQ is now also being examined on the theory that smaller funds position there based on what they see in SPX/NDX.",
+        "correlation_note": "SPX, SPY, ES, NDX, QQQ and NQ are said to move together, so a level reached on one is reached on all."
+      },
+      "levels": [
+        {
+          "name": "Put wall / max put gamma",
+          "aka": "peak put gamma",
+          "behaviour": "Magnet, then rejection. Price is drawn to it and reverses.",
+          "use": "Support in the model \u2014 the side to buy from."
+        },
+        {
+          "name": "Call wall / max call gamma",
+          "behaviour": "Magnet, then rejection.",
+          "use": "Resistance in the model \u2014 the side to sell from."
+        },
+        {
+          "name": "Positive convexity level",
+          "display": "cyan bars in the tool named",
+          "meaning": "Someone bought options there, buying volatility and creating a peak (a cone) in the volatility surface.",
+          "behaviour": "Rejection. Described as a mountain: a ball pushed up it comes back down. Price arrives, there is nothing left for the market maker to hedge, and it reverses.",
+          "use": "Tradable. Speaker trades positive convexity to positive convexity."
+        },
+        {
+          "name": "Negative convexity level",
+          "display": "purple bars in the tool named",
+          "meaning": "Someone sold options there, selling volatility and creating a pocket in the surface.",
+          "behaviour": "Price falls through easily \u2014 described as a valley the ball rolls into.",
+          "use": "Not traded. Stated as not having a clear enough read."
+        }
+      ],
+      "volatility_surface": {
+        "definition": "Three-dimensional: implied volatility on the vertical axis, strike prices and time on the other two.",
+        "buying_options": "Buying options is buying volatility. It takes liquidity, raises implied volatility, and creates a peak. Price is attracted to the peak, then must come back because there is no more hedging to do.",
+        "selling_options": "Selling options is selling volatility. It makes options cheaper and creates a pocket. Price tends to travel to the pocket.",
+        "analogy": "A table-tennis ball moving over the surface: up a peak it must come back down; a pocket it rolls into.",
+        "mapping_to_volume_profile": "Peaks of bought volatility behave like high-volume nodes; pockets of sold volatility behave like low-volume nodes, where price moves very quickly.",
+        "skew": "A slice through the surface gives the volatility skew. Cited as telling the speaker that price was not going lower, prompting a profit-take at the bottom of a move.",
+        "stated_importance": "Named as the weapon and as how institutions trade, in contrast to moving averages."
+      },
+      "entry_rules": [
+        "Do nothing until price reaches a major level. Waiting is the method, and is described as removing the anxiety of missed moves.",
+        "Judge the approach by slope. A steep, fast approach is treated as physics \u2014 it will cross the level.",
+        "On a steep approach, wait for the level to be reclaimed before entering.",
+        "On a gentle approach, the level is expected to hold and can be traded directly.",
+        "If the level does not hold as expected, exit quickly \u2014 something unseen is happening.",
+        "Take the position in NQ at the level identified on SPX/NDX."
+      ],
+      "exit_rules": [
+        "Target the next major gamma level or the next large position on the map.",
+        "Positive convexity to positive convexity for the convexity model.",
+        "Take profit at the wall rather than holding through it \u2014 gamma levels are rejections.",
+        "Enter with two or more contracts, take profit on one and move the other to break-even.",
+        "Do not hold a winning short into a put wall expecting continuation; take the profit at the level."
+      ],
+      "risk": {
+        "stop_loss": "30-50 ticks, placed by structure (below the low that formed at the level)",
+        "stop_rationale": "The level either works quickly or does not. The market maker is moving at speed, so if the move is going to happen it happens.",
+        "stated_risk_reward": "Risking roughly $150-$200 to make around $2,000 on NQ, described as about 1:10",
+        "contrast_drawn": "Set against ATR-based stops of 150-200 ticks",
+        "sizing": "Speaker trades 1-2 NQ contracts normally; up to 10 NQ when passing funded-account evaluations, quoted as $6,000 in one move"
+      },
+      "timing": {
+        "session": "First two hours after the New York open only",
+        "reason_given": "Institutions position themselves in options in the morning. Beyond that the edge is not there for this method.",
+        "greeks_traded": "Delta and gamma within the first two hours. Charm is acknowledged as important near expiry but described as difficult and not yet traded. Vanna is set aside because volatility does not change much intraday.",
+        "midday_note": "Theta decay is said to explode between roughly midday and 1:30pm.",
+        "lunchtime_claim_rejected": "The common explanation that liquidity dries up because traders go to lunch is rejected \u2014 institutional traders eat at the desk. The cause given is different flow and positioning."
+      },
+      "data_inputs": [
+        "0DTE option chain for SPX and NDX by strike",
+        "Gamma exposure by strike, converted to a dollar amount, to locate max put gamma and max call gamma",
+        "90-day open interest, used to see how the whole market is positioned for the current session",
+        "The volatility surface, and the skew taken as a slice of it",
+        "Convexity levels derived from the surface",
+        "Underlying futures price (NQ/ES) for execution"
+      ],
+      "claims": [
+        {
+          "claim": "This model wins about 75% of the time.",
+          "kind": "performance",
+          "status": "untested"
+        },
+        {
+          "claim": "One or two trading opportunities per day for the gamma-level model; other models trade more often.",
+          "kind": "frequency",
+          "status": "untested"
+        },
+        {
+          "claim": "Stop losses of 30-50 ticks are sufficient on NQ when trading these levels.",
+          "kind": "risk",
+          "status": "untested"
+        },
+        {
+          "claim": "0DTE options are about 60-63% of daily S&P volume, on roughly $3.3 trillion daily.",
+          "kind": "market structure",
+          "status": "untested"
+        },
+        {
+          "claim": "A record 110 million contracts traded in October 2025; on September 3rd, 70% of options volume was 0DTE.",
+          "kind": "market structure",
+          "status": "untested"
+        },
+        {
+          "claim": "Net gamma readings translate to the market maker needing to hedge billions per 1% move \u2014 $7bn cited, sometimes 200-300bn.",
+          "kind": "market structure",
+          "status": "untested"
+        },
+        {
+          "claim": "Price is magnetised to max gamma levels and then rejected there.",
+          "kind": "mechanism",
+          "status": "untested"
+        },
+        {
+          "claim": "Peaks in the volatility surface act as rejections; pockets are travelled through quickly.",
+          "kind": "mechanism",
+          "status": "untested"
+        },
+        {
+          "claim": "Example trades cited: 420 ticks (~$2,000), 592 ticks (~$3,000), 478 ticks (~$2,300), 636 ticks (~$3,000), 800 ticks, 384 ticks (~$2,000 in 15 minutes).",
+          "kind": "performance",
+          "status": "untested"
+        },
+        {
+          "claim": "Indices move together, so a level hit on SPX is hit on ES, NQ, QQQ and NDX.",
+          "kind": "mechanism",
+          "status": "untested"
+        }
+      ],
+      "calendar": [
+        {
+          "event": "Triple witching",
+          "when": "Third Friday of March, June, September, December",
+          "why": "Index options, single-stock options and options on futures all expire the same day.",
+          "action_stated": "Speaker does not trade it \u2014 no 0DTE edge that day."
+        },
+        {
+          "event": "OPEX",
+          "when": "Monthly options expiry",
+          "why": "Charm and vanna create pin effects and magnets around expiring longer-dated options."
+        },
+        {
+          "event": "Vixperation",
+          "when": "The Wednesday exactly 30 days before the third Friday",
+          "why": "VIX options expire at 9:30 Eastern, as the market opens. VIX and the indices are inversely related.",
+          "observation_stated": "Trend days \u2014 if the market starts down it tends to keep going. Explicitly flagged as having no data behind it."
+        },
+        {
+          "event": "JP Morgan collar",
+          "when": "End of March, June, September, December",
+          "why": "A $22bn hedge fund hedged with a collar \u2014 selling a far call, selling a far put, buying a put in the middle \u2014 with nodes of 30,000-40,000 contracts.",
+          "effect_stated": "Creates sustained pressure; mean-reversion sellers get run over."
+        }
+      ],
+      "concepts": [
+        {
+          "term": "Delta",
+          "definition": "First-order derivative. The market maker hedges to delta-zero and is safe while there."
+        },
+        {
+          "term": "Gamma",
+          "definition": "Second-order derivative: the change in delta with respect to change in spot price. Tells the market maker how much more to hedge as price moves."
+        },
+        {
+          "term": "Charm",
+          "definition": "Change with respect to time. Matters near expiry, creates the pin effect where price returns to a level repeatedly."
+        },
+        {
+          "term": "Vanna",
+          "definition": "Change with respect to volatility."
+        },
+        {
+          "term": "Theta decay",
+          "definition": "Time decay. Described as a tax on the position that accelerates through the session."
+        },
+        {
+          "term": "Convexity",
+          "definition": "The exponential payoff of an option before the strike. Past the strike the payoff is roughly one-to-one, so the same move earns materially less."
+        },
+        {
+          "term": "Delta 50",
+          "definition": "At-the-money options have delta 0.5 \u2014 a 50% probability of finishing in the money. This is where gamma peaks."
+        },
+        {
+          "term": "Volatility surface",
+          "definition": "Three dimensions: implied volatility, strike, time."
+        }
+      ],
+      "philosophy": [
+        "Enter the market when the big participants enter it. Stated as the edge the speaker arrived at after hedging $1.5bn positions and seeing his own hedging move spot.",
+        "Institutions are not hunting retail stops. They are forced into the market to hedge, and retail stops simply sit in the path.",
+        "Indicators are lagging. A stated test of 11 indicators across 7,000-10,000 combinations produced nothing usable.",
+        "The method does not require replacing an existing strategy. It is presented as a lens that raises win rate and cuts losses on whatever is already being traded.",
+        "Mindfulness and risk management are given equal weight to the method. Stop trading after a loss; the speaker takes about one stop every two or three weeks and closes the platform when it happens."
+      ],
+      "how_agents_should_test_this": [
+        "The levels are the testable object. Locate max put gamma and max call gamma per session, then measure what price actually did on arrival.",
+        "Measure the rejection claim directly: on reaching a wall, how often does price reverse by more than the 30-50 tick stop before breaking through?",
+        "Test the slope rule as a filter: split arrivals into fast and slow approaches and compare outcomes. The claim is that fast approaches break and slow ones hold.",
+        "Test the first-two-hours restriction by comparing the same setup inside and outside that window.",
+        "The 75% claim is a win rate, not a return. Record both, since a 75% win rate with a 1:10 reward and rare large losses is a different thing from what it sounds like.",
+        "Gamma exposure by strike is the one input this requires and it is not currently available in this environment. CBOE is named as the free source, delayed 10-15 minutes. Establishing a source is the first blocker."
+      ],
+      "blockers_here": [
+        "No gamma-exposure-by-strike feed is currently wired up. Named free source: CBOE, with a 10-15 minute delay, raw.",
+        "No SPX or NDX option chain is being pulled yet, though Robinhood exposes option chains and the account is approved for level 2.",
+        "The account is $100 in a cash account. One NQ contract is far beyond that, so this cannot be traded here as described even if it works.",
+        "No order has ever been placed from this account and execution is not delegated to agents."
+      ]
+    }
+  ]
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+$("stamp").textContent = "built " + D.built;
+$("foot").textContent =
+  `${D.strategies.length} source${D.strategies.length===1?"":"s"} · ` +
+  `${D.strategies.reduce((n,s)=>n+(s.claims||[]).length,0)} claims tracked · ` +
+  `Extraction only — each entry states what its source said. Claim status changes when an experiment says so, not before.`;
+
+const card = (title, body, pill) => !body ? "" :
+  `<section class="card"><header><h2 class="lbl">${title}</h2>${pill||""}</header><div class="b">${body}</div></section>`;
+const list = (arr, cls="t") => !arr||!arr.length ? "" :
+  `<ul class="${cls}">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+const steps = arr => !arr||!arr.length ? "" :
+  `<ol class="steps">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+
+function renderStrategy(s){
+  const srcRows = Object.entries(s.source||{}).map(([k,v]) =>
+    `<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+
+  const levels = (s.levels||[]).map(l =>
+    `<div class="lv ${/not traded/i.test(l.use||"")?"no":""}">
+      <b>${esc(l.name)}</b>${l.aka?` <span class="m" style="display:inline">· ${esc(l.aka)}</span>`:""}
+      ${l.meaning?`<div class="m">${esc(l.meaning)}</div>`:""}
+      <div style="margin-top:5px">${esc(l.behaviour||"")}</div>
+      ${l.use?`<div class="m"><b style="color:var(--faint)">Use:</b> ${esc(l.use)}</div>`:""}
+    </div>`).join("");
+
+  const claims = (s.claims||[]).map(c =>
+    `<tr><td>${esc(c.claim)}</td><td style="white-space:nowrap;color:var(--faint)">${esc(c.kind)}</td>
+     <td class="st"><span class="pill ${c.status==="untested"?"":"ok"}">${esc(c.status)}</span></td></tr>`).join("");
+
+  const cal = (s.calendar||[]).map(c =>
+    `<tr><td><b style="color:var(--txt)">${esc(c.event)}</b><div class="m" style="color:var(--faint)">${esc(c.when)}</div></td>
+     <td>${esc(c.why)}${c.action_stated?`<div style="color:var(--warn);margin-top:4px">${esc(c.action_stated)}</div>`:""}
+     ${c.effect_stated?`<div style="margin-top:4px">${esc(c.effect_stated)}</div>`:""}
+     ${c.observation_stated?`<div style="margin-top:4px">${esc(c.observation_stated)}</div>`:""}</td></tr>`).join("");
+
+  const gloss = (s.concepts||[]).map(c=>`<dt>${esc(c.term)}</dt><dd>${esc(c.definition)}</dd>`).join("");
+  const vs = s.volatility_surface||{};
+  const vsRows = Object.entries(vs).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+  const mk = s.markets||{};
+  const mkRows = Object.entries(mk).map(([k,v])=>
+    `<dt>${esc(k.replace(/_/g," "))}</dt><dd>${Array.isArray(v)?esc(v.join(", ")):esc(v)}</dd>`).join("");
+  const risk = Object.entries(s.risk||{}).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+  const timing = Object.entries(s.timing||{}).map(([k,v])=>`<dt>${esc(k.replace(/_/g," "))}</dt><dd>${esc(v)}</dd>`).join("");
+
+  return `
+  <section class="card"><div class="b">
+    <div class="hero">${esc(s.name)}</div>
+    <p class="short">${esc(s.short||"")}</p>
+    <dl class="src">${srcRows}</dl>
+  </div></section>
+
+  ${card("Thesis", `<p style="margin:0;color:var(--dim)">${esc(s.thesis||"")}</p>`)}
+  ${card("Mechanism — how the move is said to happen", steps(s.mechanism))}
+  ${card("Why 0DTE changed it", list(s.why_zero_dte))}
+  ${mkRows?card("Markets", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${mkRows}</dl>`):""}
+  ${levels?card("Levels", levels):""}
+  ${vsRows?card("The volatility surface", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${vsRows}</dl>`):""}
+
+  <div class="two" style="margin-top:14px">
+    ${card("Entry rules", list(s.entry_rules))}
+    ${card("Exit rules", list(s.exit_rules))}
+  </div>
+  <div class="two" style="margin-top:14px">
+    ${risk?card("Risk", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${risk}</dl>`):""}
+    ${timing?card("Timing", `<dl class="src" style="margin-top:0;padding-top:0;border-top:none">${timing}</dl>`):""}
+  </div>
+
+  ${claims?card("Claims made by this source",
+    `<table><thead><tr><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${claims}</tbody></table>`,
+    `<span class="pill">${(s.claims||[]).filter(c=>c.status==="untested").length} untested</span>`):""}
+
+  ${card("Data this needs", list(s.data_inputs))}
+  ${card("How to test it here", list(s.how_agents_should_test_this))}
+  ${s.blockers_here?card("What blocks it in this environment", list(s.blockers_here)):""}
+  ${cal?card("Calendar", `<table><thead><tr><th>Event</th><th>Why it matters</th></tr></thead><tbody>${cal}</tbody></table>`):""}
+  ${gloss?card("Terms as this source defines them", `<dl class="gl">${gloss}</dl>`):""}
+  ${card("Stated philosophy", list(s.philosophy))}`;
+}
+
+function renderCompare(){
+  const rows = [];
+  D.strategies.forEach(s => (s.claims||[]).forEach(c =>
+    rows.push(`<tr><td style="white-space:nowrap;color:var(--acc)">${esc(s.name)}</td>
+      <td>${esc(c.claim)}</td><td style="white-space:nowrap;color:var(--faint)">${esc(c.kind)}</td>
+      <td class="st"><span class="pill ${c.status==="untested"?"":"ok"}">${esc(c.status)}</span></td></tr>`)));
+  const summary = D.strategies.map(s=>{
+    const cs=s.claims||[], un=cs.filter(c=>c.status==="untested").length;
+    return `<tr><td><b style="color:var(--txt)">${esc(s.name)}</b><div class="m" style="color:var(--faint)">${esc((s.source||{}).speaker||"")}</div></td>
+      <td>${esc(s.short||"")}</td><td class="st num">${cs.length-un} / ${cs.length}</td></tr>`;}).join("");
+  return `
+  ${card("Sources in the library",
+    `<table><thead><tr><th>Strategy</th><th>In one line</th><th style="text-align:right">Claims tested</th></tr></thead><tbody>${summary}</tbody></table>`)}
+  ${card("Every claim, across every source",
+    `<table><thead><tr><th>Source</th><th>Claim</th><th>Kind</th><th style="text-align:right">Status</th></tr></thead><tbody>${rows.join("")}</tbody></table>`)}
+  <div class="note"><b style="color:var(--txt)">This table is the point of the library.</b> Each strategy arrives as a set of
+  claims about how markets behave. Nothing here is endorsed or rejected on arrival — a claim moves off
+  <b>untested</b> only when an experiment in <code>research/experiments.md</code> says what happened. When a second
+  source lands, the two can be compared on the same evidence rather than on how convincing they sounded.</div>`;
+}
+
+const TABS = [...D.strategies.map((s,i)=>({label:s.name, i})), {label:"Compare", i:-1}];
+function show(i){
+  [...$("tabs").children].forEach((b,n)=>b.setAttribute("aria-selected", String(TABS[n].i===i)));
+  $("panel").innerHTML = i===-1 ? renderCompare() : renderStrategy(D.strategies[i]);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("tabs").innerHTML = TABS.map(t=>
+  `<button class="tab" role="tab" aria-selected="false">${esc(t.label)}</button>`).join("");
+[...$("tabs").children].forEach((b,n)=>b.addEventListener("click",()=>show(TABS[n].i)));
+show(D.strategies.length ? 0 : -1);
+</script>

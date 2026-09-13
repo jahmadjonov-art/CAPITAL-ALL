@@ -246,10 +246,11 @@
     "Gamma exposure by strike is the one input this requires and it is not currently available in this environment. CBOE is named as the free source, delayed 10-15 minutes. Establishing a source is the first blocker."
   ],
   "blockers_here": [
-    "**Gamma exposure by strike is the one hard requirement and nothing here pulls it.** The transcript names CBOE as a free source with a 10-15 minute delay, raw. An options data subscription is expected from the owner, which would replace this.",
-    "No SPX or NDX option chain is being pulled yet. Robinhood exposes chains and the account carries level-2 approval, so this is work rather than a wall.",
-    "The 90-day open interest view the source relies on is not available from any source currently wired up.",
-    "Live execution is not delegated to agents and no order has ever been placed. This is studied on paper regardless of that."
+    "**RESOLVED 2026-09-13 \u2014 gamma exposure by strike is available after all.** `mcp__Robinhood__get_option_quotes` returns `implied_volatility`, `delta`, `gamma`, `theta`, `vega` and `open_interest` per contract, and SPXW carries daily expirations. Gamma x open interest per strike is exactly what this strategy needs. An earlier entry here said nothing pulled it; that was wrong.",
+    "Coverage is sparse away from the money \u2014 deep in-the-money strikes returned null greeks in the same call. Handle the gaps rather than assuming them away.",
+    "The 90-day open-interest history the source uses is still not available; the broker gives current open interest only. This is the remaining real gap, and an options subscription would close it.",
+    "Only the lead session can reach these MCP tools \u2014 a script cannot. Capture and rendering are therefore separate steps: a session snapshots to `data/snapshots/`, `dashboard/surface.py` renders it.",
+    "Live execution is not delegated to agents and no order has ever been placed."
   ],
   "evaluation": {
     "capital_is_not_a_filter": "Judge this strategy at the size its source describes \u2014 one NQ contract, $5 a tick. Whether any particular account can carry that is a separate question answered later. Narrowing the study to what is currently affordable would throw away the finding.",

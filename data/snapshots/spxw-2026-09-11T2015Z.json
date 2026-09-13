@@ -1,0 +1,23 @@
+{
+  "captured_utc": "2026-09-11T20:15:00Z",
+  "captured_note": "Friday post-close snapshot, pulled Sunday. Quotes are stale by design of when they were taken — this proves the fields exist, it is not a live reading.",
+  "source": "mcp__Robinhood__get_option_quotes",
+  "underlying": "SPX",
+  "chain": "SPXW",
+  "expiry": "2026-09-14",
+  "spot_estimate": 7657.0,
+  "spot_method": "Interpolated from the delta-0.5 crossing between the 7650 call (delta 0.564) and the 7675 call (delta 0.354). Not a quoted index level — SPX spot was not fetched directly.",
+  "type": "call",
+  "strikes": [
+    {"k": 7575, "iv": 0.168314, "delta": 0.900174, "gamma": 0.002694, "theta": -6.840255, "vega": 0.677502, "oi": 263,  "vol": 119,   "bid": 85.40, "ask": 86.20, "mark": 85.80},
+    {"k": 7600, "iv": 0.154364, "delta": 0.835192, "gamma": 0.004157, "theta": -8.616705, "vega": 0.958790, "oi": 738,  "vol": 1016,  "bid": 62.70, "ask": 63.20, "mark": 62.95},
+    {"k": 7650, "iv": 0.127476, "delta": 0.563570, "gamma": 0.007993, "theta": -10.880218,"vega": 1.522440, "oi": 689,  "vol": 4082,  "bid": 23.60, "ask": 23.90, "mark": 23.75},
+    {"k": 7675, "iv": 0.118225, "delta": 0.353976, "gamma": 0.008138, "theta": -9.417620, "vega": 1.437568, "oi": 1878, "vol": 27202, "bid": 10.80, "ask": 11.00, "mark": 10.90},
+    {"k": 7700, "iv": 0.114048, "delta": 0.170195, "gamma": 0.005745, "theta": -6.136551, "vega": 0.978862, "oi": 1626, "vol": 11535, "bid": 3.90,  "ask": 4.10,  "mark": 4.00},
+    {"k": 7750, "iv": 0.118075, "delta": 0.022399, "gamma": 0.001168, "theta": -1.325179, "vega": 0.205973, "oi": 1765, "vol": 3978,  "bid": 0.35,  "ask": 0.40,  "mark": 0.375},
+    {"k": 7800, "iv": 0.140238, "delta": 0.004705, "gamma": 0.000253, "theta": -0.402846, "vega": 0.052942, "oi": 2966, "vol": 2859,  "bid": 0.05,  "ask": 0.10,  "mark": 0.075},
+    {"k": 7850, "iv": 0.152251, "delta": 0.000635, "gamma": 0.000038, "theta": -0.070625, "vega": 0.008568, "oi": 819,  "vol": 18336, "bid": 0.00,  "ask": 0.10,  "mark": 0.05}
+  ],
+  "coverage_note": "Calls only, one expiry, eight strikes. A full surface needs puts as well and several expiries — that is one more pull, not a different capability.",
+  "greeks_gap_note": "Deep in-the-money strikes (7100-7300) returned null greeks and null implied volatility on the same call. Sparse coverage away from the money is real and must be handled, not assumed away."
+}

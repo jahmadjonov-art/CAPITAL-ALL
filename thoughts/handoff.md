@@ -509,3 +509,58 @@ fields it needs, so it can be wired the day access arrives. First thing to check
 then: whether the feed carries intraday history or only snapshots — snapshots
 allow forward testing only, history allows a backtest, and that decides how long
 everything takes.
+
+---
+
+## Correction: we DO have gamma by strike
+
+An earlier entry said nothing here pulls gamma exposure by strike, and that the
+options-flow strategy was blocked on it. **That was wrong**, and it was wrong for
+two sessions.
+
+`mcp__Robinhood__get_option_quotes` returns, per contract:
+`implied_volatility`, `delta`, **`gamma`**, `theta`, `vega`, `rho`,
+`open_interest`, `volume`, plus bid/ask/mark. And `SPXW` carries **daily**
+expirations, so the 0DTE chain the strategy runs on is right there.
+
+Verified 2026-09-13 on the SPXW 2026-09-14 chain around the money:
+
+| Strike | IV | Gamma | OI | Gamma $ per 1% |
+|---|---|---|---|---|
+| 7,650 | 12.75% | 0.007993 | 689 | $323M |
+| **7,675** | 11.82% | **0.008138** | 1,878 | **$896M** |
+| 7,700 | 11.40% | 0.005745 | 1,626 | $548M |
+
+**$2.15bn of gamma across eight strikes**, with a clear wall at 7,675 — computed
+rather than asserted. The implied-volatility smile is real too: 16.8% on the
+downside wing, a floor of 11.4% near the money, 15.2% on the upside.
+
+### How to capture and render
+
+**MCP tools only work from a lead session; a plain script cannot call them.** So
+the two steps are deliberately separate:
+
+1. A session pulls the chain and writes `data/snapshots/<chain>-<time>.json`.
+2. `python3 dashboard/surface.py` renders the newest snapshot to
+   `dashboard/surface.html`.
+
+Published: **https://claude.ai/code/artifact/f85f0329-ca21-4474-bf1a-e6449c1e9020**
+
+### Traps found while doing it
+
+- **`get_option_instruments` paginates and starts at the lowest strike.** SPXW
+  runs from 3,000, so the first page is nowhere near the money. The cursor is
+  base64 of `p=<strike>` — craft one (`base64("p=7550.0000")`) to jump straight
+  to the strikes that matter instead of paging through hundreds.
+- **Greeks are null on deep in-the-money strikes.** Not an error; those contracts
+  have no real two-sided market. Filter rather than treating it as failure.
+- **SPX spot is not in the option payload.** It was derived from the delta-0.5
+  crossing between two strikes. Fetch the index level directly when it matters.
+- **Two SPX chains exist:** `SPXW` (weeklies and dailies, PM settled) and `SPX`
+  (monthlies, `settle_on_open: true`, AM settled). The strategy wants SPXW.
+
+### What is still genuinely missing
+
+The source relies on a **90-day open-interest history**. The broker returns
+current open interest only. That is the real remaining gap and the one an
+options subscription would close.

@@ -77,6 +77,34 @@ Newest first.
 
 ---
 
+### 2026-09-14 — The first autonomous run lost its work, and the loop I wrote is why
+**What I decided:** when building `.claude/commands/research.md`, to have a
+session commit and push **once, at the very end**, after the research and the
+dashboard rebuild.
+**What it rested on:** Reasoned — it seemed tidy to finish with one clean commit,
+and the container warning was already written into the loop.
+**Written down beforehand:** the loop says plainly "the container is wiped when
+the session ends, unpushed work is lost". I wrote that warning and then designed
+the step order that maximises the damage when it comes true.
+**What happened:** the first scheduled run found a CBOE data source, wrote a
+belief, ran an experiment and recorded a wall — then failed to push. One commit,
+`a2c8f4d`, died with the container. It is not recoverable.
+**Decision verdict:** MISTAKE. Not bad luck. A single push at the end means the
+window between "work exists" and "work is safe" is the entire session, and the
+failure mode is silent — the dashboard republish succeeded, so from outside the
+run looked fine.
+**What I would do differently:** push after each material step, and **verify the
+push rather than assume it.** `git ls-remote` against local HEAD is one line and
+converts a silent loss into something the session can still report. I had the
+information to know this mattered and wrote the warning; I just did not follow it
+into the design.
+**For the next agent:** a warning in a document does not protect anything. If the
+container can take your work, the loop has to push early and check that the push
+landed. And when a scheduled run goes quiet, **compare the dashboard's build
+commit against the remote** — that mismatch is what exposed this.
+
+---
+
 ### 2026-09-13 — I called a one-sided book a tight market, with the tell in my own table
 **What I decided:** to report that Kalshi's busiest series were fee-free with
 1-cent spreads and real depth, citing KXBOXING, KXBTC15M, KXETH15M and KXSOL15M.

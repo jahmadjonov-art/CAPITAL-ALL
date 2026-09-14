@@ -152,11 +152,22 @@ python3 dashboard/build.py
 Republish `dashboard/office.html` with the `Artifact` tool, passing the existing
 URL from `thoughts/handoff.md` as `url` so his link keeps working.
 
-**The container is wiped when the session ends. Unpushed work is lost.**
+**The container is wiped when the session ends. Unpushed work is lost — and on
+2026-09-14 it was: a run did real work, failed to push, and the commit died with
+its container. See `thoughts/4-walls.md`.**
+
+So do not save it all for the end. **Commit and push after each material step**,
+and **verify the push landed** rather than assuming it:
 
 ```bash
 git add -A && git commit -m "..." && git push -u origin claude/greeting-jk8c0j
+test "$(git rev-parse HEAD)" = "$(git ls-remote origin claude/greeting-jk8c0j | cut -f1)" \
+  && echo "push confirmed" || echo "** PUSH DID NOT LAND **"
 ```
+
+**If the push will not land, say so on the dashboard.** Republishing demonstrably
+still works when pushing does not, so it is the one channel left — put the
+failure on the page rather than letting the run look successful from outside.
 
 ## 6. Report back in plain English
 

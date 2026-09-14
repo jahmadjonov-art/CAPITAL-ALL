@@ -15,6 +15,57 @@ Strongest evidence first. Format is in [`README.md`](README.md).
 
 ---
 
+### B-005 · CBOE gives the entire option chain with greeks, free and unauthenticated
+**Tier:** T2 — fetched and parsed directly.
+**Basis:** Tested
+**Note on provenance:** a scheduled session found this first and its commit was
+lost (see `thoughts/4-walls.md`). **This entry is re-established from scratch by
+direct verification, not transcribed** — the original wording is gone.
+
+```
+https://cdn.cboe.com/api/global/delayed_quotes/options/_SPX.json
+```
+
+**One request returned 28,934 SPX contracts** — every strike, every expiry —
+12.8 MB, no API key, no account, no broker. Each contract carries `gamma`,
+`delta`, `theta`, `vega`, `rho`, `iv`, `open_interest`, `volume`, `bid`, `ask`,
+sizes and `theo`. The payload also carries the underlying: spot 7,601.85 against
+a previous close of 7,656.98.
+
+**This supersedes the broker route for chain work.** Reaching ~14 contracts
+through `mcp__Robinhood__get_option_quotes` took several paginated calls and a
+crafted cursor; this is one `curl`. It also works from a **subagent or a plain
+script**, which the MCP tools do not — that alone removes the capture/render
+split that `dashboard/surface.py` was built around.
+
+**Measured on the 2026-09-14 0DTE expiry (488 contracts):**
+
+| | |
+|---|---|
+| Net dealer gamma | **−$23.03B** per 1% move — **NEGATIVE** |
+| Call wall | 7,600 ($1.09B) |
+| Put wall | **7,600** ($4.57B) — same strike again |
+| Gamma flip | 7,625, with spot at 7,601.85 **below** it |
+
+Spot below the flip is consistent with the negative reading, and the walls
+coinciding is the pin condition a second time on a different day and source.
+
+**This also corrects our own number.** The six-strike broker sample in
+`EXP-001`'s follow-up read **−$54M**. The full chain reads **−$23B** — the same
+sign, the magnitude wrong by roughly 400×. **A sample of a gamma profile is not
+a small version of it**; the mass sits in strikes a narrow sample never sees.
+**What is still missing:** open interest here is the **official end-of-day
+figure and does not move intraday**, so it cannot see 0DTE positions opened and
+closed within the session — which is most of the flow this strategy depends on.
+Quotes are delayed. Neither is fatal for research; both are fatal for signalling
+live off same-day flow.
+**What would falsify it:** the endpoint requiring auth, rate-limiting hard, or
+its greeks disagreeing materially with the broker's on the same contracts. The
+last of those has not been checked and is a cheap, obvious test.
+**Last reviewed:** 2026-09-14
+
+---
+
 ### B-004 · The fee-free route is real on Kalshi — but probably unreachable from our account
 **Tier:** T2 — fee schedule now cited from source; liquidity measured by walking
 full order books; the venue question unresolved.

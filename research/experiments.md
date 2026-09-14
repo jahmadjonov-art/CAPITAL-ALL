@@ -18,6 +18,47 @@ Newest first.
 
 ---
 
+### EXP-002 · 2026-09-14 · Full-chain 0DTE gamma from a free source
+**Tier reached:** T2
+**Market / instrument:** SPX options, 2026-09-14 expiry (0DTE), via CBOE.
+
+**Hypothesis (pre-registered):** a lost scheduled session reported that CBOE
+serves full-chain gamma without a broker. Re-establish it independently: does one
+unauthenticated request return every strike with greeks and open interest, and
+does the resulting gamma profile agree with the six-strike broker sample?
+
+**Success criterion (pre-registered):** the endpoint returns the whole chain with
+`gamma` and `open_interest` per contract, unauthenticated, and a net dealer gamma
+can be computed from it.
+
+**Method:** one GET, parse the OCC-style option symbols into expiry/type/strike,
+aggregate `gamma × open_interest × 100 × spot² × 0.01` by strike, net calls
+against puts.
+
+**Costs assumed:** none — this measures data availability, not a strategy.
+
+**Variants tried:** 1.
+
+**Result: criterion met.** 28,934 contracts in one 12.8 MB response, no key. The
+0DTE expiry held 488 of them. Net dealer gamma **−$23.03B**, call wall and put
+wall both at **7,600**, gamma flip **7,625** with spot **below** it.
+
+**The interesting part is the disagreement.** The six-strike broker sample read
+**−$54M**; the full chain reads **−$23B**. Same sign, magnitude off by ~400×.
+The sign survived a 400× error in magnitude, which says the regime call is far
+more robust to thin sampling than any number attached to it — and that quoting
+the number from a sample would have been badly wrong.
+
+**Alternative explanations:** the two readings are from different sessions
+(Friday close vs Monday intraday), so they are not strictly comparable. The
+sampling gap is still the dominant term — six strikes cannot contain a profile
+whose mass sits across hundreds.
+
+**Status:** promoted to `B-005`. Open interest here is end-of-day and does not
+move intraday, so this does not solve same-day flow.
+
+---
+
 ### EXP-001 · 2026-09-13 · Does fee-free Kalshi liquidity actually exist?
 **Tier reached:** pending — pre-registered below, before any data was pulled.
 **Market / instrument:** Kalshi, open markets across series of both fee types.

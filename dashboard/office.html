@@ -301,10 +301,10 @@ const D = {
     }
   ],
   "counts": {
-    "experiments": 1,
-    "beliefs": 4,
-    "walls": 0,
-    "postmortems": 2,
+    "experiments": 2,
+    "beliefs": 5,
+    "walls": 1,
+    "postmortems": 3,
     "unknowns": 2
   },
   "scores": {
@@ -314,11 +314,11 @@ const D = {
   },
   "whiteboard": {
     "known": [
-      "**$100, cash, options level 2 \u2014 trading options is closed to us** (100-share",
-      "**Kalshi: taking liquidity is dead at $100** (fees ~3.5\u00d7 the spread). **Resting",
-      "**A tight spread is not a tradable market.** A third of Kalshi markets sit at a",
+      "**$100, cash, options level 2 \u2014 trading options is closed to us.** The",
+      "**Kalshi is parked on a venue question.** Taking liquidity is dead at $100",
       "**Never price a spread from `get_equity_quotes` after hours** \u2014 487\u00d7 wrong on",
-      "**The broker gives us the whole option chain with greeks.** `get_option_quotes`",
+      "**CBOE serves the whole option chain free and unauthenticated** \u2014 28,934 SPX",
+      "**Read the gamma sign before any level rule.** Positive = dealers dampen,",
       "**Broker access is narrow.** Only account `\u2022\u2022\u2022\u20226622` is agent-reachable;"
     ],
     "known_empty": false,
@@ -329,9 +329,9 @@ const D = {
     "live": "Session of 2026-09-12 audited the funded account. Options are ruled out on arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable (`B-002`). **Which market to start in is still open.** A `scout` is checking whether Kalshi is economically viable at $100 \u2014 that answer decides it. **Two concrete tasks are queued, both cheap and both decisive:** 1. **The Kalshi maker-fee test** (`B-003`) \u2014 do resting orders on plain `quadratic` series really cost nothing? The demo environment settles it without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place fee-free and liquid overlap. 2. **The regular-hours quote test** (`B-002`) \u2014 one paired call around 10:00 ET says whether the quote feed is broken generally or only after hours."
   },
   "build": {
-    "at": "13 Sep 2026, 21:50",
-    "commit": "7b33dcf",
-    "commits": "29",
+    "at": "14 Sep 2026, 15:33",
+    "commit": "b0d86c3",
+    "commits": "32",
     "branch": "claude/greeting-jk8c0j"
   }
 };

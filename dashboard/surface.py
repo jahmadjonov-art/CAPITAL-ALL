@@ -15,7 +15,8 @@ import json, sys, datetime as dt
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SNAPS = sorted((ROOT / "data" / "snapshots").glob("*.json"))
+# newest by modification time — filename order is not chronological
+SNAPS = sorted((ROOT / "data" / "snapshots").glob("*.json"), key=lambda p: p.stat().st_mtime)
 if not SNAPS:
     sys.exit("no snapshots in data/snapshots/")
 src = Path(sys.argv[1]) if len(sys.argv) > 1 else SNAPS[-1]

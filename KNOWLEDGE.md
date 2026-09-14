@@ -15,26 +15,28 @@ Full charter in [`MISSION.md`](MISSION.md).
 Claims that have earned a place here. Each is one line, carries its evidence
 tier, and names the experiments behind it so the detail can be pulled on demand.
 
-- **$100, cash, options level 2 — trading options is closed to us** (100-share
-  multiplier caps puts and covered calls at a $1 underlying; T+1 settlement
-  allows ~one round trip per dollar per day). **Reading the option chain is
-  not** — see below. — `B-001`
-- **Kalshi: taking liquidity is dead at $100** (fees ~3.5× the spread). **Resting
-  orders are genuinely free** on plain `quadratic` series — cited from Kalshi's
-  published schedule — and fee-free *and* liquid markets do exist. **But it is
-  probably unreachable from our account:** all of it is Kalshi-direct, we hold
-  Robinhood, whose reported event pricing is ~4¢ per round trip against a 1¢
-  spread. **Settle the venue before scanning any more markets.** — `B-003`, `B-004`
-- **A tight spread is not a tradable market.** A third of Kalshi markets sit at a
-  penny boundary where 1¢ is tautological; real books cost 1.5–22% to round-trip,
-  and deep quotes are not flow. — `B-004`
+- **$100, cash, options level 2 — trading options is closed to us.** The
+  100-share multiplier caps puts and covered calls at a $1 underlying; T+1
+  settlement allows ~one round trip per dollar per day. **Reading the chain is
+  not closed** — see below. — `B-001`
+- **Kalshi is parked on a venue question.** Taking liquidity is dead at $100
+  (fees ~3.5× spread); resting orders are genuinely free and liquid markets do
+  exist — but all of it is Kalshi-direct and we hold Robinhood (~4¢ round trip).
+  Also: a tight spread is not a tradable market — a third of its book sits at a
+  penny boundary, and deep quotes are not flow. **Settle the venue before
+  scanning further.** — `B-003`, `B-004`
 - **Never price a spread from `get_equity_quotes` after hours** — 487× wrong on
   SPY. Use `review_equity_order`'s disclosure. Untested in hours. — `B-002`
-- **The broker gives us the whole option chain with greeks.** `get_option_quotes`
-  returns IV, delta, **gamma**, theta, vega and open interest per contract; SPXW
-  carries daily expiries. Measured $2.15bn of gamma across eight SPX strikes with
-  a wall at 7,675. Snapshot to `data/snapshots/`, render with
-  `dashboard/surface.py` — MCP tools reach only a lead session, never a script.
+- **CBOE serves the whole option chain free and unauthenticated** — 28,934 SPX
+  contracts in one request with gamma, IV and open interest on each, and it works
+  from a script or subagent, which the MCP tools do not. 0DTE net dealer gamma
+  read **−$23B (negative — do not fade)**, walls both at 7,600, flip 7,625 with
+  spot below it. **Its open interest is end-of-day and does not move intraday.**
+  — `B-005`, `EXP-002`
+- **Read the gamma sign before any level rule.** Positive = dealers dampen,
+  fading edges works. Negative = dealers amplify, fading gets run over. A
+  six-strike sample got the sign right and the magnitude wrong by 400×: **sample
+  a gamma profile and you do not get a small version of it.**
 - **Broker access is narrow.** Only account `••••6622` is agent-reachable;
   **subagents and scheduled runs get no broker tools at all**, so the lead must
   fetch and paste. Kalshi's API silently returns nothing for pre-migration field

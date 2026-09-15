@@ -672,3 +672,32 @@ own table, never silently dropped.
 **Iterate the heuristic against a cache, not against CBOE.** `--cache DIR` saves
 and reuses the raw chains, so tuning a threshold costs one fetch rather than 70
 per attempt.
+
+### Two ways CBOE hands you bad data with a 200
+
+Both found on the second morning the scanner ran, both silent, both fixed in
+`scanner/tipsheet.py`. Assume a third exists.
+
+**It rate-limits, and the failure is invisible.** Eight parallel workers got a
+clean 70 of 70 one morning and `429` on 23 of 70 the next. The run still
+"succeeded" — it just ranked whatever got through, with the missing third
+listed in small type at the bottom of the page. Now: four workers, exponential
+backoff with jitter, four attempts, and the script **refuses to write** below
+90% coverage rather than publishing a partial ranking. `--force` overrides it
+deliberately. A full scan takes about 12 seconds.
+
+**It serves dead symbols forever.** A renamed or delisted ticker keeps returning
+a complete, well-formed chain — the last file CBOE ever wrote for it — with a
+200 and no warning. `SQ` was returning a full chain stamped **2025-01-21** and
+being ranked on it; `PARA` one from 2025-08-10. Both had been renamed (Block is
+now `XYZ`, Paramount Skydance is `PSKY`) and the universe has been corrected.
+The defence: the response's **top-level `timestamp` field** is the feed's own
+age, and it is thrown away if you take `["data"]` and nothing else. `scan()` now
+rejects any chain more than 4 days old (Friday's close read on Monday is 3), and
+writes the range to `feed_latest` / `feed_earliest`, which the page displays —
+"when we asked" and "what the numbers describe" are different things, and only
+the second one matters when the sheet runs before the open.
+
+**Nothing checks the universe for renames automatically.** A dead ticker now
+drops out with a `stale feed` error instead of poisoning the ranking, but it
+still has to be noticed and replaced by hand.

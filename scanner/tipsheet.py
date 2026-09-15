@@ -24,7 +24,8 @@ DATA NOTES
 
 Usage: python3 scanner/tipsheet.py [--out FILE] [--cache DIR]
 """
-import json, re, argparse, datetime as dt, urllib.request
+import json, re, argparse, datetime as dt, random, time
+import urllib.request, urllib.error
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from pathlib import Path
@@ -38,11 +39,11 @@ SYM = re.compile(r"^([A-Z]+)(\d{6})([CP])(\d{8})$")
 UNIVERSE = """
 AAPL MSFT NVDA AMZN GOOGL META TSLA AMD AVGO NFLX
 INTC MU PLTR SOFI COIN HOOD RIVN LCID F GM
-BAC JPM GS WFC C SCHW V MA PYPL SQ
+BAC JPM GS WFC C SCHW V MA PYPL XYZ
 XOM CVX OXY SLB FCX NEM GLD SLV USO UNG
 SPY QQQ IWM DIA TLT HYG XLF XLE SMH ARKK
 BA GE CAT DE UPS FDX DAL UAL AAL CCL
-DIS WBD PARA ROKU SNAP PINS UBER LYFT ABNB DASH
+DIS WBD PSKY ROKU SNAP PINS UBER LYFT ABNB DASH
 """.split()
 
 CONTRACT_VOL_FLOOR = 250      # ignore thin contracts — a 5x ratio on 3 lots is noise
@@ -81,17 +82,51 @@ NO_OPTIONALITY_VEGA = 0.01
 BUCKETS = ("day", "week", "month", "beyond")
 
 
+# CBOE rate-limits. Eight workers with no backoff got a clean 70/70 one morning
+# and 429s on 23 of 70 the next, which is the worst possible failure mode: the
+# run "succeeds", a third of the universe is quietly missing, and the ranking is
+# over whatever happened to get through. Four workers with backoff, and a
+# coverage check at the end that refuses to write a thin scan.
+WORKERS = 4
+RETRIES = 4
+BACKOFF = 2.0                 # seconds, doubling
+MIN_COVERAGE = 0.9            # refuse to write a scan missing more than a tenth
+MAX_FEED_AGE_DAYS = 4         # Fri close read on Mon is 3; beyond that it is a dead symbol
+
+
+def feed_age(ts, today):
+    """Days between the feed's own timestamp and today. None if unreadable."""
+    try:
+        return (today - dt.datetime.fromisoformat(str(ts)).date()).days
+    except Exception:
+        return None
+
+
 def fetch(sym, cache=None):
     if cache:
         p = Path(cache) / f"{sym}.json"
         if p.exists():
             return sym, json.loads(p.read_text())
-    try:
-        r = urllib.request.Request(CBOE.format(sym), headers={"User-Agent": "research/1.0"})
-        with urllib.request.urlopen(r, timeout=45) as f:
-            d = json.load(f)["data"]
-    except Exception as e:
-        return sym, {"_error": f"{type(e).__name__}: {e}"}
+    last = "no attempt"
+    for attempt in range(RETRIES):
+        try:
+            r = urllib.request.Request(CBOE.format(sym),
+                                       headers={"User-Agent": "research/1.0"})
+            with urllib.request.urlopen(r, timeout=45) as f:
+                raw = json.load(f)
+            d = raw["data"]
+            d["_feed_ts"] = raw.get("timestamp")
+            break
+        except urllib.error.HTTPError as e:
+            last = f"HTTP {e.code}"
+            if e.code not in (429, 500, 502, 503, 504):
+                return sym, {"_error": f"HTTPError: {e}"}
+        except Exception as e:
+            last = f"{type(e).__name__}: {e}"
+        if attempt < RETRIES - 1:
+            time.sleep(BACKOFF * (2 ** attempt) * (0.5 + random.random()))
+    else:
+        return sym, {"_error": f"{last} after {RETRIES} attempts"}
     if cache:
         Path(cache).mkdir(parents=True, exist_ok=True)
         (Path(cache) / f"{sym}.json").write_text(json.dumps(d))
@@ -107,11 +142,21 @@ def bucket(days):
 
 def scan(universe, cache=None):
     today = dt.date.today()
-    out, errors = [], []
-    with ThreadPoolExecutor(max_workers=8) as ex:
+    out, errors, feed_ts = [], [], []
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
         for sym, d in ex.map(lambda s: fetch(s, cache), universe):
             if "_error" in d:
                 errors.append({"symbol": sym, "error": d["_error"]}); continue
+            # CBOE keeps serving the last file it ever wrote for a delisted or
+            # renamed symbol, with a 200 and no warning. SQ (now XYZ) was still
+            # returning a full chain from 2025-01-21 and being ranked on it.
+            # The feed stamps its own age, so check it.
+            age = feed_age(d.get("_feed_ts"), today)
+            if age is None or age > MAX_FEED_AGE_DAYS:
+                errors.append({"symbol": sym,
+                               "error": f"stale feed: {d.get('_feed_ts')} "
+                                        f"({'unparseable' if age is None else f'{age} days old'})"})
+                continue
             spot = float(d.get("current_price") or 0)
             tot_v = tot_oi = call_v = put_v = 0.0
             fin_v = fin_notional = 0.0
@@ -162,6 +207,7 @@ def scan(universe, cache=None):
                     rec["ratio"] = None
                     std[b]["fresh"].append(rec)
             if not tot_v: continue
+            if d.get("_feed_ts"): feed_ts.append(str(d["_feed_ts"]))
 
             buckets = {}
             for b in BUCKETS:
@@ -196,20 +242,27 @@ def scan(universe, cache=None):
                 "financing_share": round(fin_notional / (fin_notional + bn + fn), 3)
                                    if (fin_notional + bn + fn) else 0,
             })
-    return out, errors
+    return out, errors, feed_ts
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "data" / "tipsheet.json"))
     ap.add_argument("--cache", default=None, help="reuse/store raw CBOE chains here")
+    ap.add_argument("--force", action="store_true",
+                    help="write even if the scan is missing part of the universe")
     a = ap.parse_args()
-    rows, errors = scan(UNIVERSE, a.cache)
+    rows, errors, feed_ts = scan(UNIVERSE, a.cache)
     # Rank by the dollars behind genuinely unusual activity, not by raw turnover.
     rows.sort(key=lambda r: -r["unusual_notional"])
     payload = {
         "scanned_utc": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "universe_size": len(UNIVERSE), "returned": len(rows), "errors": errors,
+        "coverage": round(len(rows) / len(UNIVERSE), 3),
+        # The feed stamps its own age. This is what the numbers describe;
+        # scanned_utc is only when we asked.
+        "feed_latest": max(feed_ts) if feed_ts else None,
+        "feed_earliest": min(feed_ts) if feed_ts else None,
         "params": {
             "contract_vol_floor": CONTRACT_VOL_FLOOR,
             "min_oi_for_ratio": MIN_OI_FOR_RATIO,
@@ -219,9 +272,19 @@ def main():
         },
         "rows": rows,
     }
+    coverage = len(rows) / len(UNIVERSE)
+    print(f"scanned {len(UNIVERSE)} tickers, {len(rows)} returned data, "
+          f"{len(errors)} errors  ({coverage:.0%} coverage)")
+    if coverage < MIN_COVERAGE and not a.force:
+        print(f"\nREFUSING TO WRITE: coverage {coverage:.0%} is below "
+              f"{MIN_COVERAGE:.0%}. A ranking over a partial universe is not a "
+              f"ranking of the market — it ranks whatever got through.\n"
+              f"missing: {', '.join(e['symbol'] for e in errors)}\n"
+              f"Re-run (the old {Path(a.out).name} is untouched), or pass "
+              f"--force if a thin scan is genuinely what you want.")
+        raise SystemExit(1)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(payload, indent=2))
-    print(f"scanned {len(UNIVERSE)} tickers, {len(rows)} returned data, {len(errors)} errors")
     print(f"\n{'sym':>6} {'spot':>9} {'P/C':>6} {'build $':>13} {'fresh $':>13} "
           f"{'top x':>7} {'financing $':>13} {'fin%':>5}")
     print("-" * 82)

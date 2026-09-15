@@ -129,8 +129,9 @@ const money = n => {
 const num = n => n.toLocaleString("en-US");
 
 $("stamp").innerHTML =
+  (D.feed_latest ? `exchange data to ${esc(D.feed_latest)}<br>` : "") +
   `scanned ${esc(D.scanned)}<br>${D.returned} of ${D.universe_size} tickers returned data` +
-  (D.errors.length ? `<br>no data: ${esc(D.errors.join(", "))}` : "");
+  (D.errors.length ? `<br><span style="color:var(--warn)">no data: ${esc(D.errors.join(", "))}</span>` : "");
 
 const grand = D.tabs.reduce((s,t) => s + t.total, 0);
 const allRows = D.tabs.flatMap(t => t.rows);

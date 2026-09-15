@@ -55,6 +55,8 @@ DATA = {
     "built": dt.datetime.now().strftime("%d %b %Y  %H:%M"),
     "scanned": scanned.strftime("%d %b %Y  %H:%M UTC"),
     "universe_size": d["universe_size"], "returned": d["returned"],
+    "coverage": d.get("coverage"),
+    "feed_latest": d.get("feed_latest"), "feed_earliest": d.get("feed_earliest"),
     "errors": [e["symbol"] for e in d["errors"]],
     "params": d["params"],
     "tabs": tabs,

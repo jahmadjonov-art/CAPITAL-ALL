@@ -399,3 +399,36 @@ Worth stating the general rule this came from, since it will come up again:
 question been how to name the folder, guessing and moving on would have been
 right. The clarifying question is cheap; a wrong structural guess is discovered
 late and costs more than the question saves.
+
+---
+
+### 2026-09-15 — Excluded delta-1 contracts from the tip sheet rather than flagging them
+**Asked:** a tip sheet listing "all the stocks for a month and a week and a day
+that is seeing unusual volumes in the option chain."
+**Did:** removed contracts with |delta| ≥ 0.98 and vega ≤ 0.01 from every
+ranking on the sheet, and gave them their own table instead.
+**Assumed:** these are not option positions. A contract with no vega and a delta
+pinned at 1 is a stock substitute; volume there is financing, a roll, a box or
+an assignment being managed, and the owner asking "what is seeing unusual option
+volume" is not asking about that. On 2026-09-14 it was 88% of IWM's standout
+notional and put IWM at the top of the sheet on plumbing alone.
+**Would have settled it:** asking whether he wants the plumbing counted. I did
+not ask because either answer is served — it is excluded from the ranking but
+printed in full underneath, so nothing is hidden, only reordered.
+**If wrong:** one threshold, two lines of code, and the numbers come back.
+
+Worth recording why this is the *second* filter in two attempts, because the
+pattern is the point. Both failures had the same shape: **the filter supplied
+the quantity it was supposed to be measuring.** Version one ranked on volume ÷
+open interest with a floor under the denominator, so the top of the sheet was
+volume ÷ my own floor. Version two flagged a ticker "mechanical" on three
+deep-in-the-money strikes sharing an expiry, and fired on 11 of the top 15 —
+a flag that fires on everything is a constant, not a measurement.
+
+What fixed it was noticing that CBOE already ships greeks per contract, so the
+property could be **tested on the data instead of inferred from the strike**.
+The check that a filter is real: it must be possible for it to come back empty,
+and it must be possible for it to come back on nearly everything, and which one
+happens has to be the market's decision rather than mine. The general rule —
+**before trusting any ranking, ask what it looks like if the underlying effect
+is absent.** If the answer is "the same", the ranking is measuring the filter.

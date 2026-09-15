@@ -32,6 +32,12 @@ tier, and names the experiments behind it so the detail can be pulled on demand.
   Kalshi-direct and we hold Robinhood (~4¢ round trip). A tight spread is also
   not a tradable market there. **Settle the venue before scanning further.**
   — `B-003`, `B-004`
+- **A screen that ranks on a ratio must not supply the denominator.** Two
+  tip-sheet rankings in a row were artifacts of their own filters: volume ÷ an
+  open-interest *floor*, then a "mechanical" flag that fired on 11 of the top 15
+  names. CBOE ships greeks per contract, so test the property directly — delta
+  pinned at ±1 with no vega left is a stock substitute, not a position, and it
+  was 88% of IWM's option notional. — `scanner/tipsheet.py`
 - **Broker quirks:** never price a spread from `get_equity_quotes` after hours
   (487× wrong on SPY — use `review_equity_order`'s disclosure); only `••••6622`
   is agent-reachable; **subagents and scheduled runs get no broker tools**;
@@ -50,18 +56,13 @@ independently rediscovering the same dead end.
 
 The question currently being worked, and by whom.
 
-> Session of 2026-09-12 audited the funded account. Options are ruled out on
-> arithmetic (`B-001`); the quote feed's after-hours bid/ask proved unusable
-> (`B-002`). **Which market to start in is still open.** A `scout` is checking
-> whether Kalshi is economically viable at $100 — that answer decides it.
->
-> **Two concrete tasks are queued, both cheap and both decisive:**
-> 1. **The Kalshi maker-fee test** (`B-003`) — do resting orders on plain
->    `quadratic` series really cost nothing? The demo environment settles it
->    without money. If yes, look straight at `KXBTCD`/`KXETHD`, the one place
->    fee-free and liquid overlap.
-> 2. **The regular-hours quote test** (`B-002`) — one paired call around 10:00 ET
->    says whether the quote feed is broken generally or only after hours.
+> 2026-09-15: the tip sheet is live — `scanner/tipsheet.py` scans 70 names on
+> CBOE and `dashboard/tipsheet.py` renders it by day / week / month horizon.
+> **Which market to start in is still open**, and two cheap tests would settle
+> most of it: the Kalshi maker-fee test on the demo environment (`B-003` — do
+> resting orders on plain `quadratic` series really cost nothing?), and one
+> paired quote call around 10:00 ET to learn whether `B-002` is an after-hours
+> fault or a general one.
 
 ## Open ground
 

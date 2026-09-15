@@ -451,15 +451,20 @@ reading, which matters when strikes sit $100 apart.
 
 ---
 
-## The three published pages
+## The published pages
 
-| Page | URL |
-|---|---|
-| **Office floor plan** — the firm at a glance | https://claude.ai/code/artifact/7b709ccd-35aa-4f97-a096-26026bf8573b |
-| **Fair value desk** — live BTC contracts vs model | https://claude.ai/code/artifact/a0aa3e0b-1fe1-420e-99b1-fc9103ac170d |
-| **Strategy library** — one tab per source | https://claude.ai/code/artifact/d39ab618-439a-48aa-a40e-d3fe756ec966 |
+| Page | Built by | URL |
+|---|---|---|
+| **Office floor plan** — the firm at a glance | `dashboard/build.py` | https://claude.ai/code/artifact/7b709ccd-35aa-4f97-a096-26026bf8573b |
+| **Fair value desk** — live BTC contracts vs model | `dashboard/desk.py` | https://claude.ai/code/artifact/a0aa3e0b-1fe1-420e-99b1-fc9103ac170d |
+| **Strategy library** — one tab per source | `dashboard/strategies.py` | https://claude.ai/code/artifact/d39ab618-439a-48aa-a40e-d3fe756ec966 |
+| **Volatility surface** — IV smile and gamma by strike | `dashboard/surface.py` | https://claude.ai/code/artifact/f85f0329-ca21-4474-bf1a-e6449c1e9020 |
+| **Tip sheet** — unusual option volume, day / week / month | `dashboard/tipsheet.py` | https://claude.ai/artifact/MqSnH99CKyT2WZuYNRu5QA |
 
-Each is generated: `dashboard/build.py`, `desk.py`, `strategies.py`. Republish
+**There is no index page linking these together.** The owner holds five separate
+bookmarks and nothing on any page points at the others. Worth fixing.
+
+Each is generated. Republish
 by passing the URL above as `url` to the Artifact tool so the owner's links keep
 working. **Never hand-edit the generated HTML.**
 
@@ -620,3 +625,50 @@ warning, and a flip estimate. On the 2026-09-11 SPXW snapshot it read
 six strikes against a full chain, and that tool read −$14.73bn. Our flip landed
 at the edge of the sampled range, which means it was not determined. Sample the
 whole chain before trusting either number.
+
+---
+
+## The tip sheet, and the two ways a screen lies to you
+
+`scanner/tipsheet.py` pulls full chains for 70 liquid names from CBOE and ranks
+unusual option volume; `dashboard/tipsheet.py` renders it as day / week / month.
+Both run unauthenticated from a plain script, so a scheduled run can do it.
+
+**What it measures:** volume against open interest. Open interest is published
+once after the close and does not move intraday — that is what makes the ratio
+mean something, and it also means a pre-open run describes the *previous*
+session. Say which it is when reporting.
+
+**What it does not measure:** unusual versus this ticker's own normal day. That
+needs a history of daily option volume, and nothing records one yet
+(`sandbox/data-collection.md`). Names that trade huge volume every day will keep
+appearing. That is turnover, not news.
+
+**Two filters that turned out to be measuring themselves.** Both are worth
+knowing before adding a third:
+
+1. **A ratio against a floor.** Ranking on volume ÷ open interest with a floor
+   of 50 on the denominator put contracts with an open interest of 0–21 at the
+   top. The headline "816×" was volume divided by the floor, not by anything
+   observed. Median open interest in the top 40 was 24. Fix: contracts with real
+   open interest (`build`, OI ≥ 100, ranked by ratio) are now separated from
+   contracts with almost none (`fresh`, OI ≤ 100, ranked by notional), and the
+   ratio is simply not computed in between.
+2. **A flag that fires on everything.** The replacement called a ticker
+   "mechanical" when three strikes more than 8% in the money shared an expiry.
+   It fired on 11 of the top 15 names, which carries no information. Fix: CBOE
+   ships greeks per contract, so ask the property directly — **|delta| ≥ 0.98
+   with vega ≤ 0.01 means the contract has no optionality left and is a stock
+   substitute.** Volume there is financing, a roll, a box or an assignment being
+   managed. Measured across the universe, 88% of contracts with delta ≥ 0.98
+   also had vega ≤ 0.005, so this tests one real thing rather than two loose
+   ones.
+
+That second class of volume is not small. On 2026-09-14 it was **88% of IWM's
+entire standout option notional ($1.39B)** and would have put IWM top of the
+sheet on plumbing alone. It is excluded from every ranking and reported in its
+own table, never silently dropped.
+
+**Iterate the heuristic against a cache, not against CBOE.** `--cache DIR` saves
+and reuses the raw chains, so tuning a threshold costs one fetch rather than 70
+per attempt.

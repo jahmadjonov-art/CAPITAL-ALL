@@ -365,6 +365,19 @@ The fix, if scheduled runs need broker access: the owner recreates or edits the
 Routine from the Routines UI on claude.ai, where his connectors can be attached
 to it. Worth doing before relying on the schedule for anything broker-shaped.
 
+**The same edit fixes something worse.** Read on 2026-09-16, the Routine
+"Capital-All — weekday research run" carries `sources: []` **and**
+`mcp_connections: []` — no repository attached, not just no connectors. That is
+the leading explanation for why two scheduled runs have now done their work,
+committed locally, and failed to push (`thoughts/4-walls.md`, 2026-09-14). An
+interactive session has the repository attached and pushes fine; a fired one
+with an empty `sources` list appears not to.
+
+So the Routine needs **two** things attached in one visit: the `capital-all`
+repository, and the connectors. `update_trigger` reaches neither — it can change
+the name, schedule, enabled state, model and prompt only. This is the owner's
+click, and nothing an agent can do.
+
 ## Options access: what it would actually take
 
 The account is **cash** with **`option_level_2`**. Spreads are level 3, and

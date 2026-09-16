@@ -50,7 +50,7 @@ as a guess, gives the next session somewhere to start.
 
 ---
 
-### 2026-09-14 — OPEN — A scheduled session could not push, and its work is gone
+### 2026-09-14 — OPEN, cause identified 2026-09-16 — A scheduled session could not push
 **Goal:** the first autonomous weekday run, fired by the Routine at 15:10 UTC.
 **Wall:** it did the work and **could not push to GitHub.** It made one commit,
 `a2c8f4d` — the 31st on the branch — which never reached the remote. The
@@ -89,3 +89,42 @@ session's own words are lost and are not recoverable.**
 **Cost of leaving it:** every scheduled run is a coin flip on whether its work
 survives, and the failure is invisible. **Nothing the Routine produces can be
 trusted to persist until this is fixed.**
+
+---
+
+**2026-09-16 — it happened a second time, and the likely cause is now named.**
+
+The Routine fired at 15:10 UTC, ran seven minutes, and the platform recorded it
+`SUCCEEDED`. The remote branch did not move: it was still at `24502a5`, the last
+commit from the interactive session the day before. Two for two, both reported
+as successes from outside.
+
+Reading the Routine's own configuration (`list_triggers`) gives the candidate:
+
+    "sources": []
+    "mcp_connections": []
+
+**The scheduled job was created with no repository attached to it.** An
+interactive session has the repository attached and its git credentials scoped
+to it — which is why `git push` works here and has worked 31 times. A fired
+session with an empty `sources` list gets no such grant, so it can read the
+public repository and clone it, do the work, commit locally, and fail at exactly
+one step: the push. That matches every symptom, including the short run.
+
+**Basis: Reasoned, not Tested.** The configuration is a fact read directly from
+the platform, and the failure is a fact observed twice. That the first causes the
+second is the obvious explanation and nothing else fits as well, but it has not
+been demonstrated — no scheduled run has yet captured the actual error text from
+`git push`, which is the thing that would settle it.
+
+**The fix is the owner's, and it is a settings change, not a code change.** In
+the Routines page on claude.ai, edit "Capital-All — weekday research run" and
+attach the `capital-all` repository as a source. `update_trigger` cannot do it —
+that tool reaches the name, schedule, enabled state, model and prompt, and not
+the sources. Attaching the connectors in the same edit would also clear the
+separate limitation in `handoff.md` about scheduled runs having no broker tools.
+
+**Until it is attached, do not schedule work whose only output is a commit.** The
+mitigations already in place (push after every step, verify with `ls-remote`,
+state the failure in the dashboard) make the failure loud, but a loud failure
+still loses the work.

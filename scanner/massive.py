@@ -28,11 +28,15 @@ SO IT COMPLEMENTS CBOE RATHER THAN REPLACING IT
          every question of the form "is this unusual for THIS name?"
 
 RATE LIMIT
-  There is a per-minute cap. Its exact size has not been measured — an attempt to
-  measure it by hammering one endpoint was correctly refused as credential
-  probing, and it is better established from real use than from a benchmark.
-  Exceeding it returns HTTP 429, or a 200 whose body carries status ERROR and
-  "exceeded the maximum requests per minute".
+  **About four requests a minute**, measured 2026-09-16 from real use rather than
+  a benchmark: the first full backfill fetched 59 tickers in 859 seconds and the
+  adaptive gap below settled at its 15-second ceiling. That is far tighter than
+  the "unlimited pool" the plan was believed to carry, and it shapes everything —
+  a 70-name history refresh is a ~15 minute job, not a ~15 second one, so it is
+  cached on disk and only refetched when stale.
+
+  Exceeding the cap returns HTTP 429, or HTTP 403, or a 200 whose body carries
+  status ERROR and "exceeded the maximum requests per minute".
 
   **A rate limit and a missing entitlement look almost identical.** Both can
   arrive as a non-200, and both surface under `status` values that have been

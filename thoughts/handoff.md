@@ -768,6 +768,13 @@ for options and stocks alike.
 `massive.get()` retries through the cap and raises `NotEntitled` only for a real
 plan limit, so callers cannot repeat the mistake. **Anything that queries this
 API without that retry will eventually report that the plan lacks data the plan
-has.** The exact size of the cap is still unmeasured — an attempt to measure it
-by hammering one endpoint was refused as credential probing, which was the right
-call; establish it from real use instead.
+has.**
+
+**The cap is about four requests a minute.** Measured from real use on
+2026-09-16 — the first full history backfill fetched 59 tickers in 859 seconds,
+and the adaptive gap in `massive.get()` settled at its 15-second ceiling. Worth
+telling the owner: he believed the plan carried an unlimited request pool, and
+what is actually there is tight enough to shape the design. A 70-name history
+refresh is a **~15 minute job**, which is why `scanner/history.py` caches to
+disk and refetches only what has gone stale, saves incrementally as it goes, and
+offers `--cached-history` so a rebuild never waits behind a backfill.

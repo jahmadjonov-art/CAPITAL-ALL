@@ -59,7 +59,36 @@ def key():
     return k
 
 
-def get(path, tries=6, pause=13, **params):
+# ADAPTIVE PACING.
+#
+# Reacting to 429s wastes the whole budget: every refusal costs a request AND a
+# sleep, so the first backfill crawled at about one ticker a minute. Pacing
+# proactively — waiting a little between calls and widening that gap only when
+# actually refused — spends the same allowance without the wasted round trips.
+#
+# The gap starts optimistic and converges on whatever this plan really allows,
+# which is better than a guessed constant: the cap is not documented anywhere we
+# trust, and an attempt to measure it directly was refused as credential probing.
+_gap = 0.0          # seconds to wait between requests
+_last = 0.0         # when the last request went out
+
+
+def _pace():
+    global _last
+    if _gap:
+        wait = _gap - (time.time() - _last)
+        if wait > 0:
+            time.sleep(wait)
+    _last = time.time()
+
+
+def _slower():
+    """Called on a refusal: widen the gap, but never past a useless crawl."""
+    global _gap
+    _gap = min(max(_gap * 1.6, 5.0), 20.0)
+
+
+def get(path, tries=9, pause=13, **params):
     """GET a Massive endpoint, retrying through the per-minute cap.
 
     Raises NotEntitled for a genuine plan limit, so a caller can tell the two
@@ -69,18 +98,19 @@ def get(path, tries=6, pause=13, **params):
     url = f"{BASE}{path}?" + "&".join(f"{k}={v}" for k, v in params.items())
     last = None
     for _ in range(tries):
+        _pace()
         try:
             with urllib.request.urlopen(url, timeout=30) as f:
                 d = json.load(f)
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                time.sleep(pause); continue
+                _slower(); continue
             if e.code == 403:
                 raise NotEntitled(f"403 on {path}")
             raise
         err = str(d.get("error", ""))
         if "exceeded the maximum requests" in err:
-            time.sleep(pause); last = err; continue
+            _slower(); last = err; continue
         if "not entitled" in err.lower():
             raise NotEntitled(err)
         return d

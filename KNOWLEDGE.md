@@ -16,33 +16,37 @@ Claims that have earned a place here. Each is one line, carries its evidence
 tier, and names the experiments behind it so the detail can be pulled on demand.
 
 - **$100, cash, options level 2 — trading options is closed to us.** The
-  100-share multiplier caps puts and covered calls at a $1 underlying. Reading
-  the chain is not closed. — `B-001`
+  100-share multiplier caps us at a $1 underlying. Reading the chain is
+  not closed. — `B-001`
 - **CBOE serves the whole option chain free and unauthenticated** — 28,934 SPX
-  contracts in one request, gamma and open interest on each, and it works from a
-  script or subagent where the MCP tools do not. 0DTE net dealer gamma **−$23B
-  (negative — do not fade)**, walls both at 7,600, flip above spot. **Its open
-  interest is end-of-day and does not move intraday.** — `B-005`, `EXP-002`
+  contracts per request with gamma and open interest on each, and it works from a
+  script where the MCP tools do not. 0DTE net dealer gamma **−$23B (negative — do
+  not fade)**. **Its open interest is end-of-day.** — `B-005`, `EXP-002`
 - **Read the gamma sign before applying any level rule.** Positive = dealers
-  dampen, fading works. Negative = dealers amplify, fading gets run over. A
-  six-strike sample got the sign right and the magnitude wrong by 400× —
-  **sampling a gamma profile does not give you a small version of it.**
-- **Kalshi is parked on one venue question.** Taking liquidity is dead at $100;
-  resting orders are genuinely free and liquid markets exist — but it is all
-  Kalshi-direct and we hold Robinhood (~4¢ round trip). A tight spread is also
-  not a tradable market there. **Settle the venue before scanning further.**
-  — `B-003`, `B-004`
-- **A screen that ranks on a ratio must not supply the denominator.** Two
-  tip-sheet rankings in a row were artifacts of their own filters: volume ÷ an
-  open-interest *floor*, then a "mechanical" flag that fired on 11 of the top 15
-  names. CBOE ships greeks per contract, so test the property directly — delta
-  pinned at ±1 with no vega left is a stock substitute, not a position, and it
-  was 88% of IWM's option notional. — `scanner/tipsheet.py`
+  dampen and fading works; negative = they amplify and it gets run over. A
+  six-strike sample was 400× wrong — **a sampled gamma profile is not a small
+  one.**
+- **Kalshi is parked on one venue question.** Free resting orders and liquid
+  markets exist, but only Kalshi-direct; we hold Robinhood (~4¢ round trip).
+  **Settle the venue before scanning further.** — `B-003`, `B-004`
+- **A screen must not supply the quantity it claims to measure.** Three tip-sheet
+  rankings died of this: volume ÷ an open-interest *floor*; a "mechanical" flag
+  firing on 11 of the top 15 names; and a per-contract volume percentile whose
+  contracts had a median of **five days** of history. The test before trusting
+  any ranking: *what would this look like if the effect were absent?* Same
+  answer ⇒ it measures the filter. — `scanner/tipsheet.py`
+- **Two option data sources; neither is sufficient alone.** CBOE gives today's
+  full chain *with greeks*, free and keyless, and no history. Massive (ex-Polygon,
+  the owner's key, in `MASSIVE_API_KEY` and never in the repo) gives ~2 years of
+  daily bars for stocks and single contracts — but no greeks, no real-time, and
+  **no way to recover a ticker's past option volume**, which must be banked daily
+  going forward. Its rate limit and its entitlement errors look alike; conflating
+  them produced two wrong readings of the plan in ten minutes. —
+  `scanner/massive.py`, `scanner/history.py`
 - **Broker quirks:** never price a spread from `get_equity_quotes` after hours
-  (487× wrong on SPY — use `review_equity_order`'s disclosure); only `••••6622`
-  is agent-reachable; **subagents and scheduled runs get no broker tools**;
-  Kalshi's API silently returns nothing for pre-migration field names. Details in
-  `handoff.md`. — `B-002`
+  (487× wrong on SPY); only `••••6622` is agent-reachable; **subagents and
+  scheduled runs get no broker tools**; Kalshi silently returns nothing for
+  pre-migration field names. `handoff.md` has the detail. — `B-002`
 
 ## What is dead
 
@@ -70,20 +74,18 @@ Staked out, not built. Pick any up without asking — see
 [`sandbox/`](sandbox/README.md).
 
 - [`strategies/`](strategies/README.md) — **1 source, 10 claims, all untested.**
-  Options-flow gamma levels, with a sandbox and forward paper record ready.
-  **No longer blocked** — only the 90-day open-interest history is missing.
-- [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** BTC
-  contracts vs a lognormal model; gaps too large and unstable to believe, because
-  settlement is misspecified. Fix that first.
-- [`data-collection.md`](sandbox/data-collection.md) — **nothing records anything
-  yet**, so no question about the past is answerable. Likely a GitHub Actions
-  cron, which needs a merge to `main`.
+  Options-flow gamma levels, sandbox and paper record ready. Only the 90-day
+  open-interest history is missing.
+- [`fair-value-model.md`](sandbox/fair-value-model.md) — **in progress.** BTC vs
+  a lognormal model; gaps unbelievable because settlement is misspecified.
+- [`data-collection.md`](sandbox/data-collection.md) — **partly answered.** Stock
+  volume history is now bought, not collected; option volume still must be banked
+  daily and cannot be backfilled. The Actions cron still needs a merge to `main`.
 - [`backtest-harness.md`](sandbox/backtest-harness.md) — no code exists yet.
 - [`cost-model.md`](sandbox/cost-model.md) — Kalshi priced; equities still need a
   regular-hours measurement.
-- [`markets-untouched.md`](sandbox/markets-untouched.md) and
-  [`robinhood.md`](sandbox/robinhood.md) — market choice still unargued; the
-  broker is now well mapped (account, chains, greeks, quote traps).
+- [`markets-untouched.md`](sandbox/markets-untouched.md),
+  [`robinhood.md`](sandbox/robinhood.md) — market choice unargued; broker mapped.
 
 ## Where the detail lives
 
@@ -108,11 +110,9 @@ Run `./scorecard/summary.sh` — it reports the current size. **Over the cap, th
 next session consolidates rather than extends.** No exceptions, because the
 exception is how every document like this dies.
 
-This constraint is the entire point. The record below this page grows without
-limit, and if catching up meant reading all of it, catch-up cost would rise
-forever until sessions spent their whole budget reading and none working. A
-fixed-size front page means **knowledge compounds while reading cost stays
-flat.**
+This constraint is the entire point. The record below grows without limit; if
+catching up meant reading all of it, catch-up cost would rise forever. A
+fixed-size front page means **knowledge compounds while reading cost stays flat.**
 
 ### Every session pays into it
 

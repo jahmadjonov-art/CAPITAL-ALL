@@ -56,6 +56,8 @@ h1,h2,h3{margin:0}
 .tag.call{color:var(--call);border-color:#14442C;background:#08170F}
 .tag.put{color:var(--put);border-color:#5A1A1A;background:#1C0A0A}
 .tag.fin{color:var(--warn);border-color:#3D2B0C;background:#1A1207}
+.tag.hot{color:#FF8A5B;border-color:#4A2416;background:#1B0E08}
+.tag.cold{color:#6FA8DC;border-color:#16304A;background:#081119}
 .body{padding:2px 13px 13px}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
 th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
@@ -89,6 +91,7 @@ h2.sec{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;
 </div>
 
 <div class="strip" id="strip"></div>
+<div class="sub" id="banking"></div>
 <div class="tabs" id="tabs" role="tablist"></div>
 <div class="sub" id="sub"></div>
 <div id="panel" role="tabpanel"></div>
@@ -100,10 +103,20 @@ h2.sec{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;
   positions changing hands. That is the standard screen and it is the honest version of the
   question we can answer with free data today.
   <br><br>
-  <b>It is not "unusual versus this ticker's own normal day."</b> That needs a history of daily
-  option volume, which nothing here records yet. A name that trades a million contracts every
-  single day will keep appearing; that is turnover, not news. Until a volume history exists,
-  read this as "where is the new positioning", not "what changed today".
+  <b>The share-volume badge is a different, fully measured thing.</b> Where a ticker shows
+  <span class="tag hot">shares 96th pct</span> that <i>is</i> "unusual for this name" &mdash;
+  its share volume for this session ranked against its own previous six months, off two years
+  of history. A name can be busy in options while its shares are quiet, or the reverse, and
+  the two together say more than either alone.
+  <br><br>
+  <b>The same measure for OPTION volume is being banked, not backfilled.</b> It is the one
+  number this sheet most wants and the one that cannot be bought: there is no endpoint that
+  gives a ticker's total option volume for a past day, and rebuilding it contract by contract
+  would take thousands of requests per name. Doing it per contract instead does not work either
+  &mdash; sampling this sheet's own standouts, the median contract had <b>five days</b> of
+  history, because near-dated contracts have not existed long enough to have any. So each run
+  records the day, and the count below shows how far that record has got. Nothing can recover
+  the days before it started.
   <br><br>
   <b>Open interest is yesterday's number.</b> It is published once, after the close, and does not
   move during the session — which is exactly what makes the ratio mean something, but it also
@@ -181,6 +194,14 @@ function tickerRow(r, max) {
   if (r.fresh_notional > r.build_notional) tags.push(`<span class="tag">all-new strikes</span>`);
   if (r.financing_share >= 0.25)
     tags.push(`<span class="tag fin">${(r.financing_share*100).toFixed(0)}% financing</span>`);
+  const sc = r.stock_context;
+  if (sc && sc.known) {
+    const cls = sc.pctile >= 90 ? "hot" : sc.pctile <= 10 ? "cold" : "";
+    const when = sc.offset_days ? ` (${sc.session.slice(5)})` : "";
+    tags.push(`<span class="tag ${cls}" title="share volume on ${sc.session} vs its own `
+      + `previous ${sc.sessions} sessions">`
+      + `shares ${sc.pctile.toFixed(0)}th pct \u00b7 ${sc.x_median}\u00d7${when}</span>`);
+  }
 
   return `<details class="tk"><summary>
     <div class="sym">${esc(r.symbol)}<s>${r.spot.toFixed(2)}</s></div>
@@ -232,6 +253,16 @@ $("fintable").innerHTML = D.financing.length
       <td class="r num">${num(f.contracts)}</td></tr>`).join("") +
     "</tbody></table></div>"
   : '<div class="sub">No ticker had a quarter or more of its option notional in these contracts.</div>';
+
+const bk = D.banking;
+$("banking").innerHTML = bk && bk.tickers
+  ? `Option-volume record: <b style="color:var(--txt)">${bk.depth}</b> of `
+    + `${bk.need} sessions banked for ${bk.tickers} tickers`
+    + (bk.depth >= bk.need
+        ? ' \u2014 deep enough to rank a name against its own option history.'
+        : ` \u2014 ${bk.need - bk.depth} more runs before "unusual for this name" can be `
+          + 'said about options rather than shares.')
+  : "";
 
 show(0);
 </script>

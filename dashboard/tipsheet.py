@@ -40,6 +40,8 @@ for b, (label, sub) in BUCKET_LABEL.items():
             "top_ratio": bk["top_ratio"],
             "vol_oi": bk["vol_oi"],
             "financing_share": r["financing_share"],
+            "stock_context": r.get("stock_context"),
+            "option_context": r.get("option_context"),
             "build": bk["build"], "fresh": bk["fresh"],
         })
     rows.sort(key=lambda r: -r["unusual"])
@@ -56,6 +58,10 @@ DATA = {
     "scanned": scanned.strftime("%d %b %Y  %H:%M UTC"),
     "universe_size": d["universe_size"], "returned": d["returned"],
     "coverage": d.get("coverage"),
+    "session": d.get("session"),
+    # How far the banked option-volume record has got. Until it is deep enough
+    # the sheet says so rather than showing a percentile built on nothing.
+    "banking": d.get("banking"),
     "feed_latest": d.get("feed_latest"), "feed_earliest": d.get("feed_earliest"),
     "errors": [e["symbol"] for e in d["errors"]],
     "params": d["params"],

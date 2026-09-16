@@ -159,6 +159,7 @@ def scan(universe, cache=None):
                 continue
             spot = float(d.get("current_price") or 0)
             tot_v = tot_oi = call_v = put_v = 0.0
+            last_trade = ""
             fin_v = fin_notional = 0.0
             fin_n = 0
             # per bucket: aggregate turnover plus the standouts found in it
@@ -177,6 +178,12 @@ def scan(universe, cache=None):
                 v = float(o.get("volume") or 0)
                 oi = float(o.get("open_interest") or 0)
                 tot_v += v; tot_oi += oi
+                # The session this volume belongs to, taken from the tape rather
+                # than the clock. A pre-open run reports the PREVIOUS session,
+                # and only the trades themselves know which one that is.
+                if v:
+                    lt = str(o.get("last_trade_time") or "")
+                    if lt > last_trade: last_trade = lt
                 if cp == "C": call_v += v
                 else: put_v += v
                 b = bucket(dte)
@@ -228,6 +235,7 @@ def scan(universe, cache=None):
             fn = sum(buckets[b]["fresh_notional"] for b in live)
             out.append({
                 "symbol": sym, "spot": spot,
+                "session": last_trade[:10],
                 "total_vol": tot_v, "total_oi": tot_oi,
                 "vol_oi": round(tot_v / tot_oi, 4) if tot_oi else None,
                 "call_vol": call_v, "put_vol": put_v,
@@ -249,18 +257,50 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(ROOT / "data" / "tipsheet.json"))
     ap.add_argument("--cache", default=None, help="reuse/store raw CBOE chains here")
+    ap.add_argument("--cached-history", action="store_true",
+                    help="use the cached volume history only; fetch nothing")
+    ap.add_argument("--no-history", action="store_true",
+                    help="skip the Massive volume-history lookup")
     ap.add_argument("--force", action="store_true",
                     help="write even if the scan is missing part of the universe")
     a = ap.parse_args()
     rows, errors, feed_ts = scan(UNIVERSE, a.cache)
     # Rank by the dollars behind genuinely unusual activity, not by raw turnover.
     rows.sort(key=lambda r: -r["unusual_notional"])
+    # Volume history: how unusual was this session, for this name?
+    session, banked_depth = "", 0
+    if rows:
+        from collections import Counter
+        session = Counter(r["session"] for r in rows if r["session"]).most_common(1)[0][0]
+    if session and not a.no_history:
+        try:
+            import history
+            store, fetched = history.load_daily([r["symbol"] for r in rows],
+                                                fetch=not a.cached_history)
+            for r in rows:
+                r["stock_context"] = history.context(store, r["symbol"], session)
+            n, depth = history.bank_option_volume(rows, session)
+            banked_depth = depth
+            for r in rows:
+                r["option_context"] = history.option_context(r["symbol"], session)
+            known = sum(1 for r in rows if (r.get("stock_context") or {}).get("known"))
+            print(f"history: session {session}, {fetched} fetched, "
+                  f"{known}/{len(rows)} tickers have share-volume context; "
+                  f"option volume banked for {n} tickers (median {depth} sessions)")
+        except SystemExit as e:
+            print(f"history skipped: {e}")
+        except Exception as e:
+            print(f"history skipped: {type(e).__name__}: {e}")
+
     payload = {
         "scanned_utc": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
         "universe_size": len(UNIVERSE), "returned": len(rows), "errors": errors,
         "coverage": round(len(rows) / len(UNIVERSE), 3),
         # The feed stamps its own age. This is what the numbers describe;
         # scanned_utc is only when we asked.
+        "session": session,
+        "banking": {"tickers": len(rows), "depth": banked_depth,
+                    "need": 60} if session else None,
         "feed_latest": max(feed_ts) if feed_ts else None,
         "feed_earliest": min(feed_ts) if feed_ts else None,
         "params": {

@@ -6,9 +6,18 @@ Build the morning tip sheet: which names are seeing unusual option volume, at
 the day, week and month horizon, and which contracts are driving it.
 
 ```bash
+export MASSIVE_API_KEY="..."        # never commit it; see scanner/massive.py
 python3 scanner/tipsheet.py
 python3 dashboard/tipsheet.py
 ```
+
+Without the key the scan still works — it just skips the volume history and says
+so. With it, each ticker also carries how unusual its **share** volume was for
+that session, against its own previous six months.
+
+The history is cached in `data/history/` and only refetched when stale, so the
+first run of the day is slow (the data provider caps requests per minute) and
+the rest are quick.
 
 The scanner pulls full option chains from CBOE for the universe in
 `scanner/tipsheet.py`. It is unauthenticated and needs no broker session, so it
@@ -43,6 +52,28 @@ positioning showed up. It does not say the positioning is right, it does not say
 the direction, and a large call buyer may be hedging a short somewhere the
 screen cannot see. If he asks whether to follow one, that is a research
 question — open an experiment, do not answer from the sheet.
+
+## The measure this sheet still cannot make
+
+"Is this name's OPTION volume unusual for this name?" is the question the sheet
+most wants, and it **cannot be backfilled** — established 2026-09-16, so do not
+spend another session rediscovering it:
+
+- There is no grouped-daily endpoint for options. The stock one returns every
+  ticker for a date in one call; no options equivalent exists.
+- Per-contract daily bars do exist, so a ticker's daily total would mean summing
+  every contract that traded on every day — thousands of calls per name.
+- Asking it per contract instead does not rescue it. Sampling 83 standout
+  contracts off a live sheet, the **median contract had five days of history**.
+  Near-dated contracts have not existed long enough, and they are exactly what
+  the sheet is about.
+
+So every run banks that day's option volume into `data/history/option-volume.json`
+and the page shows how deep the record is. It becomes answerable after about
+sixty sessions and not before. Report it as banking, never as a finding.
+
+The share-volume figure **is** fully measured, and is a different claim. Do not
+let the two blur together when reporting.
 
 ## The two traps already hit here
 

@@ -714,3 +714,60 @@ the second one matters when the sheet runs before the open.
 **Nothing checks the universe for renames automatically.** A dead ticker now
 drops out with a `stale feed` error instead of poisoning the ranking, but it
 still has to be noticed and replaced by hand.
+
+---
+
+## Massive (formerly Polygon.io) — the options data subscription
+
+The owner supplied a key on 2026-09-16. **It is not in this repository and must
+never be**, `.gitignore` carries patterns for the obvious filenames, and
+`scanner/massive.py` reads it from `MASSIVE_API_KEY` in the environment. For a
+scheduled run, it goes in the Routine's environment variables — the same
+settings page that needs the repository and connectors attached.
+
+The host is still `api.polygon.io`; only the company name and the pricing links
+changed.
+
+**Entitlements, measured rather than read off a pricing page:**
+
+| | |
+|---|---|
+| Contract reference, full chain snapshot (strike, expiry, open interest, day volume) | yes |
+| **Daily bars for stocks and for individual option contracts, ~2 years back** | **yes** |
+| Tick-level trades | no |
+| Real-time quotes | no |
+| **Greeks** — the snapshot returns `greeks: {}` and a null IV | **no** |
+
+**It complements CBOE, it does not replace it.** CBOE gives today's chain *with*
+greeks, free and unauthenticated, and no history whatsoever. Massive gives the
+history. The tip sheet's zero-optionality filter is built on delta and vega, so
+it stays on CBOE.
+
+**What it unlocks.** `scanner/tipsheet.py` says in its own docstring that it
+cannot answer "unusual versus this ticker's own normal volume" because nothing
+records a volume history. Two years of daily bars per contract means that
+history can be **backfilled rather than waited for** — which also removes the
+dependency on a scheduled collector working, and that collector is the thing
+currently broken. `sandbox/data-collection.md` should be re-read in this light.
+
+### The trap this source sets
+
+**A rate limit and a missing entitlement look almost identical, and I confused
+them within ten minutes of getting the key.** An early probe reported `12/12
+requests succeeded, no throttling`, and a history check reported
+`NOT_AUTHORIZED` for 2024 — so the first conclusion was "unlimited calls, one
+year of history". Both were wrong. There *is* a per-minute cap; the twelve calls
+simply had not reached it yet. And the `NOT_AUTHORIZED` was the cap too — the
+same refusal arrives variously as HTTP 429, as HTTP 403, and as a **200 whose
+body carries `status: ERROR`**, sometimes with a `status` field that disagrees
+with its own error text.
+
+Measured properly, with retries through the cap: about **two years** of history,
+for options and stocks alike.
+
+`massive.get()` retries through the cap and raises `NotEntitled` only for a real
+plan limit, so callers cannot repeat the mistake. **Anything that queries this
+API without that retry will eventually report that the plan lacks data the plan
+has.** The exact size of the cap is still unmeasured — an attempt to measure it
+by hammering one endpoint was refused as credential probing, which was the right
+call; establish it from real use instead.

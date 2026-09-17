@@ -134,12 +134,11 @@ Something a session would be **materially worse off not knowing.** Not
 everything true, not everything interesting — only what changes what the next
 agent does.
 
-Promote a belief here when it reaches **T2 or better** (survived data it was not
-designed on) or when it is a hard constraint on what is possible. Retire it the
-moment its falsification condition trips, and move the line to **What is dead**
-with the date. A retired belief is not deleted from `beliefs.md`; it stays there
-marked `RETIRED`, because a disproven idea is more instructive than one never
-tested, and deleting it invites rediscovery.
+Promote a belief here at **T2 or better** (survived data it was not designed on),
+or when it is a hard constraint on what is possible. Retire it the moment its
+falsification condition trips and move the line to **What is dead**, dated. It
+stays in `beliefs.md` marked `RETIRED` — a disproven idea is more instructive
+than an untested one, and deleting it invites rediscovery.
 
 ### The ids are the network
 

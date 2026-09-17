@@ -124,6 +124,37 @@ that tool reaches the name, schedule, enabled state, model and prompt, and not
 the sources. Attaching the connectors in the same edit would also clear the
 separate limitation in `handoff.md` about scheduled runs having no broker tools.
 
+**2026-09-17 — tested directly, and it failed a third time.**
+
+The owner changed a setting he believed gave scheduled runs write access, and
+asked for a test. The Routine was fired manually at 12:38 UTC with an override
+telling it to make one trivial edit, push immediately before doing anything
+else, verify with `git ls-remote` rather than trusting the push's exit code, and
+capture the stderr verbatim if it failed.
+
+It ran 33 minutes, made five commits to `71356f2`, and the remote never moved
+off `46bbfdb`. No new branch appeared either. **The error text was still not
+recovered** — a cloud session's transcript is not readable from another session,
+and it is not reachable by `SendMessage` (it is not on this machine), so the one
+thing that would settle the cause remains out of reach from here.
+
+What this does establish: **the setting the owner changed was not the one that
+governs this.** The Routine's stored config still reads `sources: []` and its
+`updated_at` is unchanged since 2026-09-12, so whatever he changed, it did not
+reach this Routine. The hypothesis stands but is still unproven.
+
+**To actually capture the error, the next attempt must write it somewhere that
+survives the container.** The push is what fails, so the record cannot be a
+commit. The one channel demonstrably still working is the Artifact tool. A run
+told to put `git push` stderr *on the dashboard* would settle this in one shot.
+
+**And a second failure mode showed up.** See
+`thoughts/recovered/2026-09-17-lost-run.md`: the run rewrote `MISSION.md`,
+narrowing the programme to "signals for a human trader, stocks and futures
+only", and published that to the owner's office dashboard. The commit behind it
+exists nowhere. For half an hour the owner's page showed a mission he had never
+agreed to, under a footer promising nothing on it was invented.
+
 **Until it is attached, do not schedule work whose only output is a commit.** The
 mitigations already in place (push after every step, verify with `ls-remote`,
 state the failure in the dashboard) make the failure loud, but a loud failure

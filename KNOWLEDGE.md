@@ -120,15 +120,13 @@ fixed-size front page means **knowledge compounds while reading cost stays flat.
 
 ### Every session pays into it
 
-Appending to the log is not enough — that only moves the problem. A session that
-learns something also edits this page: promote what earned its place, retire
-what died, sharpen a line that has become vague, delete a line that stopped
-being load-bearing.
+Appending to the log only moves the problem. A session that learns something also
+edits this page: promote what earned its place, retire what died, sharpen a vague
+line, delete one that stopped being load-bearing.
 
 **Consolidation is real work, not tidying.** Five experiments circling one idea
-should collapse into a single sentence that carries the conclusion, with the
-five ids after it. That sentence is worth more than the five entries, and it is
-what makes the next session fast.
+should collapse into one sentence carrying the conclusion, with the five ids
+after it. That sentence is worth more than the five entries.
 
 ### What earns a line here
 

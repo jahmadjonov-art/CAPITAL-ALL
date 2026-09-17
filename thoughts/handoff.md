@@ -225,10 +225,22 @@ unless `BASE_PATH=/` were set. The Vercel integration looks like an experiment
 rather than the real deployment, but **that is inference, not something the
 owner has confirmed** — ask before assuming it can be disconnected.
 
-Restoring auto-deploy after a merge needs a workflow at the repository **root**
-that builds `legacy/frontend`. That is a small contained change and it has not
-been made, because it touches the deployment of a live business application and
-is the owner's call.
+**Resolved 2026-09-17, with the owner.** He wants the trucking app to keep
+deploying, so `.github/workflows/deploy-legacy.yml` now sits at the repository
+root: the original workflow, unchanged except for its paths, watching only
+`legacy/frontend/**` so research pushes do not trigger it. **Do not delete it
+while tidying** — without it the app freezes on merge.
+
+Verified rather than assumed: `npm ci && BASE_PATH=/CAPITAL-ALL/ npm run build`
+in `legacy/frontend` succeeds, and the asset hashes it produces
+(`index-ClyjfRJt.js`, `index-DDWGn6xj.css`) are **identical to the ones the live
+site is serving right now**. The workflow reproduces the current deployment
+exactly.
+
+On Vercel he said he does not believe he uses it. Disconnecting it lives in the
+Vercel dashboard and is his action, not ours; until he does, PR #1 carries a red
+Vercel check that does not correspond to anything actually serving. **Do not
+"fix" that check by moving the app back to the repository root.**
 
 ### Git rename detection is pairing-based, and a new file at the old path breaks it
 

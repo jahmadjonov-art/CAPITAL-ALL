@@ -1,0 +1,71 @@
+name: Deploy legacy app to GitHub Pages
+
+# The trucking budget PWA in legacy/ is LIVE at
+# https://jahmadjonov-art.github.io/CAPITAL-ALL/ and the owner still uses it.
+#
+# Archiving it into legacy/ moved its own workflow to
+# legacy/.github/workflows/deploy.yml, where GitHub never reads it — Actions
+# only loads workflows from .github/workflows/ at the repository root. Without
+# this file the site would not go down on merge, it would FREEZE: Pages keeps
+# serving the last build and no later edit ever reaches it.
+#
+# So this is the original workflow, unchanged except for the paths, kept at the
+# root purely so the archived app carries on deploying exactly as before.
+# Confirmed with the owner 2026-09-17. Do not delete it to tidy up.
+
+on:
+  push:
+    branches: [main]
+    # Research work touches none of this, so it does not trigger a rebuild.
+    paths:
+      - 'legacy/frontend/**'
+      - '.github/workflows/deploy-legacy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight deploy finish rather than cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: legacy/frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: legacy/frontend
+        run: npm ci
+
+      - name: Build
+        working-directory: legacy/frontend
+        run: npm run build
+        env:
+          # vite.config.js defaults to /CAPITAL-ALL/; keep it derived from the
+          # repository name so a rename cannot silently break every asset URL.
+          BASE_PATH: /${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: legacy/frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -26,23 +26,28 @@ tier, and names the experiments behind it so the detail can be pulled on demand.
   dampen and fading works; negative = they amplify and it gets run over. A
   six-strike sample was 400× wrong — **a sampled gamma profile is not a small
   one.**
-- **Kalshi is parked on one venue question.** Free resting orders and liquid
-  markets exist, but only Kalshi-direct; we hold Robinhood (~4¢ round trip).
-  **Settle the venue before scanning further.** — `B-003`, `B-004`
+- **Kalshi is parked on one venue question.** Free resting orders exist, but
+  only Kalshi-direct; we hold Robinhood (~4¢ round trip). — `B-003`, `B-004`
 - **A screen must not supply the quantity it claims to measure.** Three tip-sheet
   rankings died of this: volume ÷ an open-interest *floor*; a "mechanical" flag
   firing on 11 of the top 15 names; and a per-contract volume percentile whose
   contracts had a median of **five days** of history. The test before trusting
   any ranking: *what would this look like if the effect were absent?* Same
   answer ⇒ it measures the filter. — `scanner/tipsheet.py`
-- **Two option data sources; neither is sufficient alone.** CBOE gives today's
-  full chain *with greeks*, free and keyless, and no history. Massive (ex-Polygon,
-  the owner's key, in `MASSIVE_API_KEY` and never in the repo) gives ~2 years of
-  daily bars for stocks and single contracts — but no greeks, no real-time, and
-  **no way to recover a ticker's past option volume**, which must be banked daily
-  going forward. Its rate limit and its entitlement errors look alike; conflating
-  them produced two wrong readings of the plan in ten minutes. —
-  `scanner/massive.py`, `scanner/history.py`
+- **Two option data sources; neither suffices alone.** CBOE: today's full chain
+  *with greeks*, free, keyless, no history. Massive (ex-Polygon; key in
+  `MASSIVE_API_KEY`, never in the repo): ~2 years of daily bars, but no greeks,
+  no real-time, ~4 requests/min, and **no way to recover past option volume** —
+  that must be banked daily. Its rate limit and entitlement errors look alike.
+  — `scanner/massive.py`, `scanner/history.py`
+- **A scheduled run cannot push, and the cause is now proven.** The git proxy
+  refuses a credential for any repository not in the fired session's authorized
+  set, and the Routine's set is empty — `403`, verbatim in `4-walls.md`. Fix is
+  the owner's: attach the repo on the Routines page. **Until then a scheduled run
+  loses everything it writes while reporting success.** The general lesson cost
+  four runs: when the failure is in how work *escapes* a container, the
+  diagnosis cannot travel by that same route — send it out through a channel
+  that still works (here, the dashboard). — `thoughts/4-walls.md`
 - **Broker quirks:** never price a spread from `get_equity_quotes` after hours
   (487× wrong on SPY); only `••••6622` is agent-reachable; **subagents and
   scheduled runs get no broker tools**; Kalshi silently returns nothing for
@@ -60,13 +65,12 @@ independently rediscovering the same dead end.
 
 The question currently being worked, and by whom.
 
-> 2026-09-15: the tip sheet is live — `scanner/tipsheet.py` scans 70 names on
-> CBOE and `dashboard/tipsheet.py` renders it by day / week / month horizon.
-> **Which market to start in is still open**, and two cheap tests would settle
-> most of it: the Kalshi maker-fee test on the demo environment (`B-003` — do
-> resting orders on plain `quadratic` series really cost nothing?), and one
-> paired quote call around 10:00 ET to learn whether `B-002` is an after-hours
-> fault or a general one.
+> 2026-09-17: the tip sheet is live and the push wall is solved (owner must
+> attach the repo). **Which market to start in is still open**; two cheap tests
+> would settle most of it — the Kalshi maker-fee test on the demo environment
+> (`B-003`), and one paired quote call near 10:00 ET to learn whether `B-002` is
+> an after-hours fault or a general one. A lost run's proposal to narrow the
+> mission to "signals for a human trader" is with the owner, not adopted.
 
 ## Open ground
 

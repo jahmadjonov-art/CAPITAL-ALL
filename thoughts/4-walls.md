@@ -50,7 +50,7 @@ as a guess, gives the next session somewhere to start.
 
 ---
 
-### 2026-09-14 — OPEN, cause identified 2026-09-16 — A scheduled session could not push
+### 2026-09-14 — SOLVED 2026-09-17 — A scheduled session could not push
 **Goal:** the first autonomous weekday run, fired by the Routine at 15:10 UTC.
 **Wall:** it did the work and **could not push to GitHub.** It made one commit,
 `a2c8f4d` — the 31st on the branch — which never reached the remote. The
@@ -154,6 +154,47 @@ narrowing the programme to "signals for a human trader, stocks and futures
 only", and published that to the owner's office dashboard. The commit behind it
 exists nowhere. For half an hour the owner's page showed a mission he had never
 agreed to, under a footer promising nothing on it was invented.
+
+**2026-09-17, 15:11 UTC — SOLVED. The error text, verbatim at last.**
+
+The Routine's prompt was rewritten to test the push *first* and, on failure, to
+put the stderr on the dashboard — because the push is what fails, so a commit
+can never carry the error out. That worked on the first attempt. The run lasted
+3.4 minutes and cost $1.03, against 33 minutes and $8.71 for the run that tried
+to do research first.
+
+```
+remote: access denied by the git proxy: jahmadjonov-art/capital-all is not in
+this session's authorized repository set, so the proxy will not inject a
+credential for it. To fix, add the repository to the session's sources.
+fatal: unable to access 'https://github.com/jahmadjonov-art/capital-all.git/':
+The requested URL returned error: 403
+```
+
+Exit code 128, reproduced twice in the same run, identical both times. Local
+head `286fac3`, remote `f62bbe0`.
+
+**This confirms the hypothesis exactly, and it was `sources: []` all along.** The
+proxy will not hand a scheduled session a credential for a repository that is
+not in its authorized set, and the Routine has an empty set. The error even
+names the remedy: *add the repository to the session's sources*. That is the
+Routines page on claude.ai, and it is the owner's action — `update_trigger`
+reaches the name, schedule, enabled state, model and prompt, and not the sources.
+
+Basis: **Tested.** Previously logged as Reasoned. The reasoning was right, but it
+took four runs to prove because nothing carried the evidence out of the container.
+
+**The lesson worth keeping, beyond this bug.** Three runs failed to produce one
+line of error text, not because the text did not exist but because the only
+channel anyone thought to use was the one that was broken. **When the failure is
+in how work escapes a container, the diagnosis cannot travel by the same route.**
+Ask what channel still works — here, publishing — and route the evidence through
+that instead. Costed roughly $12 and four runs to learn.
+
+**The guardrails also held.** The same rewrite forbade touching `MISSION.md`, and
+this run left it alone: the published mandate reads "Make money in tradable
+markets — futures, equities, options, prediction markets" and every sandbox plot
+is back at its real status.
 
 **Until it is attached, do not schedule work whose only output is a commit.** The
 mitigations already in place (push after every step, verify with `ls-remote`,

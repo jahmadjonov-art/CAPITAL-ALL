@@ -205,6 +205,31 @@ branch, by design. If this branch ever merges to `main`, the legacy app stops
 auto-deploying. That was a deliberate choice, not an oversight — but confirm it
 is still what the owner wants before merging.
 
+**There are TWO deploy paths, and the note above only knew about one.** Found
+2026-09-17 when PR #1 came back with a red check:
+
+1. **GitHub Pages, via `.github/workflows/deploy.yml` — this is the live one.**
+   `https://jahmadjonov-art.github.io/CAPITAL-ALL/` returns the trucking app
+   right now, title "Capital Allocation". Moving the workflow makes it inert on
+   merge: Pages keeps serving the last build, so **the site does not go down, it
+   freezes** — no further change ever deploys.
+2. **Vercel, project `capital-all-backend` under team `capall`.** A GitHub App
+   watching the repository directly, so moving `.github/` did **not** disable it.
+   It builds from the repository root, cannot find `package.json` there any more,
+   and now fails on every push — that is the red check on PR #1, and it is caused
+   by our diff.
+
+Note that `legacy/frontend/vite.config.js` sets `base = '/CAPITAL-ALL/'` for
+Pages, so a Vercel build of this app would serve broken asset paths anyway
+unless `BASE_PATH=/` were set. The Vercel integration looks like an experiment
+rather than the real deployment, but **that is inference, not something the
+owner has confirmed** — ask before assuming it can be disconnected.
+
+Restoring auto-deploy after a merge needs a workflow at the repository **root**
+that builds `legacy/frontend`. That is a small contained change and it has not
+been made, because it touches the deployment of a live business application and
+is the owner's call.
+
 ### Git rename detection is pairing-based, and a new file at the old path breaks it
 
 Encountered directly while archiving. All 29 files were moved with `git mv` and

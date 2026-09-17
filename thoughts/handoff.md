@@ -215,9 +215,21 @@ is still what the owner wants before merging.
    freezes** — no further change ever deploys.
 2. **Vercel, project `capital-all-backend` under team `capall`.** A GitHub App
    watching the repository directly, so moving `.github/` did **not** disable it.
-   It builds from the repository root, cannot find `package.json` there any more,
-   and now fails on every push — that is the red check on PR #1, and it is caused
-   by our diff.
+   It fails on every push — the red check on PR #1 — and **it is not caused by
+   our diff.** Corrected 2026-09-17; the first reading of this was wrong.
+
+   Vercel's own bot comment carries its configuration base64-encoded in the
+   `[vc]: #...` prefix, and decoding it gives `"rootDirectory":"backend"`. There
+   is no `backend/` directory. There was one in the very first commit
+   (`c0b4b71`), and it was deleted on **2026-08-13** by `0f211d0` "Replace server
+   backend with static PWA + Supabase" — a month before this branch started
+   (`bd991cb`, 2026-09-12). **The Vercel project has been building a directory
+   that stopped existing in August**, and has failed on every push since.
+
+   The lesson, since the wrong reading was the plausible one: a check that fails
+   the moment your branch appears is not thereby yours. Establish it against the
+   base branch's history before claiming the cause — the evidence here was
+   sitting inside the bot's own comment.
 
 Note that `legacy/frontend/vite.config.js` sets `base = '/CAPITAL-ALL/'` for
 Pages, so a Vercel build of this app would serve broken asset paths anyway
@@ -237,10 +249,13 @@ in `legacy/frontend` succeeds, and the asset hashes it produces
 site is serving right now**. The workflow reproduces the current deployment
 exactly.
 
-On Vercel he said he does not believe he uses it. Disconnecting it lives in the
-Vercel dashboard and is his action, not ours; until he does, PR #1 carries a red
-Vercel check that does not correspond to anything actually serving. **Do not
-"fix" that check by moving the app back to the repository root.**
+On Vercel he said he does not believe he uses it, which matches the finding
+above — it has been broken since August and nobody noticed, because nothing
+depends on it. Disconnecting it, or repointing its root directory, lives in the
+Vercel dashboard and is his action, not ours. Until then PR #1 carries a red
+check that corresponds to nothing that serves anything. **Do not "fix" it by
+moving the app back to the repository root, and do not add a `vercel.json` to
+chase it** — there is no `backend/` for it to build either way.
 
 ### Git rename detection is pairing-based, and a new file at the old path breaks it
 

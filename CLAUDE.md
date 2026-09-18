@@ -181,7 +181,9 @@ why, rather than quietly ignoring it.
 - `site/` — the public website at
   **https://jahmadjonov-art.github.io/CAPITAL-ALL/office/**, which publishes the
   dashboards and the entire written record. `build.py` generates it from the
-  repository on every push to `main`; the output in `site/dist/` is not committed.
+  repository on every push to `main`, along with the front page at
+  `/CAPITAL-ALL/` that lists it beside the archived budget app; the output in
+  `site/dist/` is not committed.
 - `research/` — the whiteboard: every experiment run, and what we believe.
 - `thoughts/` — the message board: handoff notes, categorised decisions, walls,
   post-mortems.

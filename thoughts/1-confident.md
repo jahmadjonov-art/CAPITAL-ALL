@@ -8,6 +8,26 @@ files a baseline to contrast against, not because each one is interesting.
 
 ---
 
+### 2026-09-18 — Front page at the root, app moved to /budget/, old worker retired
+**Asked:** "its still showing the old app not the new" — the owner opened
+`/CAPITAL-ALL/` and got the budget app, because the research site was one level
+down at `/office/`.
+**Did:** offered three options and he picked a front page listing both. The app
+moved to `/CAPITAL-ALL/budget/`, the research site stayed at `/office/`, and
+`site/build.py` now writes the front page that lists them.
+**If wrong:** one line in `vite.config.js` and two in the workflow put it back.
+
+Recorded here rather than in judgment calls because he chose it explicitly, but
+one part of it was not optional and is worth knowing: **moving a PWA out from
+under its own service worker leaves the old registration behind on every device
+that installed it.** Left alone it would have answered for the front page and
+the research site out of a cache of an app no longer at that address. The fix is
+a replacement worker at the old path whose only job is to delete itself —
+see `handoff.md`. It only runs when a device next comes online, so there is no
+moment when it can be declared finished.
+
+---
+
 ### 2026-09-18 — One workflow builds both sites, not two
 **Asked:** publish everything the firm has built as a free website.
 **Did:** folded `deploy-legacy.yml` into a single `.github/workflows/deploy.yml`

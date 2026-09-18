@@ -8,6 +8,38 @@ files a baseline to contrast against, not because each one is interesting.
 
 ---
 
+### 2026-09-18 — One workflow builds both sites, not two
+**Asked:** publish everything the firm has built as a free website.
+**Did:** folded `deploy-legacy.yml` into a single `.github/workflows/deploy.yml`
+that builds the trucking app *and* the research site and uploads them as one
+Pages artifact.
+**If wrong:** the site that deployed second silently replaces the first.
+
+Not a close call: a GitHub Pages deployment replaces the whole site at once, and
+there is one Pages site per repository. Two workflows each uploading their own
+artifact would have looked correct, passed their own checks, and left whichever
+finished first overwritten. Verified rather than assumed — the app built through
+the new workflow produces the same asset hashes the live site was already
+serving.
+
+---
+
+### 2026-09-18 — Changed the trucking app's service worker, with permission first
+**Asked:** put the research site at the same address as the live app.
+**Did:** asked the owner before touching `legacy/`, explained the clash in plain
+English, and added `ownedByApp()` to `legacy/frontend/public/sw.js` once he chose
+that over a second web address.
+**If wrong:** reverting is one function; the cache name is unchanged.
+
+`handoff.md` forbids modifying `legacy/` unless explicitly asked, so the only
+correct move was to ask. Worth recording that the clash was a **pre-existing
+bug**, not one the research site introduced: the worker cached every page it saw
+under the single shell key, so any 404 under `/CAPITAL-ALL/` could already leave
+the app opening on the wrong page with no signal. The research site would merely
+have made it happen reliably.
+
+---
+
 ### 2026-09-12 — Sent both findings to specialists before recording either
 **Asked:** run a research session.
 **Did:** audited the funded account, then handed the two claims that came out of

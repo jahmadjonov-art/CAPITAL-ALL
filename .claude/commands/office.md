@@ -9,12 +9,22 @@ link.
 python3 dashboard/build.py
 ```
 
-Then republish `dashboard/office.html` with the `Artifact` tool. **Pass the
-existing artifact URL as `url`** so it updates in place and the owner keeps the
-same link — the URL is recorded in `thoughts/handoff.md`. Publishing without it
-creates a second artifact and splits his bookmark from the live page.
+Commit the rebuilt file and push it to `main`. **That is what publishes it** —
+`.github/workflows/deploy.yml` rebuilds the whole site on every push, so the page
+is live at
 
-Commit the rebuilt file so the repository and the published page agree.
+> https://jahmadjonov-art.github.io/CAPITAL-ALL/office/floor-plan/
+
+a minute or two later. Check the run actually went green before telling him it is
+up (`gh run list --workflow deploy.yml --limit 1`).
+
+The site publishes the **committed** `dashboard/*.html`, so a rebuild that is
+never committed changes nothing the owner can see.
+
+The five claude.ai artifacts recorded in `thoughts/handoff.md` are frozen
+snapshots from before the site existed. Do not republish them by default — one
+address that is always current beats five that may disagree. Republish only if he
+asks for the old link.
 
 Then tell him in one or two lines what changed on it since last time — a new
 belief on the whiteboard, a plot closed, a desk added, a score recorded. If

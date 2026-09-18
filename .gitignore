@@ -7,3 +7,7 @@ __pycache__/
 .env
 .env.*
 secrets/
+
+# Built site output; regenerate with site/build.py.
+site/dist/
+_site/

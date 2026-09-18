@@ -192,18 +192,49 @@ database, not a scratch file.
 The committed anon key is fine and is meant to be public; row-level security is
 what protects the rows. The `service_role` key must never enter this repo.
 
-### `main` is untouched and is what deploys
+### `main` is what deploys, and one workflow deploys everything
 
 The live site builds from `main` on every push. Work happens on a
-`claude/...` branch. Nothing done on that branch affects production until it is
-merged, which is the only reason the archiving work was safe to do at all.
+`claude/...` branch and affects nothing until it is merged, which is the only
+reason the archiving work was safe to do at all.
 
-One consequence to carry forward: the deploy workflow moved to
-`legacy/.github/workflows/deploy.yml`, and GitHub only reads workflows from
-`.github/workflows/` **at the repository root**. It is therefore inert on this
-branch, by design. If this branch ever merges to `main`, the legacy app stops
-auto-deploying. That was a deliberate choice, not an oversight — but confirm it
-is still what the owner wants before merging.
+**GitHub only reads workflows from `.github/workflows/` at the repository root**
+— the copy left behind in `legacy/.github/workflows/deploy.yml` is inert and is
+kept only as history.
+
+**One Pages site, one artifact, one workflow — `.github/workflows/deploy.yml`.**
+A Pages deployment replaces the entire site at once, so a second workflow
+uploading its own Pages artifact would silently wipe whichever one deployed
+first. That file therefore builds *both* things and uploads them together:
+
+| Address | What |
+|---|---|
+| `/CAPITAL-ALL/` | the trucking budget PWA from `legacy/frontend` |
+| `/CAPITAL-ALL/office/` | the research site from `site/build.py` |
+
+**Do not split it in two, and do not delete it while tidying.** Without it the
+trucking app does not go down, it *freezes* on its last build.
+
+Verified rather than assumed, 2026-09-18: building the app through this workflow
+produces `index-ClyjfRJt.js` and `index-DDWGn6xj.css` — the same asset hashes the
+live site was already serving, so the app's deployment is byte-for-byte what it
+was before the research site was added beside it.
+
+### The trucking app's service worker had to learn where its own site ends
+
+Its scope is the whole `/CAPITAL-ALL/` path, which now serves the research site
+too, and its navigation handler cached every page it saw under the single shell
+key. One visit to the research site would therefore have left the app opening on
+a research page the next time the driver had no signal — the exact case the
+worker exists for.
+
+`public/sw.js` now has `ownedByApp()`: the shell, its `assets/` folder, and the
+files sitting directly beside `index.html` are the app; anything in another
+subdirectory is a different site sharing the domain and is left to the network.
+This was a latent bug, not one the research site introduced — any 404 under the
+path could already poison the cached shell. **Changed with the owner's explicit
+agreement on 2026-09-18**, which is the only reason the "do not touch `legacy/`"
+rule was set aside.
 
 **There are TWO deploy paths, and the note above only knew about one.** Found
 2026-09-17 when PR #1 came back with a red check:
@@ -238,10 +269,11 @@ rather than the real deployment, but **that is inference, not something the
 owner has confirmed** — ask before assuming it can be disconnected.
 
 **Resolved 2026-09-17, with the owner.** He wants the trucking app to keep
-deploying, so `.github/workflows/deploy-legacy.yml` now sits at the repository
-root: the original workflow, unchanged except for its paths, watching only
-`legacy/frontend/**` so research pushes do not trigger it. **Do not delete it
-while tidying** — without it the app freezes on merge.
+deploying, so its workflow was restored to the repository root. It began as
+`deploy-legacy.yml` watching only `legacy/frontend/**`; on 2026-09-18 it became
+`deploy.yml`, which builds the research site alongside the app and so runs on
+every push to `main`. A research commit now redeploys the app too — harmless,
+since the build is reproducible, but that is why the path filter is gone.
 
 Verified rather than assumed: `npm ci && BASE_PATH=/CAPITAL-ALL/ npm run build`
 in `legacy/frontend` succeeds, and the asset hashes it produces
@@ -518,315 +550,35 @@ reading, which matters when strikes sit $100 apart.
 
 ## The published pages
 
-| Page | Built by | URL |
+**Everything is at one address now, and every page links to every other:**
+
+> **https://jahmadjonov-art.github.io/CAPITAL-ALL/office/**
+
+| Page | Built by | Where |
 |---|---|---|
-| **Office floor plan** — the firm at a glance | `dashboard/build.py` | https://claude.ai/code/artifact/7b709ccd-35aa-4f97-a096-26026bf8573b |
-| **Fair value desk** — live BTC contracts vs model | `dashboard/desk.py` | https://claude.ai/code/artifact/a0aa3e0b-1fe1-420e-99b1-fc9103ac170d |
-| **Strategy library** — one tab per source | `dashboard/strategies.py` | https://claude.ai/code/artifact/d39ab618-439a-48aa-a40e-d3fe756ec966 |
-| **Volatility surface** — IV smile and gamma by strike | `dashboard/surface.py` | https://claude.ai/code/artifact/f85f0329-ca21-4474-bf1a-e6449c1e9020 |
-| **Tip sheet** — unusual option volume, day / week / month | `dashboard/tipsheet.py` | https://claude.ai/artifact/MqSnH99CKyT2WZuYNRu5QA |
-
-**There is no index page linking these together.** The owner holds five separate
-bookmarks and nothing on any page points at the others. Worth fixing.
-
-Each is generated. Republish
-by passing the URL above as `url` to the Artifact tool so the owner's links keep
-working. **Never hand-edit the generated HTML.**
-
-## The strategy library
-
-`strategies/*.json` holds one extraction per source. The owner will paste more
-transcripts over time; each becomes a file and a tab with no other change.
-
-**The rule that makes it worth having:** every claim carries a `status`, starting
-at `untested`, and moves only when an experiment in `research/experiments.md`
-says what happened and the entry cites the id. A credible-sounding source is not
-evidence. The whole point is to eventually compare several strategies on the
-same footing.
-
-Extraction is faithful, including parts that look wrong — judgement belongs in
-the experiment, not the extraction. See `strategies/README.md`.
-
-**First source in:** Freddy Siento on options flow and gamma levels. 10 claims,
-all untested. Its own stated blocker is that it needs gamma-exposure-by-strike,
-which nothing here currently pulls; CBOE is named as a free source with a
-10-15 minute delay.
-
-## Following a strategy on paper
-
-`strategies/paper/<id>.jsonl` is an append-only forward record. `paper.py` opens
-a signal, settles it, and reports win rate, expectancy and P&L after costs.
-
-**The mechanism that makes it worth anything:** a signal must be committed to git
-before it is settled. The tool looks up the commit that introduced the signal id
-and marks anything settled without one `unverified`. Tested on a dummy signal
-that showed a 100% win rate and $2,586 profit — and was correctly refused.
-
-Without that check, a strategy log shows a strategy that works, every time, for
-any strategy, because whoever writes it already knows the outcome.
-
-Contract economics used: **NQ $5.00/tick, ES $12.50/tick**, plus one tick of
-slippage each way and commission. Costs are applied on every settlement and
-printed in every report, so a result can never quietly be gross of costs.
-
-**Account size is deliberately not a filter.** A strategy is judged at the size
-its source describes; whether an account can carry it is a separate question.
-Do not reintroduce the $100 as a reason to narrow a study.
-
-An options data subscription with an unlimited API pool is expected from the
-owner. Each strategy file carries a `data_readiness` block naming the exact
-fields it needs, so it can be wired the day access arrives. First thing to check
-then: whether the feed carries intraday history or only snapshots — snapshots
-allow forward testing only, history allows a backtest, and that decides how long
-everything takes.
-
----
-
-## Correction: we DO have gamma by strike
-
-An earlier entry said nothing here pulls gamma exposure by strike, and that the
-options-flow strategy was blocked on it. **That was wrong**, and it was wrong for
-two sessions.
-
-`mcp__Robinhood__get_option_quotes` returns, per contract:
-`implied_volatility`, `delta`, **`gamma`**, `theta`, `vega`, `rho`,
-`open_interest`, `volume`, plus bid/ask/mark. And `SPXW` carries **daily**
-expirations, so the 0DTE chain the strategy runs on is right there.
-
-Verified 2026-09-13 on the SPXW 2026-09-14 chain around the money:
-
-| Strike | IV | Gamma | OI | Gamma $ per 1% |
-|---|---|---|---|---|
-| 7,650 | 12.75% | 0.007993 | 689 | $323M |
-| **7,675** | 11.82% | **0.008138** | 1,878 | **$896M** |
-| 7,700 | 11.40% | 0.005745 | 1,626 | $548M |
-
-**$2.15bn of gamma across eight strikes**, with a clear wall at 7,675 — computed
-rather than asserted. The implied-volatility smile is real too: 16.8% on the
-downside wing, a floor of 11.4% near the money, 15.2% on the upside.
-
-### How to capture and render
-
-**MCP tools only work from a lead session; a plain script cannot call them.** So
-the two steps are deliberately separate:
-
-1. A session pulls the chain and writes `data/snapshots/<chain>-<time>.json`.
-2. `python3 dashboard/surface.py` renders the newest snapshot to
-   `dashboard/surface.html`.
-
-Published: **https://claude.ai/code/artifact/f85f0329-ca21-4474-bf1a-e6449c1e9020**
-
-### Traps found while doing it
-
-- **`get_option_instruments` paginates and starts at the lowest strike.** SPXW
-  runs from 3,000, so the first page is nowhere near the money. The cursor is
-  base64 of `p=<strike>` — craft one (`base64("p=7550.0000")`) to jump straight
-  to the strikes that matter instead of paging through hundreds.
-- **Greeks are null on deep in-the-money strikes.** Not an error; those contracts
-  have no real two-sided market. Filter rather than treating it as failure.
-- **SPX spot is not in the option payload.** It was derived from the delta-0.5
-  crossing between two strikes. Fetch the index level directly when it matters.
-- **Two SPX chains exist:** `SPXW` (weeklies and dailies, PM settled) and `SPX`
-  (monthlies, `settle_on_open: true`, AM settled). The strategy wants SPXW.
-
-### What is still genuinely missing
-
-The source relies on a **90-day open-interest history**. The broker returns
-current open interest only. That is the real remaining gap and the one an
-options subscription would close.
-
----
-
-## Dealer gamma: the sign is the whole thing
-
-The owner showed a gamma tool another Claude built for him two months ago, and it
-was ahead of ours on the concept that matters most. Recorded here so nobody
-rebuilds the weaker version.
-
-**Gamma has a sign, and the sign decides the regime.** Summing gamma as a
-positive quantity — which our first surface page did — throws away the finding.
-
-```
-net dealer gamma = call gamma exposure  −  put gamma exposure
-```
-
-The convention assumes dealers are **long calls** (customers sell covered calls
-to them) and **short puts** (customers buy puts as portfolio hedges).
-
-| Regime | Dealer behaviour | What it means for a trade |
-|---|---|---|
-| **Positive gamma** | sells rallies, buys dips | moves are dampened, mean-reverting tape, fading the edges works |
-| **Negative gamma** | buys rallies, sells dips | moves are **amplified**, trend continues, **do not fade** |
-
-Negative gamma is the snowball the options-flow transcript describes. A strategy
-of fading a wall is a positive-gamma strategy and gets run over in a negative-gamma
-tape — so **read the regime before applying any level rule.**
-
-**The gamma flip** is the strike where cumulative net gamma crosses zero: the
-boundary between the two regimes, and the single most actionable number on the
-page. Knowing which side of it spot sits on before the open is worth more than
-any level.
-
-**Other concepts from that tool worth carrying:**
-
-- **Call wall** = max call gamma (resistance). **Put wall** = max put gamma
-  (support). **When they are the same strike it is a pin, not a barrier** —
-  expect price drawn to it and chopping across it rather than reversing cleanly.
-- **Max open interest** is a separate "pin candidate" from the gamma walls.
-- **Cash strikes are not futures points.** That tool converts SPX cash to ES with
-  a ×1.00033 basis. Ours does not convert at all yet — anything quoted in ES or
-  NQ terms must be basis-adjusted or it is simply the wrong level.
-- It surfaces **feed health** ("2 feeds degraded") and **session state**
-  ("weekend — closed"). A dashboard that cannot say its data is stale will
-  eventually mislead someone.
-
-### What ours now computes, and what it does not
-
-`dashboard/surface.py` does net dealer gamma, the regime, both walls, the pin
-warning, and a flip estimate. On the 2026-09-11 SPXW snapshot it read
-**−$54.2M net, NEGATIVE**, with call wall and put wall both at **7,675**.
-
-**The sign agreed with the reference tool; the magnitude is not comparable** —
-six strikes against a full chain, and that tool read −$14.73bn. Our flip landed
-at the edge of the sampled range, which means it was not determined. Sample the
-whole chain before trusting either number.
-
----
-
-## The tip sheet, and the two ways a screen lies to you
-
-`scanner/tipsheet.py` pulls full chains for 70 liquid names from CBOE and ranks
-unusual option volume; `dashboard/tipsheet.py` renders it as day / week / month.
-Both run unauthenticated from a plain script, so a scheduled run can do it.
-
-**What it measures:** volume against open interest. Open interest is published
-once after the close and does not move intraday — that is what makes the ratio
-mean something, and it also means a pre-open run describes the *previous*
-session. Say which it is when reporting.
-
-**What it does not measure:** unusual versus this ticker's own normal day. That
-needs a history of daily option volume, and nothing records one yet
-(`sandbox/data-collection.md`). Names that trade huge volume every day will keep
-appearing. That is turnover, not news.
-
-**Two filters that turned out to be measuring themselves.** Both are worth
-knowing before adding a third:
-
-1. **A ratio against a floor.** Ranking on volume ÷ open interest with a floor
-   of 50 on the denominator put contracts with an open interest of 0–21 at the
-   top. The headline "816×" was volume divided by the floor, not by anything
-   observed. Median open interest in the top 40 was 24. Fix: contracts with real
-   open interest (`build`, OI ≥ 100, ranked by ratio) are now separated from
-   contracts with almost none (`fresh`, OI ≤ 100, ranked by notional), and the
-   ratio is simply not computed in between.
-2. **A flag that fires on everything.** The replacement called a ticker
-   "mechanical" when three strikes more than 8% in the money shared an expiry.
-   It fired on 11 of the top 15 names, which carries no information. Fix: CBOE
-   ships greeks per contract, so ask the property directly — **|delta| ≥ 0.98
-   with vega ≤ 0.01 means the contract has no optionality left and is a stock
-   substitute.** Volume there is financing, a roll, a box or an assignment being
-   managed. Measured across the universe, 88% of contracts with delta ≥ 0.98
-   also had vega ≤ 0.005, so this tests one real thing rather than two loose
-   ones.
-
-That second class of volume is not small. On 2026-09-14 it was **88% of IWM's
-entire standout option notional ($1.39B)** and would have put IWM top of the
-sheet on plumbing alone. It is excluded from every ranking and reported in its
-own table, never silently dropped.
-
-**Iterate the heuristic against a cache, not against CBOE.** `--cache DIR` saves
-and reuses the raw chains, so tuning a threshold costs one fetch rather than 70
-per attempt.
-
-### Two ways CBOE hands you bad data with a 200
-
-Both found on the second morning the scanner ran, both silent, both fixed in
-`scanner/tipsheet.py`. Assume a third exists.
-
-**It rate-limits, and the failure is invisible.** Eight parallel workers got a
-clean 70 of 70 one morning and `429` on 23 of 70 the next. The run still
-"succeeded" — it just ranked whatever got through, with the missing third
-listed in small type at the bottom of the page. Now: four workers, exponential
-backoff with jitter, four attempts, and the script **refuses to write** below
-90% coverage rather than publishing a partial ranking. `--force` overrides it
-deliberately. A full scan takes about 12 seconds.
-
-**It serves dead symbols forever.** A renamed or delisted ticker keeps returning
-a complete, well-formed chain — the last file CBOE ever wrote for it — with a
-200 and no warning. `SQ` was returning a full chain stamped **2025-01-21** and
-being ranked on it; `PARA` one from 2025-08-10. Both had been renamed (Block is
-now `XYZ`, Paramount Skydance is `PSKY`) and the universe has been corrected.
-The defence: the response's **top-level `timestamp` field** is the feed's own
-age, and it is thrown away if you take `["data"]` and nothing else. `scan()` now
-rejects any chain more than 4 days old (Friday's close read on Monday is 3), and
-writes the range to `feed_latest` / `feed_earliest`, which the page displays —
-"when we asked" and "what the numbers describe" are different things, and only
-the second one matters when the sheet runs before the open.
-
-**Nothing checks the universe for renames automatically.** A dead ticker now
-drops out with a `stale feed` error instead of poisoning the ranking, but it
-still has to be noticed and replaced by hand.
-
----
-
-## Massive (formerly Polygon.io) — the options data subscription
-
-The owner supplied a key on 2026-09-16. **It is not in this repository and must
-never be**, `.gitignore` carries patterns for the obvious filenames, and
-`scanner/massive.py` reads it from `MASSIVE_API_KEY` in the environment. For a
-scheduled run, it goes in the Routine's environment variables — the same
-settings page that needs the repository and connectors attached.
-
-The host is still `api.polygon.io`; only the company name and the pricing links
-changed.
-
-**Entitlements, measured rather than read off a pricing page:**
-
-| | |
-|---|---|
-| Contract reference, full chain snapshot (strike, expiry, open interest, day volume) | yes |
-| **Daily bars for stocks and for individual option contracts, ~2 years back** | **yes** |
-| Tick-level trades | no |
-| Real-time quotes | no |
-| **Greeks** — the snapshot returns `greeks: {}` and a null IV | **no** |
-
-**It complements CBOE, it does not replace it.** CBOE gives today's chain *with*
-greeks, free and unauthenticated, and no history whatsoever. Massive gives the
-history. The tip sheet's zero-optionality filter is built on delta and vega, so
-it stays on CBOE.
-
-**What it unlocks.** `scanner/tipsheet.py` says in its own docstring that it
-cannot answer "unusual versus this ticker's own normal volume" because nothing
-records a volume history. Two years of daily bars per contract means that
-history can be **backfilled rather than waited for** — which also removes the
-dependency on a scheduled collector working, and that collector is the thing
-currently broken. `sandbox/data-collection.md` should be re-read in this light.
-
-### The trap this source sets
-
-**A rate limit and a missing entitlement look almost identical, and I confused
-them within ten minutes of getting the key.** An early probe reported `12/12
-requests succeeded, no throttling`, and a history check reported
-`NOT_AUTHORIZED` for 2024 — so the first conclusion was "unlimited calls, one
-year of history". Both were wrong. There *is* a per-minute cap; the twelve calls
-simply had not reached it yet. And the `NOT_AUTHORIZED` was the cap too — the
-same refusal arrives variously as HTTP 429, as HTTP 403, and as a **200 whose
-body carries `status: ERROR`**, sometimes with a `status` field that disagrees
-with its own error text.
-
-Measured properly, with retries through the cap: about **two years** of history,
-for options and stocks alike.
-
-`massive.get()` retries through the cap and raises `NotEntitled` only for a real
-plan limit, so callers cannot repeat the mistake. **Anything that queries this
-API without that retry will eventually report that the plan lacks data the plan
-has.**
-
-**The cap is about four requests a minute.** Measured from real use on
-2026-09-16 — the first full history backfill fetched 59 tickers in 859 seconds,
-and the adaptive gap in `massive.get()` settled at its 15-second ceiling. Worth
-telling the owner: he believed the plan carried an unlimited request pool, and
-what is actually there is tight enough to shape the design. A 70-name history
-refresh is a **~15 minute job**, which is why `scanner/history.py` caches to
-disk and refetches only what has gone stale, saves incrementally as it goes, and
-offers `--cached-history` so a rebuild never waits behind a backfill.
+| **Front door** — live status, the numbers, the whole record | `site/build.py` | `/office/` |
+| **Office floor plan** — the firm at a glance | `dashboard/build.py` | `/office/floor-plan/` |
+| **Fair value desk** — live BTC contracts vs model | `dashboard/desk.py` | `/office/desk/` |
+| **Strategy library** — one tab per source | `dashboard/strategies.py` | `/office/strategies/` |
+| **Volatility surface** — IV smile and gamma by strike | `dashboard/surface.py` | `/office/surface/` |
+| **Tip sheet** — unusual option volume, day / week / month | `dashboard/tipsheet.py` | `/office/tipsheet/` |
+| Every markdown record in the repository, rendered | `site/build.py` | `/office/read/...` |
+
+`site/build.py` rebuilds all of it on every push to `main`. Two things about it
+are deliberate and worth not undoing:
+
+- **It publishes the committed `dashboard/*.html`, it does not regenerate them.**
+  `desk.py` needs live APIs and `surface.py` needs a snapshot captured through
+  broker tools, so CI can reach neither. A dashboard is therefore only as fresh
+  as the last session that ran its script, and each card on the front door prints
+  the date its page was last rebuilt so a stale reading cannot pass as current.
+- **The record pages are generated from the markdown at build time**, links and
+  all, so the site cannot drift from what the record says. Nothing is transcribed.
+
+The five claude.ai artifacts still exist and the owner may still hold the
+bookmarks, but they are hand-published snapshots and **do not update**:
+floor plan `7b709ccd-35aa-4f97-a096-26026bf8573b`, desk
+`a0aa3e0b-1fe1-420e-99b1-fc9103ac170d`, strategies
+`d39ab618-439a-48aa-a40e-d3fe756ec966`, surface
+`f85f0329-ca21-4474-bf1a-e6449c1e9020`, tip sheet
+`MqSnH99CKyT2WZuYNRu5QA`. Prefer the site; it is the one that stays true.

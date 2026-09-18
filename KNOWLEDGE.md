@@ -65,12 +65,12 @@ independently rediscovering the same dead end.
 
 The question currently being worked, and by whom.
 
-> 2026-09-17: the tip sheet is live and the push wall is solved (owner must
-> attach the repo). **Which market to start in is still open**; two cheap tests
-> would settle most of it — the Kalshi maker-fee test on the demo environment
-> (`B-003`), and one paired quote call near 10:00 ET to learn whether `B-002` is
-> an after-hours fault or a general one. A lost run's proposal to narrow the
-> mission to "signals for a human trader" is with the owner, not adopted.
+> 2026-09-18: **the whole programme is now one public website**, rebuilt on every
+> push — `jahmadjonov-art.github.io/CAPITAL-ALL/office/`. Tip sheet live; push
+> wall solved but **the owner must still attach the repo**. **Which market to
+> start in is still open**: the Kalshi maker-fee test on demo (`B-003`) and one
+> paired quote call near 10:00 ET (`B-002`, after-hours or general?) would settle
+> most of it. A lost run's proposal to narrow the mission is with the owner.
 
 ## Open ground
 

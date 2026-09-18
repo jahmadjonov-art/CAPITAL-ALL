@@ -8,9 +8,26 @@
 //    every build and can never go stale.
 //  - Anything cross-origin (every Supabase call) is left alone entirely, so
 //    your data is never served from a cache.
+//  - Anything on this domain that is not this app — the research site published
+//    at /CAPITAL-ALL/office/ — is left alone too. See ownedByApp below.
 
 const VERSION = 'cam-v1'
 const SHELL = new URL('./', self.location).pathname
+
+// This worker's scope is the whole /CAPITAL-ALL/ path, and that path now also
+// serves the trading research site at /CAPITAL-ALL/office/. Only this app's own
+// files may touch this cache. Without the check the shell entry was replaced by
+// whatever page was last navigated to, so visiting the research site once left
+// the app opening on a research page the next time there was no signal.
+//
+// "This app" means the shell, anything in its assets folder, and the files
+// sitting directly beside index.html — manifest, icons, this worker. Anything
+// in another subdirectory belongs to a different site sharing the domain.
+function ownedByApp(pathname) {
+  if (!pathname.startsWith(SHELL)) return false
+  const rest = pathname.slice(SHELL.length)
+  return rest === '' || rest.startsWith('assets/') || !rest.includes('/')
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(VERSION).then((cache) => cache.add(SHELL)))
@@ -33,7 +50,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url)
   if (url.origin !== self.location.origin) return
 
+  const mine = ownedByApp(url.pathname)
+
   if (request.mode === 'navigate') {
+    if (!mine) return
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -45,6 +65,8 @@ self.addEventListener('fetch', (event) => {
     )
     return
   }
+
+  if (!mine) return
 
   event.respondWith(
     caches.match(request).then(

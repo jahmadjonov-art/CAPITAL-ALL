@@ -11,6 +11,26 @@ Newest first.
 
 ---
 
+### 2026-09-18 — The website publishes the committed dashboards, it does not rebuild them
+**Asked:** a website with everything on it.
+**Did:** `site/build.py` renders the markdown record fresh on every build, but
+ships `dashboard/*.html` exactly as the last session committed them.
+**Assumed:** a build that cannot fail beats a build that is always current.
+`desk.py` fetches live APIs and `surface.py` needs a snapshot captured through
+broker tools, so CI can reach neither — and if two of the five must ship as
+committed files, having the other three regenerate in CI would mean the site's
+pages disagreed with each other about how fresh they were.
+**The cost, stated plainly:** a session that edits the record without running
+`/office` leaves a floor plan on the site that is out of date with the record
+beside it. Each card prints the date its page was last rebuilt, so the staleness
+is visible rather than silent, but it is real.
+**Would have settled it:** knowing whether the owner reads the floor plan as
+"what the record says now" or as "what the last session published". The first
+means `build.py` and `strategies.py` should run in CI after all.
+**If wrong:** two lines in the workflow.
+
+---
+
 ### 2026-09-12 — Seeded the sandbox with real gaps rather than leaving it empty
 **Asked:** a place to stake out work that is too big to finish now.
 **Did:** built `sandbox/` and opened four, from this session's actual unfinished

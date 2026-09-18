@@ -1,7 +1,22 @@
-name: Deploy to GitHub Pages
+name: Deploy the site
 
-# Every push to main rebuilds the site and publishes it. There is nothing to
-# run and nothing to keep alive — the output is static files on a CDN.
+# One GitHub Pages site serves two different things, and a Pages deployment
+# replaces the whole site at once. Both therefore have to be built here, in a
+# single workflow: a second workflow uploading its own Pages artifact would
+# silently wipe whichever one deployed first.
+#
+#   /CAPITAL-ALL/          the trucking budget PWA, archived in legacy/ and
+#                          still in daily use. Built exactly as it always was —
+#                          this is the original deploy workflow with the app's
+#                          build moved under legacy/ and the research site added
+#                          beside it. It replaces deploy-legacy.yml, which
+#                          replaced legacy/.github/workflows/deploy.yml.
+#   /CAPITAL-ALL/office/   the research programme: the five dashboards and the
+#                          whole written record, built by site/build.py.
+#
+# Do not split this into two workflows, and do not delete it while tidying —
+# without it the trucking app does not go down, it freezes on the last build.
+
 on:
   push:
     branches: [main]
@@ -22,26 +37,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The research site prints when each record last changed, read from
+          # the git history. The default shallow clone would date every page to
+          # this build instead.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: legacy/frontend/package-lock.json
 
-      - name: Install dependencies
-        working-directory: frontend
+      - name: Install the app's dependencies
+        working-directory: legacy/frontend
         run: npm ci
 
-      - name: Build
-        working-directory: frontend
+      - name: Build the trucking app
+        working-directory: legacy/frontend
         run: npm run build
         env:
+          # vite.config.js defaults to /CAPITAL-ALL/; keep it derived from the
+          # repository name so a rename cannot silently break every asset URL.
           BASE_PATH: /${{ github.event.repository.name }}/
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the site generator's dependencies
+        run: pip install -r site/requirements.txt
+
+      - name: Assemble both sites
+        run: |
+          mkdir -p _site
+          cp -R legacy/frontend/dist/. _site/
+          python site/build.py --out _site/office
+
+      - name: Check the site built something
+        run: |
+          test -s _site/index.html            # the trucking app
+          test -s _site/office/index.html     # the research front door
+          test -s _site/office/tipsheet/index.html
+          echo "pages: $(find _site -name index.html | wc -l)"
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: _site
 
   deploy:
     needs: build

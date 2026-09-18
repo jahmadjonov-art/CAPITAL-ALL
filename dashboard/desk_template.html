@@ -1,0 +1,293 @@
+<title>BTC Fair Value Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#798593; --faint:#49535F;
+  --mkt:#FF3D82; --mkt-dim:#7A1638;
+  --mdl:#2BD4E8; --mdl-dim:#0E5460;
+  --up:#2FD67F; --down:#FF5757; --warn:#F5A524;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 12px/1.5 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin:0 auto;padding-inline:12px;padding-block:10px 40px}
+h1,h2,h3{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+
+/* ticker bar */
+.ticker{display:flex;flex-wrap:wrap;align-items:center;gap:0;
+  background:var(--panel);border:1px solid var(--line-2);border-radius:3px;overflow:hidden}
+.ticker > div{padding:7px 13px;border-right:1px solid var(--line);white-space:nowrap}
+.ticker > div:last-child{border-right:none;margin-left:auto}
+.ticker .k{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.16em;color:var(--faint);text-transform:uppercase}
+.ticker .v{font-size:14px;font-weight:700;margin-top:1px}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:17px;
+  letter-spacing:.08em;background:var(--mkt);color:#12000A!important}
+
+/* grid */
+.grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px;align-items:start}
+@media (min-width:1000px){
+  .grid{grid-template-columns:300px 1fr 260px}
+  .span3{grid-column:1/-1}
+}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:3px;min-width:0}
+.card > header{display:flex;justify-content:space-between;align-items:center;gap:8px;
+  padding:7px 11px;border-bottom:1px solid var(--line)}
+.card > .b{padding:11px}
+.glow{border-color:var(--mkt-dim);box-shadow:0 0 0 1px rgba(255,61,130,.18),0 0 26px -8px rgba(255,61,130,.35)}
+.live{font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:700;letter-spacing:.14em;
+  padding:2px 6px;border-radius:2px;background:var(--mkt);color:#12000A}
+.live.halt{background:var(--warn);color:#1A1000}
+
+/* status card */
+.big{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.sub{font-size:11px;color:var(--faint);margin-top:3px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:11px;margin-top:11px;
+  padding-top:10px;border-top:1px solid var(--line)}
+.kv dt{color:var(--faint)} .kv dd{margin:0;text-align:right}
+
+/* candles */
+svg.chart{display:block;width:100%;height:auto}
+
+/* order book */
+.ob{font-size:11px}
+.ob .r{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px 0;position:relative}
+.ob .r span:last-child{text-align:right;color:var(--dim)}
+.ob .bar{position:absolute;top:0;bottom:0;right:0;opacity:.16}
+.ob .ask .bar{background:var(--mkt)} .ob .bid .bar{background:var(--up)}
+.ob .ask span:first-child{color:var(--mkt)} .ob .bid span:first-child{color:var(--up)}
+.ob .mid{margin:6px 0;padding:5px 0;border-block:1px solid var(--line-2);
+  display:flex;justify-content:space-between;font-weight:700}
+
+/* ladder */
+.row{padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.rh{display:flex;flex-wrap:wrap;gap:5px 13px;align-items:baseline;margin-bottom:8px}
+.strike{font-size:17px;font-weight:700}
+.tk{font-size:11px;color:var(--dim)} .mins{font-size:10px;color:var(--faint)}
+.track{position:relative;height:32px;background:var(--sunk);border-radius:2px;overflow:hidden}
+.gapfill{position:absolute;top:0;bottom:0;
+  background:linear-gradient(90deg,rgba(255,61,130,.22),rgba(43,212,232,.22))}
+.mark{position:absolute;top:0;bottom:0;width:2px}
+.mark.m{background:var(--mkt);box-shadow:0 0 10px rgba(255,61,130,.7)}
+.mark.f{background:var(--mdl);box-shadow:0 0 10px rgba(43,212,232,.7)}
+.mark i{position:absolute;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;
+  font-weight:700;letter-spacing:.05em;white-space:nowrap;padding:2px 5px;border-radius:2px}
+.mark.m i{background:var(--mkt);color:#12000A;left:4px}
+.mark.f i{background:var(--mdl);color:#02171B;right:4px}
+.rf{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:10.5px;color:var(--dim);margin-top:6px}
+.rf b{color:var(--txt)}
+.flag{color:var(--warn);font-weight:700}
+
+/* log */
+.log{max-height:230px;overflow-y:auto;font-size:11px}
+.log .l{display:grid;grid-template-columns:62px 58px 1fr;gap:9px;padding:2.5px 0;border-bottom:1px solid #121821}
+.log .l:last-child{border-bottom:none}
+.log .t{color:var(--faint)}
+.log .w{font-weight:700;letter-spacing:.04em}
+.w.SPOT{color:var(--mdl)} .w.PRICE{color:var(--mkt)} .w.FLAG,.w.HALT{color:var(--warn)}
+.w.VOL,.w.CHECK,.w.BOOK,.w.FETCH{color:var(--dim)}
+.log .d{color:var(--dim);word-break:break-word}
+
+ul.t{margin:0;padding-left:15px} ul.t li{margin-bottom:7px;font-size:11px;color:var(--dim)}
+ul.t li b{color:var(--txt);font-weight:500} ul.t li:last-child{margin-bottom:0}
+footer{margin-top:16px;font-size:10.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:5px 16px;justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="ticker" id="ticker"></div>
+
+  <div class="grid">
+    <section class="card glow">
+      <header><h2 class="lbl">Desk</h2><span class="live halt" id="haltchip">No orders</span></header>
+      <div class="b">
+        <div class="lbl">BTC / USD · median</div>
+        <div class="big num" id="bigspot"></div>
+        <div class="sub" id="bigsub"></div>
+        <dl class="kv" id="statkv"></dl>
+      </div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">BTC · 1 min · Kraken</h2><span class="lbl" id="candlab"></span></header>
+      <div class="b" style="padding:8px"><svg class="chart" id="candles" role="img" aria-label="BTC one-minute candles"></svg></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">Order book</h2><span class="lbl" id="obticker"></span></header>
+      <div class="b ob" id="ob"></div>
+    </section>
+
+    <section class="card span3">
+      <header>
+        <h2 class="lbl">Market <span style="color:var(--mkt)">&#9632;</span> vs model <span style="color:var(--mdl)">&#9632;</span></h2>
+        <span class="lbl" id="ladn"></span>
+      </header>
+      <div class="b" id="ladder"></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">Model inputs</h2></header>
+      <div class="b"><dl class="kv" id="modelkv" style="margin-top:0;padding-top:0;border-top:none"></dl></div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl" style="color:var(--warn)">Why the gap is the model, not the market</h2></header>
+      <div class="b">
+        <ul class="t">
+          <li><b>Settlement is not spot.</b> Resolves on a CF Benchmarks index averaged over
+            the final minute. Averaging cuts terminal variance, so true fair value sits closer
+            to the extremes than this model says. <b>Fix this first.</b></li>
+          <li><b>&sigma; is backward-looking</b> and noisy over a 15-minute horizon.</li>
+          <li><b>Drift assumed zero</b> — defensible over minutes, still an assumption.</li>
+          <li><b>A large gap on a liquid contract is a red flag.</b> The market knows more
+            than this model does.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <header><h2 class="lbl">Before any of this is tradable</h2></header>
+      <div class="b">
+        <ul class="t">
+          <li><b>Venue.</b> This is Kalshi-direct; the funded account is Robinhood
+            (~4&cent; round trip vs a 1&cent; spread). Unresolved, and it gates everything.</li>
+          <li><b>Calibration.</b> Log predicted probability against realised outcome. If the
+            30% bucket does not settle yes ~30% of the time, the gap column is noise.</li>
+          <li><b>Costs and queue.</b> A forced taker exit costs 1.75&cent; — about 1.75 round
+            trips of profit.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card span3">
+      <header><h2 class="lbl">Computation log</h2><span class="lbl">what this build actually did</span></header>
+      <div class="b log" id="log"></div>
+    </section>
+  </div>
+
+  <footer>
+    <span id="foot"></span>
+    <span>Every figure fetched live and computed at build time. Nothing simulated. No order has ever been placed from this account.</span>
+  </footer>
+</div>
+
+<script>
+const D = /*__DESK__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const usd = n => "$" + Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const c2 = n => (n*100).toFixed(1) + "¢";
+
+/* ticker */
+const tk = [`<div class="brand">FAIR VALUE DESK</div>`];
+for (const [k,v] of Object.entries(D.spot)) tk.push(`<div><div class="k">${esc(k)}</div><div class="v num">${usd(v)}</div></div>`);
+tk.push(`<div><div class="k">Realised vol</div><div class="v num" style="color:var(--mdl)">${(D.ann_vol*100).toFixed(1)}%</div></div>`);
+tk.push(`<div><div class="k">Contracts</div><div class="v num">${D.rows.length}</div></div>`);
+tk.push(`<div><div class="k">Built</div><div class="v num" style="font-size:12px">${esc(D.built_utc.slice(11,19))}Z</div></div>`);
+$("ticker").innerHTML = tk.join("");
+
+/* status */
+$("bigspot").textContent = usd(D.median);
+$("bigsub").textContent = `${Object.keys(D.spot).length} venues · spread ${D.disagree!=null?usd(D.disagree):"n/a"}`;
+const last = D.candles.length ? D.candles[D.candles.length-1] : null;
+const first = D.candles.length ? D.candles[0] : null;
+const chg = (last&&first) ? (last.c-first.o)/first.o*100 : null;
+$("statkv").innerHTML = [
+  ["Window move", chg==null?"n/a":`<span style="color:${chg>=0?"var(--up)":"var(--down)"}">${chg>=0?"+":""}${chg.toFixed(2)}%</span>`],
+  ["&sigma; / minute", (D.sd_min*100).toFixed(4)+"%"],
+  ["Open positions", "0"],
+  ["Realised P&amp;L", "$0.00"],
+  ["Orders placed", "<span style='color:var(--warn)'>0 — ever</span>"],
+  ["Venues polled", Object.keys(D.spot).length],
+  ["Bars sampled", D.nbars],
+  ["Contracts priced", D.rows.length],
+].map(([k,v])=>`<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
+$("bigsub").insertAdjacentHTML("afterend",
+  `<p style="font-size:10.5px;color:var(--faint);margin:9px 0 0;line-height:1.45">
+   Every figure on this page was fetched seconds ago and computed here. No fills,
+   no P&amp;L curve, no win rate — there is nothing to simulate, because nothing
+   has been traded.</p>`);
+
+/* candles */
+(function(){
+  const C = D.candles; if (!C.length) return;
+  const W=760,H=210,PL=6,PR=52,PT=8,PB=16;
+  const lo=Math.min(...C.map(c=>c.l)), hi=Math.max(...C.map(c=>c.h)), rng=(hi-lo)||1;
+  const x=i=>PL+(i/(C.length-1))*(W-PL-PR), y=v=>PT+(1-(v-lo)/rng)*(H-PT-PB);
+  const bw=Math.max(1.6,(W-PL-PR)/C.length*0.62);
+  let g="";
+  C.forEach((c,i)=>{
+    const up=c.c>=c.o, col=up?"var(--up)":"var(--down)";
+    const yo=y(c.o), yc=y(c.c), top=Math.min(yo,yc), h=Math.max(1,Math.abs(yc-yo));
+    g+=`<line x1="${x(i).toFixed(1)}" y1="${y(c.h).toFixed(1)}" x2="${x(i).toFixed(1)}" y2="${y(c.l).toFixed(1)}" stroke="${col}" stroke-width="1" opacity=".75"/>`;
+    g+=`<rect x="${(x(i)-bw/2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" fill="${col}"/>`;
+  });
+  const lastC=C[C.length-1];
+  g+=`<line x1="${PL}" y1="${y(lastC.c).toFixed(1)}" x2="${W-PR}" y2="${y(lastC.c).toFixed(1)}" stroke="var(--mkt)" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>`;
+  g+=`<rect x="${W-PR+2}" y="${(y(lastC.c)-8).toFixed(1)}" width="48" height="16" rx="2" fill="var(--mkt)"/>`;
+  g+=`<text x="${W-PR+26}" y="${(y(lastC.c)+4).toFixed(1)}" text-anchor="middle" fill="#12000A" font-size="10" font-weight="700" font-family="JetBrains Mono,monospace">${lastC.c.toFixed(0)}</text>`;
+  // strike lines for open contracts
+  D.rows.forEach(r=>{ if(r.strike>=lo&&r.strike<=hi){
+    g+=`<line x1="${PL}" y1="${y(r.strike).toFixed(1)}" x2="${W-PR}" y2="${y(r.strike).toFixed(1)}" stroke="var(--mdl)" stroke-width="1" opacity=".5"/>`;
+    g+=`<text x="${W-PR-4}" y="${(y(r.strike)-3).toFixed(1)}" text-anchor="end" fill="var(--mdl)" font-size="9" font-family="JetBrains Mono,monospace">K ${r.strike.toLocaleString("en-US")}</text>`;}});
+  $("candles").setAttribute("viewBox",`0 0 ${W} ${H}`);
+  $("candles").innerHTML=g;
+  $("candlab").textContent = `${C.length} bars · ${lo.toFixed(0)}–${hi.toFixed(0)}`;
+})();
+
+/* order book */
+(function(){
+  const b=D.book;
+  if(!b){ $("ob").innerHTML=`<p style="color:var(--faint);margin:0">No book — between expiries.</p>`; return; }
+  $("obticker").textContent=b.ticker.split("-").slice(-1)[0];
+  const mx=Math.max(...b.asks.map(a=>a[1]),...b.bids.map(x=>x[1]),1);
+  const line=(p,q,cls)=>`<div class="r ${cls}"><div class="bar" style="width:${(q/mx*100).toFixed(1)}%"></div>
+    <span class="num">${c2(p)}</span><span class="num">${q.toLocaleString("en-US")}</span></div>`;
+  const asks=b.asks.slice().reverse().map(a=>line(a[0],a[1],"ask")).join("");
+  const bids=b.bids.map(x=>line(x[0],x[1],"bid")).join("");
+  const sp=b.asks.length&&b.bids.length?(b.asks[0][0]-b.bids[0][0]):null;
+  $("ob").innerHTML=asks+
+    `<div class="mid"><span class="num">spread</span><span class="num">${sp!=null?c2(sp):"n/a"}</span></div>`+bids+
+    `<div style="margin-top:8px;font-size:10px;color:var(--faint)">depth ${b.depth_bid.toLocaleString("en-US")} bid / ${b.depth_ask.toLocaleString("en-US")} ask</div>`;
+})();
+
+/* ladder */
+$("ladn").textContent = D.rows.length ? D.rows.length+" open" : "none open";
+$("ladder").innerHTML = D.rows.length ? D.rows.map(r=>{
+  const lo=Math.max(0,Math.min(r.mid,r.fair)-0.10), hi=Math.min(1,Math.max(r.mid,r.fair)+0.10);
+  const pos=v=>((v-lo)/(hi-lo))*100, pm=pos(r.mid), pf=pos(r.fair), wide=Math.abs(r.gap)>0.02;
+  return `<div class="row">
+    <div class="rh"><span class="strike num">${r.strike.toLocaleString("en-US")}</span>
+      <span class="tk">${esc(r.ticker)}</span><span class="mins num">${r.mins} min left</span></div>
+    <div class="track">
+      <div class="gapfill" style="left:${Math.min(pm,pf)}%;width:${Math.abs(pf-pm)}%"></div>
+      <div class="mark m" style="left:${pm}%"><i>MKT ${c2(r.mid)}</i></div>
+      <div class="mark f" style="left:${pf}%"><i>MODEL ${c2(r.fair)}</i></div>
+    </div>
+    <div class="rf"><span>bid <b>${c2(r.bid)}</b> / ask <b>${c2(r.ask)}</b></span>
+      <span>spread <b>${r.spread}¢</b></span><span>24h vol <b>${r.vol.toLocaleString("en-US")}</b></span>
+      <span>gap <b class="${wide?"flag":""}">${r.gap>=0?"+":""}${c2(r.gap)}</b>${wide?' <span class="flag">— too large to believe</span>':""}</span></div>
+  </div>`;}).join("")
+  : `<p style="color:var(--faint);margin:0">No contracts with a two-sided book right now. These series are short-dated, so this is normal between expiries.</p>`;
+
+/* model + log */
+$("modelkv").innerHTML=[
+  ["Spot (median)",usd(D.median)],["Venue spread",D.disagree!=null?usd(D.disagree):"n/a"],
+  ["&sigma; / min",(D.sd_min*100).toFixed(4)+"%"],["&sigma; annualised",(D.ann_vol*100).toFixed(1)+"%"],
+  ["Sample",D.nbars+" bars"],["Drift","zero (assumed)"],
+  ["Settlement","<span style='color:var(--warn)'>spot — wrong</span>"],
+].map(([k,v])=>`<dt>${k}</dt><dd class="num">${v}</dd>`).join("");
+
+$("log").innerHTML = D.log.map(l=>
+  `<div class="l"><span class="t num">${esc(l.t)}</span><span class="w ${esc(l.what)}">${esc(l.what)}</span><span class="d">${esc(l.detail)}</span></div>`).join("");
+$("foot").textContent="Built "+D.built+(D.errors&&D.errors.length?"  ·  fetch errors: "+D.errors.join(", "):"");
+</script>

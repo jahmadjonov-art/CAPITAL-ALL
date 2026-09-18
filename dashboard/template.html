@@ -1,0 +1,369 @@
+<style>
+:root{
+  --paper:#FBFAF7; --panel:#FFFFFF; --sunk:#F1EEE8;
+  --ink:#16212B; --ink-2:#41505E; --ink-3:#75838F;
+  --rule:#DFD9CE; --rule-2:#EBE6DC;
+  --plan:#1B2A38; --plan-fill:#22343F; --plan-line:#5B7284;
+  --brass:#A8762E; --brass-soft:#EFE2CB;
+  --up:#2E7A58; --down:#AF3F2E; --idle:#8D9AA6;
+  --shadow:0 1px 2px rgba(22,33,43,.06),0 8px 24px -12px rgba(22,33,43,.18);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111A22; --panel:#172330; --sunk:#1E2C39;
+    --ink:#E7EDF2; --ink-2:#A9B8C4; --ink-3:#7C8B98;
+    --rule:#2A3B49; --rule-2:#223341;
+    --plan:#0D161E; --plan-fill:#182631; --plan-line:#436074;
+    --brass:#D3A257; --brass-soft:#3A2F1C;
+    --up:#4FA97E; --down:#DD6A55; --idle:#6B7A87;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111A22; --panel:#172330; --sunk:#1E2C39;
+  --ink:#E7EDF2; --ink-2:#A9B8C4; --ink-3:#7C8B98;
+  --rule:#2A3B49; --rule-2:#223341;
+  --plan:#0D161E; --plan-fill:#182631; --plan-line:#436074;
+  --brass:#D3A257; --brass-soft:#3A2F1C;
+  --up:#4FA97E; --down:#DD6A55; --idle:#6B7A87;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font:400 15px/1.6 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1160px; margin:0 auto; padding-inline:20px; padding-block:28px 56px}
+h1,h2,h3{margin:0; text-wrap:balance}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.eyebrow{
+  font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+
+/* ---------- masthead ---------- */
+.masthead{
+  display:flex; flex-wrap:wrap; gap:18px 32px; align-items:flex-end;
+  justify-content:space-between; padding-bottom:20px;
+  border-bottom:2px solid var(--ink);
+}
+.firm{font-family:Spectral,Georgia,serif; font-weight:600; font-size:clamp(1.9rem,4.4vw,2.7rem); line-height:1.05; letter-spacing:-.015em}
+.mandate{margin-top:8px; color:var(--ink-2); max-width:56ch; font-size:.95rem}
+.stamp{text-align:right; color:var(--ink-3); font:400 12px/1.7 "IBM Plex Mono",monospace}
+.stamp b{color:var(--ink-2); font-weight:500}
+
+/* ---------- the book ---------- */
+.book{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:1px; background:var(--rule); border:1px solid var(--rule);
+  margin-top:22px; border-radius:3px; overflow:hidden;
+}
+.fig{background:var(--panel); padding:14px 16px}
+.fig .v{
+  font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:1.5rem; font-weight:500; letter-spacing:-.02em; margin-top:6px; line-height:1.1;
+}
+.fig .v.na{font-size:.95rem; color:var(--ink-3); font-weight:400; padding-block:9px}
+.fig .sub{font-size:.76rem; color:var(--ink-3); margin-top:4px}
+.v.up{color:var(--up)} .v.down{color:var(--down)}
+.notice{
+  margin-top:14px; padding:11px 14px; background:var(--sunk);
+  border-left:3px solid var(--brass); border-radius:0 3px 3px 0;
+  font-size:.85rem; color:var(--ink-2);
+}
+
+/* ---------- layout ---------- */
+.cols{display:grid; grid-template-columns:1fr; gap:26px; margin-top:30px; align-items:start}
+@media (min-width:940px){ .cols{grid-template-columns:1.55fr 1fr} }
+.panel{background:var(--panel); border:1px solid var(--rule); border-radius:4px; box-shadow:var(--shadow)}
+.panel > header{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  padding:13px 16px; border-bottom:1px solid var(--rule-2);
+}
+.panel > .body{padding:16px}
+
+/* ---------- floor plan ---------- */
+.planwrap{background:var(--plan); border-radius:0 0 3px 3px; padding:10px}
+svg.plan{display:block; width:100%; height:auto; max-width:100%}
+.plan .hit{cursor:pointer}
+.plan .hit:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+.plan text{font-family:"IBM Plex Mono",monospace}
+
+/* ---------- whiteboard ---------- */
+.wb{background:var(--sunk); border-radius:3px; padding:15px 16px}
+.wb + .wb{margin-top:12px}
+.wb h3{font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+.wb ul{margin:0; padding-left:18px; font-size:.9rem; color:var(--ink-2)}
+.wb li + li{margin-top:6px}
+.wb .empty{font-family:Spectral,Georgia,serif; font-style:italic; color:var(--ink-3); font-size:.95rem}
+
+/* ---------- plots ---------- */
+.plot{display:block; width:100%; text-align:left; font:inherit; color:inherit;
+  background:var(--panel); border:1px solid var(--rule); border-left:3px solid var(--brass);
+  border-radius:0 3px 3px 0; padding:12px 14px; cursor:pointer}
+.plot + .plot{margin-top:10px}
+.plot:hover{background:var(--sunk)}
+.plot:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+.plot .t{font-weight:600; font-size:.94rem}
+.plot .g{font-size:.83rem; color:var(--ink-3); margin-top:3px}
+.tag{
+  display:inline-block; font:500 10px/1 "IBM Plex Mono",monospace; letter-spacing:.1em;
+  padding:4px 7px; border-radius:2px; background:var(--brass-soft); color:var(--brass);
+  text-transform:uppercase; vertical-align:1px;
+}
+
+/* ---------- drawer ---------- */
+.drawer{margin-top:26px; scroll-margin-top:20px}
+.drawer .body{padding:18px}
+.drawer h2{font-family:Spectral,Georgia,serif; font-size:1.3rem; font-weight:600}
+.drawer dl{margin:0; display:grid; gap:14px}
+.drawer dt{font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:5px}
+.drawer dd{margin:0; color:var(--ink-2); font-size:.92rem}
+.close{background:none; border:1px solid var(--rule); border-radius:3px; color:var(--ink-3);
+  font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.1em; padding:7px 10px; cursor:pointer}
+.close:hover{color:var(--ink); border-color:var(--ink-3)}
+
+/* ---------- ledger list ---------- */
+.ledger{width:100%; border-collapse:collapse; font-size:.88rem}
+.ledger th{text-align:left; font:500 10px/1 "IBM Plex Mono",monospace; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3); padding:0 10px 9px 0; border-bottom:1px solid var(--rule-2)}
+.ledger td{padding:9px 10px 9px 0; border-bottom:1px solid var(--rule-2); color:var(--ink-2); vertical-align:top}
+.ledger td:last-child{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; text-align:right; color:var(--ink); padding-right:0}
+.ledger tr:last-child td{border-bottom:none}
+
+footer{margin-top:40px; padding-top:18px; border-top:1px solid var(--rule);
+  color:var(--ink-3); font-size:.8rem; display:flex; flex-wrap:wrap; gap:6px 20px; justify-content:space-between}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Research programme &middot; day one</div>
+      <h1 class="firm">Capital&#8209;All</h1>
+      <p class="mandate" id="mandate"></p>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <section class="book" id="book" aria-label="The book"></section>
+  <p class="notice" id="notice"></p>
+
+  <div class="cols">
+    <section class="panel">
+      <header>
+        <h2 class="eyebrow">The floor</h2>
+        <span class="eyebrow" id="floornote"></span>
+      </header>
+      <div class="planwrap"><svg class="plan" id="plan" role="img" aria-label="Floor plan of the research office"></svg></div>
+    </section>
+
+    <div>
+      <section class="panel">
+        <header><h2 class="eyebrow">The whiteboard</h2></header>
+        <div class="body" id="whiteboard"></div>
+      </section>
+
+      <section class="panel" style="margin-top:26px">
+        <header>
+          <h2 class="eyebrow">Sandbox plots</h2>
+          <span class="eyebrow" id="plotcount"></span>
+        </header>
+        <div class="body" id="plots"></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel drawer" id="drawer" hidden aria-live="polite">
+    <header>
+      <h2 class="eyebrow" id="drawerkind">Detail</h2>
+      <button class="close" id="drawerclose" type="button">Close</button>
+    </header>
+    <div class="body" id="drawerbody"></div>
+  </section>
+
+  <section class="panel drawer">
+    <header><h2 class="eyebrow">Reports</h2></header>
+    <div class="body">
+      <table class="ledger" id="reports">
+        <thead><tr><th>Record</th><th>Holds</th><th>Count</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span id="foot-build"></span>
+    <span>Every figure on this page is read from the repository at build time. Nothing is stored twice, and nothing is invented.</span>
+  </footer>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const md = (s) => esc(s)
+  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<b>$1</b>')
+  .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+  .replace(/`([^`]+)`/g, '<span class="mono">$1</span>');
+
+/* ---------------- masthead + book ---------------- */
+$("mandate").textContent = D.mandate;
+$("stamp").innerHTML =
+  `<b>${esc(D.build.at)}</b><br>branch ${esc(D.build.branch)} &middot; ${esc(D.build.commit)}<br>${esc(D.build.commits)} commits on the record`;
+
+const money = (n) => "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+const figs = [
+  {k:"Capital deployed", v:money(D.book.capital), sub:D.book.account || ("verified " + D.book.verified)},
+  {k:"Realised P&L", v:D.book.realised === null ? null : money(D.book.realised), sub:"no order placed yet"},
+  {k:"Open positions", v:D.book.open_positions, sub:"verified empty", raw:true},
+  {k:"Experiments run", v:D.counts.experiments, sub:"research/experiments.md", raw:true},
+  {k:"Beliefs held", v:D.counts.beliefs, sub:"nothing tested yet", raw:true},
+  {k:"Average score", v:D.scores.average, sub:D.scores.count + " scored", raw:true},
+];
+$("book").innerHTML = figs.map(f => {
+  let cls = "v", body;
+  if (f.v === null || f.v === undefined) { body = "not yet known"; cls += " na"; }
+  else body = esc(f.v);
+  return `<div class="fig"><div class="eyebrow">${esc(f.k)}</div>
+    <div class="${cls}">${body}</div><div class="sub">${esc(f.sub)}</div></div>`;
+}).join("");
+$("notice").textContent = D.book.note;
+
+/* ---------------- floor plan ---------------- */
+(function drawPlan(){
+  const desks = D.desks, plots = D.plots;
+  const perRow = 3, dw = 156, dh = 94, gx = 28, gy = 30, x0 = 74, y0 = 212;
+  const rows = Math.ceil(desks.length / perRow);
+  const zoneX = 668, zoneW = 322;
+  const ph = Math.max(58, Math.min(96, Math.floor((430 - (plots.length - 1) * 14) / Math.max(plots.length, 1))));
+  const H = Math.max(600, y0 + rows * (dh + gy) + 70);
+
+  const deskSVG = desks.map((d, i) => {
+    const x = x0 + (i % perRow) * (dw + gx);
+    const y = y0 + Math.floor(i / perRow) * (dh + gy);
+    return `<g class="hit" tabindex="0" role="button" data-kind="desk" data-i="${i}"
+        aria-label="Desk: ${esc(d.name)}">
+      <rect x="${x}" y="${y}" width="${dw}" height="${dh}" rx="3"
+        fill="var(--plan-fill)" stroke="${d.lead ? "var(--brass)" : "var(--plan-line)"}" stroke-width="${d.lead ? 2 : 1.2}"/>
+      <rect x="${x + 14}" y="${y + 14}" width="${dw - 28}" height="26" rx="2" fill="none" stroke="var(--plan-line)" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="${x + dw / 2}" cy="${y + dh + 15}" r="11" fill="none" stroke="var(--plan-line)" stroke-width="1.2"/>
+      <circle cx="${x + 24}" cy="${y + dh - 16}" r="4" fill="${d.lead ? "var(--brass)" : "var(--idle)"}"/>
+      <text x="${x + 36}" y="${y + dh - 12}" fill="#C8D6E0" font-size="12.5" font-weight="500">${esc(d.name)}</text>
+      <text x="${x + 14}" y="${y + 31}" fill="var(--plan-line)" font-size="9.5" letter-spacing="1.2">${esc(d.lead ? "LEAD" : "ON CALL")}</text>
+    </g>`;
+  }).join("");
+
+  const plotSVG = plots.map((p, i) => {
+    const y = 132 + i * (ph + 14);
+    return `<g class="hit" tabindex="0" role="button" data-kind="plot" data-i="${i}" aria-label="Sandbox: ${esc(p.title)}">
+      <rect x="${zoneX + 16}" y="${y}" width="${zoneW - 32}" height="${ph}" rx="2"
+        fill="url(#hatch)" stroke="var(--brass)" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="${zoneX + 30}" y="${y + 24}" fill="#E4D3B4" font-size="12.5" font-weight="500">${esc(p.title.slice(0, 26))}</text>
+      <text x="${zoneX + 30}" y="${y + 42}" fill="var(--plan-line)" font-size="9.5" letter-spacing="1.2">${esc(p.status)}</text>
+    </g>`;
+  }).join("");
+
+  $("plan").setAttribute("viewBox", `0 0 1040 ${H}`);
+  $("plan").innerHTML = `
+    <defs>
+      <pattern id="hatch" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+        <rect width="8" height="8" fill="var(--plan-fill)"/>
+        <line x1="0" y1="0" x2="0" y2="8" stroke="var(--plan-line)" stroke-width="1.1" opacity=".55"/>
+      </pattern>
+    </defs>
+    <rect x="0" y="0" width="1040" height="${H}" fill="var(--plan)"/>
+    <rect x="24" y="24" width="992" height="${H - 48}" fill="none" stroke="var(--plan-line)" stroke-width="1.6"/>
+
+    <rect x="92" y="32" width="470" height="15" rx="2" fill="#E9EEF2" opacity=".92"/>
+    <text x="92" y="68" fill="var(--plan-line)" font-size="10" letter-spacing="1.6">WHITEBOARD — WHAT WE KNOW / WHAT IS DEAD</text>
+
+    <g class="hit" tabindex="0" role="button" data-kind="head" aria-label="The head of the firm">
+      <circle cx="330" cy="118" r="15" fill="none" stroke="var(--brass)" stroke-width="1.8"/>
+      <circle cx="330" cy="118" r="5" fill="var(--brass)"/>
+      <line x1="330" y1="133" x2="330" y2="150" stroke="var(--brass)" stroke-width="1.4"/>
+      <text x="356" y="116" fill="#E4D3B4" font-size="12.5" font-weight="500">The head</text>
+      <text x="356" y="132" fill="var(--plan-line)" font-size="9.5" letter-spacing="1.2">AT THE BOARD</text>
+    </g>
+
+    <text x="74" y="188" fill="var(--plan-line)" font-size="10" letter-spacing="1.6">DESKS — ${desks.length} SEAT${desks.length === 1 ? "" : "S"}</text>
+    ${deskSVG}
+
+    <line x1="${zoneX - 20}" y1="60" x2="${zoneX - 20}" y2="${H - 60}" stroke="var(--plan-line)" stroke-width="1" stroke-dasharray="4 6"/>
+    <text x="${zoneX + 16}" y="104" fill="var(--plan-line)" font-size="10" letter-spacing="1.6">SANDBOX — STAKED OUT, NOT BUILT</text>
+    ${plotSVG}`;
+})();
+$("floornote").textContent = D.desks.length + " desks · " + D.plots.length + " plots";
+
+/* ---------------- whiteboard ---------------- */
+const wb = D.whiteboard;
+const wbBlock = (title, items, empty) => `<div class="wb"><h3>${title}</h3>` +
+  (empty ? `<p class="empty">${esc(items[0] || "Nothing yet.")}</p>`
+         : `<ul>${items.map(i => `<li>${md(i)}</li>`).join("")}</ul>`) + `</div>`;
+$("whiteboard").innerHTML =
+  wbBlock("What we know", wb.known, wb.known_empty) +
+  wbBlock("What is dead", wb.dead, wb.dead_empty) +
+  `<div class="wb"><h3>Live right now</h3><p class="empty">${md(wb.live)}</p></div>`;
+
+/* ---------------- plots ---------------- */
+$("plotcount").textContent = D.plots.length + " open";
+$("plots").innerHTML = D.plots.map((p, i) =>
+  `<button class="plot" type="button" data-kind="plot" data-i="${i}">
+     <div class="t">${esc(p.title)} <span class="tag">${esc(p.status)}</span></div>
+     <div class="g">${esc(p.goal.slice(0, 130))}${p.goal.length > 130 ? "…" : ""}</div>
+   </button>`).join("");
+
+/* ---------------- reports ---------------- */
+const reports = [
+  ["Experiments", "Every test run, survivors and failures alike", D.counts.experiments],
+  ["Beliefs", "What we think is true, and what would disprove it", D.counts.beliefs],
+  ["Open unknowns", "Questions nobody has been able to settle", D.counts.unknowns],
+  ["Walls", "Where a session stopped, and the route through", D.counts.walls],
+  ["Post-mortems", "What went wrong, and why we think it did", D.counts.postmortems],
+  ["Scores", "The owner's ratings of past work", D.scores.count],
+];
+document.querySelector("#reports tbody").innerHTML = reports.map(
+  ([a, b, c]) => `<tr><td><b>${esc(a)}</b></td><td>${esc(b)}</td><td>${c}</td></tr>`).join("");
+
+/* ---------------- drawer ---------------- */
+const row = (k, v) => v ? `<div><dt>${esc(k)}</dt><dd>${md(v)}</dd></div>` : "";
+function open(kind, i){
+  let title = "", rows = "";
+  if (kind === "desk"){
+    const d = D.desks[i];
+    title = d.name; rows = row("Seat", d.role) + row("Brief", d.brief) +
+      row("Status", d.lead ? "This is the seat you fill when you run /research."
+        : "Called by the lead with the Agent tool. Reports back; does not write to the record.");
+    $("drawerkind").textContent = "Desk";
+  } else if (kind === "plot"){
+    const p = D.plots[i];
+    title = p.title; rows = row("Status", p.status) + row("The goal", p.goal) +
+      row("Why it matters", p.why) + row("What is missing", p.missing) +
+      row("File", "sandbox/" + p.file);
+    $("drawerkind").textContent = "Sandbox plot";
+  } else {
+    title = "The head of the firm";
+    rows = row("Standing at", "The whiteboard — KNOWLEDGE.md, the one page every session reads.") +
+      row("The job", "Hear the reasoning before judging the work. Score a phase once it has been run, and never punish an honest mistake.") +
+      row("Why that matters", "Punish an agent for an honest wrong answer and you have not taught it to be right — you have taught it to avoid punishment, and the cheapest way to do that is a better story rather than better work.");
+    $("drawerkind").textContent = "The head";
+  }
+  $("drawerbody").innerHTML = `<h2>${esc(title)}</h2><dl style="margin-top:14px">${rows}</dl>`;
+  $("drawer").hidden = false;
+  $("drawer").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+$("drawerclose").addEventListener("click", () => { $("drawer").hidden = true; });
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("[data-kind]");
+  if (t) open(t.dataset.kind, +t.dataset.i || 0);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const t = e.target.closest && e.target.closest("g[data-kind]");
+  if (t){ e.preventDefault(); open(t.dataset.kind, +t.dataset.i || 0); }
+});
+$("foot-build").textContent = "Built " + D.build.at + " from " + D.build.commit;
+</script>

@@ -1,110 +1,88 @@
-# Capital Allocation Manager
+# CAPITAL-ALL
 
-A budgeting app for a trucking business, reachable from any phone or laptop, running on
-$0/month permanently.
+A trading research programme — futures, equities, options and prediction
+markets. The goal is to make money; the method is an accumulating research
+record that each session builds on rather than starting over.
 
-Log an income event and it splits automatically across taxes, the repair reserve, your
-capital fund and your own salary, following rules you control.
+**Start with [`KNOWLEDGE.md`](KNOWLEDGE.md)** — one page, capped at 150 lines,
+holding what we know, what is dead, and what is being worked on right now. It is
+deliberately short so that catching up never means reading the whole archive.
 
-## How this is free, and why there is no server
+Then [`MISSION.md`](MISSION.md) for the goal, the ground rules, and the
+reasoning behind the discipline the research follows.
 
-There isn't one. The app is a folder of static files on GitHub Pages, and it talks
-straight to a hosted Postgres database at Supabase. Nothing has to stay running, so
-nothing costs anything and nothing goes to sleep between uses.
+Agents work in a small hierarchy. A session that gets stuck or wants a second
+opinion calls a specialist — a **skeptic** that tries to break a finding, a
+**quant** that runs the numbers, a **scout** that researches the open internet.
+They are defined in [`.claude/agents/`](.claude/agents/).
 
-That is also why the previous version couldn't be deployed. It was an Express server
-writing to a SQLite file on disk, and free hosting gives you a disk that gets wiped on
-every redeploy — the budget would have reset to zero each time. The allocation logic was
-never server-shaped to begin with: it's arithmetic on a handful of numbers, so it now runs
-in the browser, where you can watch a split before committing it.
+## Starting a session
 
-```
-frontend/         the entire app
-  src/lib/        allocation waterfall — the only real logic here
-  src/store.js    all database reads and writes
-supabase/         schema.sql — run this once in the Supabase dashboard
-.github/          builds and publishes on every push to main
-```
+| Command | What it does |
+|---|---|
+| **`/research`** | Boots an autonomous research session. Picks up where the last one left off, does the work, writes down what it found, and reports back in plain English. |
+| **`/status`** | Where everything stands right now. |
+| **`/score N`** | Records your rating of recent work, 1–10. |
 
-## One-time setup
+⚠️ A live Robinhood brokerage account is connected — deliberately, and currently
+unfunded. Agents research freely and choose their own markets, strategies and
+risk; **no agent places a real order** until that is authorised in writing. See
+[`thoughts/handoff.md`](thoughts/handoff.md).
 
-### 1. Create the database
+## The records kept here
 
-1. Sign up at [supabase.com](https://supabase.com) and create a project. The free tier is
-   what you want; no card required.
-2. In the left sidebar open **SQL Editor**, paste in the entire contents of
-   [`supabase/schema.sql`](supabase/schema.sql), and press Run.
-3. Open **Project Settings → API** and copy two values: the **Project URL** and the
-   **anon public** key.
+Work in this repo is done largely by AI agents, and agent sessions do not share
+memory between them. Two records exist in the repository itself so that each
+session starts from what the last one learned, rather than from nothing.
 
-### 2. Point the app at it
+| | |
+|---|---|
+| [`KNOWLEDGE.md`](KNOWLEDGE.md) | The front page. What we know, what is dead, what is live. Size-capped on purpose: the archive grows, this does not. |
+| [`research/`](research/README.md) | The whiteboard. [`experiments.md`](research/experiments.md) is an append-only log of everything tried; [`beliefs.md`](research/beliefs.md) is what we currently think is true and why. |
+| [`sandbox/`](sandbox/README.md) | Ground staked out but not built on. Anyone may pick one up. Leaving work open is expected, not a failure. |
+| [`SCORECARD.md`](SCORECARD.md) | How the owner rated each phase, out of 10, and the standing directives drawn from those ratings. Run [`./scorecard/summary.sh`](scorecard/summary.sh) for the short version. |
+| [`thoughts/`](thoughts/README.md) | A message board. What previous agents learned, decisions split by how confident they actually were, where sessions got stuck, and honest post-mortems when something went wrong. |
+| [`CLAUDE.md`](CLAUDE.md) | The protocol agents follow for both of the above. |
 
-Paste those two values into [`frontend/src/config.js`](frontend/src/config.js), replacing
-the placeholders.
+**If you are picking this repo up — human or agent — start with
+[`thoughts/handoff.md`](thoughts/handoff.md).** It is short and it holds the
+traps, including one about a live production database.
 
-These get committed to a public repo, which is correct and safe. The anon key is a public
-client key — it names the project, it doesn't unlock it. What guards your numbers is the
-row-level security in `schema.sql`: the database itself will only return rows belonging to
-the logged-in user. **Never** put the `service_role` key here; that one does bypass those
-rules and belongs only in the Supabase dashboard.
+**Reasoning is heard before work is judged, and honest mistakes are never
+punished.** That is deliberate: punish an agent for an honest wrong answer and
+you have not taught it to be right, you have taught it to avoid punishment — and
+the cheapest way to do that is a better story, not better work. The other half
+of the deal is that no agent may talk its way to a better score. See
+[`MISSION.md`](MISSION.md).
 
-### 3. Turn on GitHub Pages
+**If you want to brief the work better,** read
+[`thoughts/2-judgment-calls.md`](thoughts/2-judgment-calls.md). Every entry
+names the one question that would have removed an agent's doubt, which is a more
+practical guide to what was missing from a request than any amount of general
+advice about prompting.
 
-In the repo: **Settings → Pages → Source → GitHub Actions**. Then push:
+## `legacy/`
+
+The previous occupant — **Capital Allocation Manager**, a budgeting PWA for a
+trucking business — now lives untouched in [`legacy/`](legacy/). It was moved,
+not rewritten: every file is byte-identical to what it was, and `git log
+--follow` still traces each one's full history.
+
+Its own [`legacy/README.md`](legacy/README.md) documents how it works and how to
+run it — but read the database warning in
+[`thoughts/handoff.md`](thoughts/handoff.md) first. Local development talks to
+the same live Supabase project as the production site.
+
+### It is still live
+
+`main` has not been touched, so the deployed site at
+<https://jahmadjonov-art.github.io/CAPITAL-ALL/> and its Supabase database keep
+working exactly as before. Note that `legacy/.github/workflows/deploy.yml` is no
+longer at the path GitHub reads workflows from — that only takes effect if this
+branch is ever merged to `main`, at which point the old app stops auto-deploying.
+
+### Putting it back
 
 ```bash
-git push
+git mv legacy/* legacy/.github legacy/.gitignore . && rmdir legacy
 ```
-
-The workflow builds and publishes in about a minute. Your app lands at
-**https://jahmadjonov-art.github.io/CAPITAL-ALL/**
-
-### 4. Create your login
-
-Open the site and click *Create an account*. By default Supabase emails you a confirmation
-link. If you'd rather skip that for a single-user app, turn off **Confirm email** under
-**Authentication → Providers → Email** in the Supabase dashboard before signing up.
-
-### 5. Put it on your phone
-
-Open the URL in Safari or Chrome on your phone and choose *Add to Home Screen*. It installs
-as a real app with its own icon, opens without browser chrome, and keeps working in a dead
-zone (entering new transactions needs a connection, since that writes to the database).
-
-## Working on it locally
-
-```bash
-npm run install-all
-npm run dev            # http://localhost:5173
-```
-
-Local dev talks to the same Supabase project as the live site, so you'll see the same data.
-If you'd rather not hardcode keys during development, drop them in `frontend/.env.local`
-instead as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; those take precedence over
-`config.js` and are gitignored.
-
-## How the allocation works
-
-Each income event runs through a waterfall, in priority order:
-
-1. **Taxes** come off the top at your tax percentage — that money was never yours.
-2. **Repair reserve** is topped up by its percentage, but only until it reaches its target.
-   Once the reserve is full, that money is better off as capital.
-3. **Capital fund** takes its guaranteed floor percentage.
-4. **You** get paid whatever is left, up to your salary cap.
-5. **Surplus** above the cap falls back into capital.
-
-Every step draws from a running remainder that stops at zero, so the lines always sum to
-exactly what came in. Aggressive settings (say 60% tax plus a 60% capital floor) can starve
-the later buckets, but can never allocate more money than you earned. Edit the rules under
-**Rules**, where a worked example shows what a $10,000 load would do before you save.
-
-Bucket balances are never stored — they're summed from the ledger on read, so a balance can
-never quietly disagree with the transactions behind it. Deleting one line of a split
-removes the whole split, for the same reason.
-
-## Notes
-
-- `npm audit` reports a moderate advisory in esbuild, reachable only through Vite's local
-  dev server. It does not affect the static files that get deployed.
-- The old Express + SQLite backend is preserved in git history at commit `c0b4b71`.

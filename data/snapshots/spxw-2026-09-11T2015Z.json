@@ -1,0 +1,19 @@
+{
+  "captured_utc": "2026-09-11T20:15:00Z",
+  "captured_note": "Friday post-close snapshot, pulled Sunday. Stale by design of when it was taken — this proves the fields exist and the method works; it is not a live reading.",
+  "source": "mcp__Robinhood__get_option_quotes",
+  "underlying": "SPX", "chain": "SPXW", "expiry": "2026-09-14",
+  "spot_estimate": 7657.0,
+  "spot_method": "Interpolated from the delta-0.5 crossing between the 7650 call (delta 0.564) and the 7675 call (delta 0.354). Not a quoted index level.",
+  "convention": "Dealer gamma = call gamma exposure MINUS put gamma exposure. The standard assumption is that dealers are long calls (customers sell covered calls to them) and short puts (customers buy puts as portfolio hedges). Positive net means dealers dampen moves; negative means they amplify them.",
+  "strikes": [
+    {"k": 7575, "call": {"iv": 0.168314, "delta": 0.900174, "gamma": 0.002694, "oi": 263,  "vol": 119},   "put": {"iv": 0.173292, "delta": -0.105841, "gamma": 0.002737, "oi": 1392, "vol": 3385}},
+    {"k": 7600, "call": {"iv": 0.154364, "delta": 0.835192, "gamma": 0.004157, "oi": 738,  "vol": 1016},  "put": {"iv": 0.158030, "delta": -0.169858, "gamma": 0.004151, "oi": 2009, "vol": 9218}},
+    {"k": 7650, "call": {"iv": 0.127476, "delta": 0.563570, "gamma": 0.007993, "oi": 689,  "vol": 4082},  "put": {"iv": 0.129905, "delta": -0.437443, "gamma": 0.007867, "oi": 479,  "vol": 5352}},
+    {"k": 7675, "call": {"iv": 0.118225, "delta": 0.353976, "gamma": 0.008138, "oi": 1878, "vol": 27202}, "put": {"iv": 0.120765, "delta": -0.643415, "gamma": 0.008008, "oi": 1298, "vol": 5383}},
+    {"k": 7700, "call": {"iv": 0.114048, "delta": 0.170195, "gamma": 0.005745, "oi": 1626, "vol": 11535}, "put": {"iv": 0.117611, "delta": -0.822962, "gamma": 0.005726, "oi": 1747, "vol": 1899}},
+    {"k": 7750, "call": {"iv": 0.118075, "delta": 0.022399, "gamma": 0.001168, "oi": 1765, "vol": 3978},  "put": {"iv": 0.130381, "delta": -0.965709, "gamma": 0.001511, "oi": 383,  "vol": 160}}
+  ],
+  "coverage_note": "Six strikes with both sides, one expiry. The reference tool this was compared against reads the whole chain — magnitudes here are not comparable to it, only the method and the sign.",
+  "greeks_gap_note": "Deep in-the-money strikes returned null greeks. Sparse coverage away from the money is real."
+}

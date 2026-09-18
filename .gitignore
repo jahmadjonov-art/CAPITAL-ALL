@@ -1,11 +1,13 @@
-node_modules
-dist
-frontend/dist
+__pycache__/
+*.pyc
 
-# Local Supabase credentials for development; the committed ones live in
-# frontend/src/config.js.
+# Never commit credentials.
+*api_key*
+*.key
 .env
-.env.local
-frontend/.env.local
+.env.*
+secrets/
 
-.DS_Store
+# Built site output; regenerate with site/build.py.
+site/dist/
+_site/

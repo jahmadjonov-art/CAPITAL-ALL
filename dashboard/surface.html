@@ -1,0 +1,943 @@
+<title>Volatility Surface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#8A96A4; --faint:#49535F;
+  --iv:#2BD4E8; --gex:#FF3D82; --spot:#F5A524; --ok:#2FD67F;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 12.5px/1.6 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:14px;padding-block:16px 48px}
+h1,h2{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed","JetBrains Mono",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--faint)}
+.top{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between;
+  padding-bottom:12px;border-bottom:1px solid var(--line-2)}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:25px;letter-spacing:.05em}
+.brand b{color:var(--iv)}
+.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.7}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-top:13px;border-radius:3px;overflow:hidden}
+.cell{background:var(--panel);padding:10px 13px}
+.cell .v{font-size:19px;font-weight:700;margin-top:4px}
+.big{font-size:40px;font-weight:700;letter-spacing:-.02em;line-height:1.05;margin-top:8px}
+.pill{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:2px;border:1px solid}
+.pill.neg{color:#FF5757;border-color:#5A1A1A;background:#1C0A0A}
+.pill.pos{color:var(--ok);border-color:#14442C;background:#08170F}
+.warn{background:#1A1207;border:1px solid #3D2B0C;border-radius:3px;padding:11px 13px;
+  color:#E0B968;font-size:12px;margin-top:12px}
+.cell .s{font-size:10.5px;color:var(--faint);margin-top:2px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:3px;margin-top:13px}
+.card > header{padding:8px 13px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:10px}
+.card > .b{padding:12px}
+svg{display:block;width:100%;height:auto}
+.two{display:grid;grid-template-columns:1fr;gap:13px;margin-top:13px}
+@media (min-width:900px){.two{grid-template-columns:1fr 1fr}}
+.two .card{margin-top:0}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{text-align:right;font-family:"Barlow Condensed",sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--faint);padding:0 8px 7px 0;border-bottom:1px solid var(--line-2)}
+th:first-child,td:first-child{text-align:left}
+td{padding:6px 8px 6px 0;border-bottom:1px solid var(--line);color:var(--dim);text-align:right}
+td:last-child,th:last-child{padding-right:0}
+tr:last-child td{border-bottom:none}
+tr.wall td{color:var(--txt);background:rgba(255,61,130,.07)}
+.note{background:var(--sunk);border-left:3px solid var(--spot);padding:10px 13px;border-radius:0 3px 3px 0;
+  font-size:11.5px;color:var(--dim);margin-top:13px}
+.note b{color:var(--txt)}
+footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-size:10.5px;color:var(--faint)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 class="brand">VOLATILITY <b>SURFACE</b></h1>
+      <div class="lbl" id="sub" style="margin-top:3px"></div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <section class="card" id="regimecard">
+    <header><h2 class="lbl">Dealer gamma exposure</h2><span class="lbl" id="wallflag"></span></header>
+    <div class="b">
+      <div id="regimepill"></div>
+      <div class="big num" id="netgex"></div>
+      <div id="regimetext" style="color:var(--dim);max-width:64ch;margin-top:5px"></div>
+    </div>
+  </section>
+
+  <div class="strip" id="strip"></div>
+
+  <div class="two">
+    <section class="card">
+      <header><h2 class="lbl">Implied volatility — call vs put</h2><span class="lbl" id="ivlab"></span></header>
+      <div class="b"><svg id="smile" role="img" aria-label="Implied volatility against strike"></svg></div>
+    </section>
+    <section class="card">
+      <header><h2 class="lbl">Gamma by strike — calls up, puts down</h2><span class="lbl" id="gexlab"></span></header>
+      <div class="b"><svg id="gex" role="img" aria-label="Gamma exposure against strike"></svg></div>
+    </section>
+  </div>
+
+  <section class="card">
+    <header><h2 class="lbl">The chain</h2><span class="lbl" id="nlab"></span></header>
+    <div class="b" style="overflow-x:auto"><table id="tbl"></table></div>
+  </section>
+
+  <div class="note" id="honesty"></div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const D = {
+  "built": "14 Sep 2026  15:33",
+  "snapshot": "spx-cboe-2026-09-14T1555Z.json",
+  "captured": "2026-09-14T15:55:00Z",
+  "captured_note": "CBOE delayed quotes, full SPX chain in one unauthenticated request. Quotes are delayed and open interest is the official end-of-day figure, so it does not move intraday.",
+  "underlying": "SPX",
+  "chain": "SPX / SPXW",
+  "expiry": "2026-09-14",
+  "spot": 7601.8501,
+  "spot_method": "Quoted directly in the CBOE payload as current_price \u2014 not derived this time.",
+  "rows": [
+    {
+      "k": 7490.0,
+      "moneyness": -0.01471353664287589,
+      "call_iv": 0.2689,
+      "put_iv": 0.2729,
+      "call_gamma": 0.0005,
+      "put_gamma": 0.0005,
+      "call_oi": 21,
+      "put_oi": 806,
+      "call_vol": 6,
+      "put_vol": 1593,
+      "call_gex": 606775.3119001351,
+      "put_gex": 23288614.351976614,
+      "net_gex": -22681839.04007648
+    },
+    {
+      "k": 7495.0,
+      "moneyness": -0.014055802021142205,
+      "call_iv": 0.2853,
+      "put_iv": 0.2673,
+      "call_gamma": 0.0006,
+      "put_gamma": 0.0006,
+      "call_oi": 4,
+      "put_oi": 488,
+      "call_vol": 12,
+      "put_vol": 2076,
+      "call_gex": 138691.499862888,
+      "put_gex": 16920362.983272336,
+      "net_gex": -16781671.48340945
+    },
+    {
+      "k": 7500.0,
+      "moneyness": -0.013398067399408409,
+      "call_iv": 0.3061,
+      "put_iv": 0.2564,
+      "call_gamma": 0.0007,
+      "put_gamma": 0.0007,
+      "call_oi": 134,
+      "put_oi": 9425,
+      "call_vol": 83,
+      "put_vol": 4758,
+      "call_gex": 5420526.119641206,
+      "put_gex": 381257154.31058484,
+      "net_gex": -375836628.19094366
+    },
+    {
+      "k": 7505.0,
+      "moneyness": -0.012740332777674723,
+      "call_iv": 0.2469,
+      "put_iv": 0.2454,
+      "call_gamma": 0.0007,
+      "put_gamma": 0.0007,
+      "call_oi": 6,
+      "put_oi": 1667,
+      "call_vol": 14,
+      "put_vol": 2330,
+      "call_gex": 242710.12476005402,
+      "put_gex": 67432962.995835,
+      "net_gex": -67190252.87107496
+    },
+    {
+      "k": 7510.0,
+      "moneyness": -0.012082598155940927,
+      "call_iv": 0.2358,
+      "put_iv": 0.2344,
+      "call_gamma": 0.0008,
+      "put_gamma": 0.0008,
+      "call_oi": 78,
+      "put_oi": 801,
+      "call_vol": 103,
+      "put_vol": 4644,
+      "call_gex": 3605978.9964350886,
+      "put_gex": 37030630.4633911,
+      "net_gex": -33424651.466956016
+    },
+    {
+      "k": 7515.0,
+      "moneyness": -0.011424863534207241,
+      "call_iv": 0.2246,
+      "put_iv": 0.2274,
+      "call_gamma": 0.0009,
+      "put_gamma": 0.0009,
+      "call_oi": 30,
+      "put_oi": 892,
+      "call_vol": 236,
+      "put_vol": 2568,
+      "call_gex": 1560279.3734574902,
+      "put_gex": 46392306.70413604,
+      "net_gex": -44832027.330678545
+    },
+    {
+      "k": 7520.0,
+      "moneyness": -0.010767128912473556,
+      "call_iv": 0.2208,
+      "put_iv": 0.2197,
+      "call_gamma": 0.001,
+      "put_gamma": 0.001,
+      "call_oi": 38,
+      "put_oi": 2095,
+      "call_vol": 38,
+      "put_vol": 6117,
+      "call_gex": 2195948.74782906,
+      "put_gex": 121066121.75531268,
+      "net_gex": -118870173.00748362
+    },
+    {
+      "k": 7525.0,
+      "moneyness": -0.01010939429073976,
+      "call_iv": 0.2092,
+      "put_iv": 0.2082,
+      "call_gamma": 0.0012,
+      "put_gamma": 0.0012,
+      "call_oi": 64,
+      "put_oi": 5429,
+      "call_vol": 269,
+      "put_vol": 8596,
+      "call_gex": 4438127.995612416,
+      "put_gex": 376478076.37780946,
+      "net_gex": -372039948.382197
+    },
+    {
+      "k": 7530.0,
+      "moneyness": -0.009451659669006074,
+      "call_iv": 0.2035,
+      "put_iv": 0.2026,
+      "call_gamma": 0.0014,
+      "put_gamma": 0.0014,
+      "call_oi": 51,
+      "put_oi": 3495,
+      "call_vol": 89,
+      "put_vol": 8492,
+      "call_gex": 4126072.120920919,
+      "put_gex": 282757295.3454629,
+      "net_gex": -278631223.224542
+    },
+    {
+      "k": 7535.0,
+      "moneyness": -0.008793925047272277,
+      "call_iv": 0.1965,
+      "put_iv": 0.1957,
+      "call_gamma": 0.0017,
+      "put_gamma": 0.0017,
+      "call_oi": 13,
+      "put_oi": 2818,
+      "call_vol": 111,
+      "put_vol": 5993,
+      "call_gex": 1277117.561237427,
+      "put_gex": 276839791.351313,
+      "net_gex": -275562673.79007554
+    },
+    {
+      "k": 7540.0,
+      "moneyness": -0.008136190425538592,
+      "call_iv": 0.1926,
+      "put_iv": 0.1879,
+      "call_gamma": 0.002,
+      "put_gamma": 0.002,
+      "call_oi": 25,
+      "put_oi": 1517,
+      "call_vol": 280,
+      "put_vol": 10934,
+      "call_gex": 2889406.2471435005,
+      "put_gex": 175329171.0766676,
+      "net_gex": -172439764.8295241
+    },
+    {
+      "k": 7545.0,
+      "moneyness": -0.0074784558038049065,
+      "call_iv": 0.1797,
+      "put_iv": 0.1791,
+      "call_gamma": 0.0024,
+      "put_gamma": 0.0024,
+      "call_oi": 27,
+      "put_oi": 4407,
+      "call_vol": 272,
+      "put_vol": 19576,
+      "call_gex": 3744670.496297976,
+      "put_gex": 611213439.8957474,
+      "net_gex": -607468769.3994495
+    },
+    {
+      "k": 7550.0,
+      "moneyness": -0.00682072118207111,
+      "call_iv": 0.1764,
+      "put_iv": 0.1728,
+      "call_gamma": 0.003,
+      "put_gamma": 0.003,
+      "call_oi": 61,
+      "put_oi": 5411,
+      "call_vol": 716,
+      "put_vol": 32273,
+      "call_gex": 10575226.864545211,
+      "put_gex": 938074632.1976088,
+      "net_gex": -927499405.3330636
+    },
+    {
+      "k": 7555.0,
+      "moneyness": -0.0061629865603374245,
+      "call_iv": 0.1706,
+      "put_iv": 0.1677,
+      "call_gamma": 0.0037,
+      "put_gamma": 0.0037,
+      "call_oi": 41,
+      "put_oi": 2475,
+      "call_vol": 457,
+      "put_vol": 20496,
+      "call_gex": 8766458.55383338,
+      "put_gex": 529194754.1643321,
+      "net_gex": -520428295.6104987
+    },
+    {
+      "k": 7560.0,
+      "moneyness": -0.005505251938603739,
+      "call_iv": 0.1608,
+      "put_iv": 0.1604,
+      "call_gamma": 0.0045,
+      "put_gamma": 0.0045,
+      "call_oi": 66,
+      "put_oi": 2432,
+      "call_vol": 565,
+      "put_vol": 28265,
+      "call_gex": 17163073.10803239,
+      "put_gex": 632433239.3747693,
+      "net_gex": -615270166.266737
+    },
+    {
+      "k": 7565.0,
+      "moneyness": -0.004847517316869943,
+      "call_iv": 0.1573,
+      "put_iv": 0.1553,
+      "call_gamma": 0.0057,
+      "put_gamma": 0.0057,
+      "call_oi": 73,
+      "put_oi": 1290,
+      "call_vol": 1036,
+      "put_vol": 19566,
+      "call_gex": 24045638.78872821,
+      "put_gex": 424916082.7049232,
+      "net_gex": -400870443.916195
+    },
+    {
+      "k": 7570.0,
+      "moneyness": -0.004189782695136257,
+      "call_iv": 0.1509,
+      "put_iv": 0.1506,
+      "call_gamma": 0.0071,
+      "put_gamma": 0.0071,
+      "call_oi": 61,
+      "put_oi": 1484,
+      "call_vol": 1424,
+      "put_vol": 25889,
+      "call_gex": 25028036.912757,
+      "put_gex": 608878799.6480556,
+      "net_gex": -583850762.7352985
+    },
+    {
+      "k": 7575.0,
+      "moneyness": -0.0035320480734024606,
+      "call_iv": 0.1471,
+      "put_iv": 0.1457,
+      "call_gamma": 0.0087,
+      "put_gamma": 0.0087,
+      "call_oi": 238,
+      "put_oi": 3088,
+      "call_vol": 1656,
+      "put_vol": 29102,
+      "call_gex": 119656091.50670663,
+      "put_gex": 1552512649.4651682,
+      "net_gex": -1432856557.9584615
+    },
+    {
+      "k": 7580.0,
+      "moneyness": -0.002874313451668775,
+      "call_iv": 0.142,
+      "put_iv": 0.1413,
+      "call_gamma": 0.0106,
+      "put_gamma": 0.0106,
+      "call_oi": 96,
+      "put_oi": 2170,
+      "call_vol": 2574,
+      "put_vol": 33653,
+      "call_gex": 58805195.94186452,
+      "put_gex": 1329242449.935896,
+      "net_gex": -1270437253.9940314
+    },
+    {
+      "k": 7585.0,
+      "moneyness": -0.0022165788299350897,
+      "call_iv": 0.1371,
+      "put_iv": 0.1374,
+      "call_gamma": 0.0126,
+      "put_gamma": 0.0126,
+      "call_oi": 189,
+      "put_oi": 1180,
+      "call_vol": 3829,
+      "put_vol": 29058,
+      "call_gex": 137616640.73895064,
+      "put_gex": 859193841.6505913,
+      "net_gex": -721577200.9116406
+    },
+    {
+      "k": 7590.0,
+      "moneyness": -0.0015588442082012932,
+      "call_iv": 0.1332,
+      "put_iv": 0.1335,
+      "call_gamma": 0.0146,
+      "put_gamma": 0.0146,
+      "call_oi": 97,
+      "put_oi": 1818,
+      "call_vol": 6770,
+      "put_vol": 36064,
+      "call_gex": 81839542.54409249,
+      "put_gex": 1533858642.73361,
+      "net_gex": -1452019100.1895175
+    },
+    {
+      "k": 7595.0,
+      "moneyness": -0.0009011095864676077,
+      "call_iv": 0.1305,
+      "put_iv": 0.1293,
+      "call_gamma": 0.0165,
+      "put_gamma": 0.0165,
+      "call_oi": 255,
+      "put_oi": 978,
+      "call_vol": 12731,
+      "put_vol": 39528,
+      "call_gex": 243143535.69712558,
+      "put_gex": 932526972.2030933,
+      "net_gex": -689383436.5059677
+    },
+    {
+      "k": 7600.0,
+      "moneyness": -0.00024337496473392228,
+      "call_iv": 0.1274,
+      "put_iv": 0.1269,
+      "call_gamma": 0.0176,
+      "put_gamma": 0.0176,
+      "call_oi": 1069,
+      "put_oi": 4496,
+      "call_vol": 36211,
+      "put_vol": 54923,
+      "call_gex": 1087248897.9251337,
+      "put_gex": 4572751211.479327,
+      "net_gex": -3485502313.5541935
+    },
+    {
+      "k": 7605.0,
+      "moneyness": 0.0004143596569998742,
+      "call_iv": 0.1246,
+      "put_iv": 0.1241,
+      "call_gamma": 0.018,
+      "put_gamma": 0.018,
+      "call_oi": 582,
+      "put_oi": 3198,
+      "call_vol": 27422,
+      "put_vol": 30050,
+      "call_gex": 605388396.9015062,
+      "put_gex": 3326515624.2113686,
+      "net_gex": -2721127227.309862
+    },
+    {
+      "k": 7610.0,
+      "moneyness": 0.0010720942787336707,
+      "call_iv": 0.1232,
+      "put_iv": 0.1227,
+      "call_gamma": 0.0173,
+      "put_gamma": 0.0173,
+      "call_oi": 276,
+      "put_oi": 1598,
+      "call_vol": 34977,
+      "put_vol": 27993,
+      "call_gex": 275926738.9772157,
+      "put_gex": 1597575829.2956183,
+      "net_gex": -1321649090.3184025
+    },
+    {
+      "k": 7615.0,
+      "moneyness": 0.0017298289004672451,
+      "call_iv": 0.1211,
+      "put_iv": 0.1214,
+      "call_gamma": 0.0157,
+      "put_gamma": 0.0157,
+      "call_oi": 205,
+      "put_oi": 2588,
+      "call_vol": 43668,
+      "put_vol": 23143,
+      "call_gex": 185991080.1286271,
+      "put_gex": 2348023977.4287167,
+      "net_gex": -2162032897.3000894
+    },
+    {
+      "k": 7620.0,
+      "moneyness": 0.0023875635222010416,
+      "call_iv": 0.1219,
+      "put_iv": 0.1218,
+      "call_gamma": 0.0134,
+      "put_gamma": 0.0134,
+      "call_oi": 146,
+      "put_oi": 1404,
+      "call_vol": 53235,
+      "put_vol": 16206,
+      "call_gex": 113056687.63823089,
+      "put_gex": 1087202667.4251792,
+      "net_gex": -974145979.7869483
+    },
+    {
+      "k": 7625.0,
+      "moneyness": 0.003045298143934838,
+      "call_iv": 0.123,
+      "put_iv": 0.1216,
+      "call_gamma": 0.0108,
+      "put_gamma": 0.0108,
+      "call_oi": 492,
+      "put_oi": 1894,
+      "call_vol": 43496,
+      "put_vol": 6379,
+      "call_gex": 307062980.6964341,
+      "put_gex": 1182067653.3313947,
+      "net_gex": -875004672.6349607
+    },
+    {
+      "k": 7630.0,
+      "moneyness": 0.0037030327656684126,
+      "call_iv": 0.1257,
+      "put_iv": 0.1254,
+      "call_gamma": 0.0084,
+      "put_gamma": 0.0084,
+      "call_oi": 269,
+      "put_oi": 1151,
+      "call_vol": 42389,
+      "put_vol": 4659,
+      "call_gex": 130578047.12090905,
+      "put_gex": 558718707.1976444,
+      "net_gex": -428140660.0767353
+    },
+    {
+      "k": 7635.0,
+      "moneyness": 0.004360767387402209,
+      "call_iv": 0.1287,
+      "put_iv": 0.1274,
+      "call_gamma": 0.0064,
+      "put_gamma": 0.0064,
+      "call_oi": 261,
+      "put_oi": 755,
+      "call_vol": 34019,
+      "put_vol": 2540,
+      "call_gex": 96529283.90457006,
+      "put_gex": 279232219.7239479,
+      "net_gex": -182702935.81937784
+    },
+    {
+      "k": 7640.0,
+      "moneyness": 0.0050185020091360055,
+      "call_iv": 0.1334,
+      "put_iv": 0.133,
+      "call_gamma": 0.0049,
+      "put_gamma": 0.0049,
+      "call_oi": 407,
+      "put_oi": 890,
+      "call_vol": 58588,
+      "put_vol": 2465,
+      "call_gex": 115246857.57356565,
+      "put_gex": 252014012.87585607,
+      "net_gex": -136767155.30229044
+    },
+    {
+      "k": 7645.0,
+      "moneyness": 0.00567623663086958,
+      "call_iv": 0.1387,
+      "put_iv": 0.135,
+      "call_gamma": 0.0037,
+      "put_gamma": 0.0037,
+      "call_oi": 338,
+      "put_oi": 1275,
+      "call_vol": 48129,
+      "put_vol": 2020,
+      "call_gex": 72269829.05355324,
+      "put_gex": 272615479.41798925,
+      "net_gex": -200345650.36443603
+    },
+    {
+      "k": 7650.0,
+      "moneyness": 0.0063339712526033765,
+      "call_iv": 0.1447,
+      "put_iv": 0.1399,
+      "call_gamma": 0.0028,
+      "put_gamma": 0.0028,
+      "call_oi": 2328,
+      "put_oi": 2140,
+      "call_vol": 29496,
+      "put_vol": 1848,
+      "call_gex": 376686113.6276038,
+      "put_gex": 346266444.65767705,
+      "net_gex": 30419668.969926775
+    },
+    {
+      "k": 7655.0,
+      "moneyness": 0.006991705874337173,
+      "call_iv": 0.1528,
+      "put_iv": 0.1521,
+      "call_gamma": 0.0023,
+      "put_gamma": 0.0023,
+      "call_oi": 1374,
+      "put_oi": 904,
+      "call_vol": 16430,
+      "put_vol": 1019,
+      "call_gex": 182622032.4444578,
+      "put_gex": 120153069.38121532,
+      "net_gex": 62468963.06324248
+    },
+    {
+      "k": 7660.0,
+      "moneyness": 0.007649440496070969,
+      "call_iv": 0.1598,
+      "put_iv": 0.1528,
+      "call_gamma": 0.0018,
+      "put_gamma": 0.0018,
+      "call_oi": 1081,
+      "put_oi": 1336,
+      "call_vol": 16877,
+      "put_vol": 1138,
+      "call_gex": 112444133.51383646,
+      "put_gex": 138968882.86261377,
+      "net_gex": -26524749.34877731
+    },
+    {
+      "k": 7665.0,
+      "moneyness": 0.008307175117804544,
+      "call_iv": 0.1714,
+      "put_iv": 0.1705,
+      "call_gamma": 0.0016,
+      "put_gamma": 0.0016,
+      "call_oi": 1125,
+      "put_oi": 984,
+      "call_vol": 18135,
+      "put_vol": 424,
+      "call_gex": 104018624.89716601,
+      "put_gex": 90981623.91005453,
+      "net_gex": 13037000.987111479
+    },
+    {
+      "k": 7670.0,
+      "moneyness": 0.00896490973953834,
+      "call_iv": 0.1764,
+      "put_iv": 0.1752,
+      "call_gamma": 0.0013,
+      "put_gamma": 0.0013,
+      "call_oi": 1245,
+      "put_oi": 716,
+      "call_vol": 14915,
+      "put_vol": 309,
+      "call_gex": 93530080.22003509,
+      "put_gex": 53789186.696823396,
+      "net_gex": 39740893.523211695
+    },
+    {
+      "k": 7675.0,
+      "moneyness": 0.009622644361272137,
+      "call_iv": 0.1836,
+      "put_iv": 0.1863,
+      "call_gamma": 0.0011,
+      "put_gamma": 0.0011,
+      "call_oi": 3444,
+      "put_oi": 1867,
+      "call_vol": 5171,
+      "put_vol": 1023,
+      "call_gex": 218924532.53356874,
+      "put_gex": 118679472.19517213,
+      "net_gex": 100245060.33839661
+    },
+    {
+      "k": 7680.0,
+      "moneyness": 0.010280378983005711,
+      "call_iv": 0.1899,
+      "put_iv": 0.1883,
+      "call_gamma": 0.0009,
+      "put_gamma": 0.0009,
+      "call_oi": 2948,
+      "put_oi": 1779,
+      "call_vol": 5156,
+      "put_vol": 109,
+      "call_gex": 153323453.0984227,
+      "put_gex": 92524566.84602916,
+      "net_gex": 60798886.25239354
+    },
+    {
+      "k": 7685.0,
+      "moneyness": 0.010938113604739508,
+      "call_iv": 0.2005,
+      "put_iv": 0.2082,
+      "call_gamma": 0.0008,
+      "put_gamma": 0.0008,
+      "call_oi": 796,
+      "put_oi": 272,
+      "call_vol": 4320,
+      "put_vol": 166,
+      "call_gex": 36799477.96361962,
+      "put_gex": 12574695.987568514,
+      "net_gex": 24224781.976051107
+    },
+    {
+      "k": 7690.0,
+      "moneyness": 0.011595848226473304,
+      "call_iv": 0.211,
+      "put_iv": 0.219,
+      "call_gamma": 0.0007,
+      "put_gamma": 0.0007,
+      "call_oi": 1113,
+      "put_oi": 270,
+      "call_vol": 2579,
+      "put_vol": 132,
+      "call_gex": 45022728.14299002,
+      "put_gex": 10921955.61420243,
+      "net_gex": 34100772.52878759
+    },
+    {
+      "k": 7695.0,
+      "moneyness": 0.012253582848206879,
+      "call_iv": 0.2215,
+      "put_iv": 0.2298,
+      "call_gamma": 0.0007,
+      "put_gamma": 0.0007,
+      "call_oi": 1805,
+      "put_oi": 157,
+      "call_vol": 3055,
+      "put_vol": 111,
+      "call_gex": 73015295.86531626,
+      "put_gex": 6350914.931221413,
+      "net_gex": 66664380.934094846
+    },
+    {
+      "k": 7700.0,
+      "moneyness": 0.012911317469940675,
+      "call_iv": 0.2183,
+      "put_iv": 0.2405,
+      "call_gamma": 0.0004,
+      "put_gamma": 0.0004,
+      "call_oi": 3735,
+      "put_oi": 1374,
+      "call_vol": 3429,
+      "put_vol": 638,
+      "call_gex": 86335458.66464779,
+      "put_gex": 31760353.468601353,
+      "net_gex": 54575105.196046434
+    },
+    {
+      "k": 7705.0,
+      "moneyness": 0.013569052091674472,
+      "call_iv": 0.2282,
+      "put_iv": 0.2253,
+      "call_gamma": 0.0004,
+      "put_gamma": 0.0004,
+      "call_oi": 3576,
+      "put_oi": 952,
+      "call_vol": 3450,
+      "put_vol": 58,
+      "call_gex": 82660133.91828126,
+      "put_gex": 22005717.9782449,
+      "net_gex": 60654415.94003636
+    },
+    {
+      "k": 7710.0,
+      "moneyness": 0.014226786713408046,
+      "call_iv": 0.2379,
+      "put_iv": 0.235,
+      "call_gamma": 0.0004,
+      "put_gamma": 0.0004,
+      "call_oi": 1629,
+      "put_oi": 230,
+      "call_vol": 2885,
+      "put_vol": 56,
+      "call_gex": 37654742.2127741,
+      "put_gex": 5316507.49474404,
+      "net_gex": 32338234.718030058
+    },
+    {
+      "k": 7715.0,
+      "moneyness": 0.014884521335141843,
+      "call_iv": 0.2477,
+      "put_iv": 0.214,
+      "call_gamma": 0.0004,
+      "put_gamma": 0.0004,
+      "call_oi": 3168,
+      "put_oi": 78,
+      "call_vol": 3661,
+      "put_vol": 18,
+      "call_gex": 73229111.92760488,
+      "put_gex": 1802989.4982175443,
+      "net_gex": 71426122.42938735
+    }
+  ],
+  "net_total": -22863201291.397194,
+  "regime": "NEGATIVE",
+  "regime_text": "Dealers amplify moves. Expect trend continuation and a larger realised range. Do not fade.",
+  "call_wall": 7600.0,
+  "call_wall_gex": 1087248897.9251337,
+  "put_wall": 7600.0,
+  "put_wall_gex": 4572751211.479327,
+  "walls_coincide": true,
+  "max_oi_strike": 7500.0,
+  "max_oi": 9559,
+  "flip": 7630.0,
+  "flip_reliable": true,
+  "convention": "Dealer gamma = call gamma exposure MINUS put gamma exposure, assuming dealers are long calls and short puts. Positive dampens moves; negative amplifies them.",
+  "floor_strike": 7615.0,
+  "floor_iv": 0.1211,
+  "coverage_note": "46 strikes within 1.5% of spot, both sides, drawn from the full 0DTE expiry. The whole chain was 28,934 contracts in one request.",
+  "greeks_gap_note": "Strikes far from the money carry iv of 0 and are filtered out rather than plotted as real.",
+  "snapshots_available": [
+    "spxw-2026-09-11T2015Z.json",
+    "spx-cboe-2026-09-14T1555Z.json"
+  ]
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const m$ = n => n>=1e9 ? "$"+(n/1e9).toFixed(2)+"B" : n>=1e6 ? "$"+(n/1e6).toFixed(0)+"M" : "$"+Math.round(n).toLocaleString();
+
+$("sub").textContent = `${D.underlying} · ${D.chain} · expiry ${D.expiry} · calls and puts`;
+$("stamp").innerHTML = `snapshot ${esc(D.captured)}<br>built ${esc(D.built)}`;
+$("foot").textContent = `Rendered from ${D.snapshot}. Every figure fetched from the broker's option chain — none modelled, none invented.`;
+
+const neg = D.net_total < 0;
+$("regimepill").innerHTML = `<span class="pill ${neg?"neg":"pos"}">${neg?"▼":"▲"} ${D.regime} GAMMA</span>`;
+$("netgex").innerHTML = `<span style="color:${neg?"#FF5757":"var(--ok)"}">${m$(Math.abs(D.net_total)).replace("$", neg?"$-":"$+")}</span>`;
+$("regimetext").innerHTML = `net dealer gamma per 1% move in spot.<br><b style="color:var(--txt)">${esc(D.regime_text)}</b>`;
+$("wallflag").textContent = D.walls_coincide ? "call wall = put wall" : "";
+
+$("strip").innerHTML = [
+  ["Spot (derived)", D.spot.toLocaleString("en-US",{maximumFractionDigits:0}), "delta-0.5 crossing"],
+  ["Call wall", D.call_wall.toLocaleString(), m$(D.call_wall_gex)+" call gamma", "var(--gex)"],
+  ["Put wall", D.put_wall.toLocaleString(), m$(D.put_wall_gex)+" put gamma", "var(--iv)"],
+  ["Gamma flip", D.flip ? D.flip.toLocaleString() : "n/a",
+   D.flip_reliable ? "regime boundary" : "at the edge of the sample — unreliable", "var(--spot)"],
+  ["Max open interest", D.max_oi_strike.toLocaleString(), D.max_oi.toLocaleString()+" contracts · pin candidate"],
+].map(([k,v,s2,c])=>`<div class="cell"><div class="lbl">${k}</div>
+  <div class="v num" ${c?`style="color:${c}"`:""}>${v}</div><div class="s">${s2}</div></div>`).join("");
+
+if (D.walls_coincide) $("strip").insertAdjacentHTML("afterend",
+  `<div class="warn"><b>Call wall and put wall are the same strike.</b> One strike carrying the
+   largest gamma on both sides behaves as a pin rather than a directional barrier — expect price to
+   be drawn to it and to chop across it, rather than to reverse cleanly off it.</div>`);
+
+const W=560, H=290, PL=54, PR=16, PT=16, PB=34;
+const ks = D.rows.map(r=>r.k);
+const kmin=Math.min(...ks), kmax=Math.max(...ks);
+const x = k => PL + (k-kmin)/(kmax-kmin||1)*(W-PL-PR);
+const xax = ts => ts.map(t=>`<text x="${x(t).toFixed(1)}" y="${H-PB+16}" text-anchor="middle"
+  fill="var(--faint)" font-size="9.5" font-family="JetBrains Mono,monospace">${t.toLocaleString()}</text>`).join("");
+const spotLine = h => `<line x1="${x(D.spot).toFixed(1)}" y1="${PT}" x2="${x(D.spot).toFixed(1)}" y2="${h}"
+  stroke="var(--spot)" stroke-width="1" stroke-dasharray="3 3"/>
+  <text x="${x(D.spot).toFixed(1)}" y="${PT-4}" text-anchor="middle" fill="var(--spot)" font-size="9.5"
+   font-family="JetBrains Mono,monospace">SPOT ${D.spot.toLocaleString("en-US",{maximumFractionDigits:0})}</text>`;
+
+/* ---- smile: both sides ---- */
+(function(){
+  const all=[...D.rows.map(r=>r.call_iv),...D.rows.map(r=>r.put_iv)];
+  const lo=Math.min(...all)*0.96, hi=Math.max(...all)*1.04;
+  const y = v => PT + (1-(v-lo)/(hi-lo))*(H-PT-PB);
+  let g="";
+  for(let i=0;i<=4;i++){ const v=lo+(hi-lo)*i/4, yy=y(v).toFixed(1);
+    g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>
+        <text x="${PL-7}" y="${(+yy+3).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9.5"
+         font-family="JetBrains Mono,monospace">${(v*100).toFixed(1)}%</text>`; }
+  g += spotLine(H-PB);
+  [["call_iv","var(--iv)"],["put_iv","var(--gex)"]].forEach(([f,col])=>{
+    g+=`<polyline points="${D.rows.map(r=>`${x(r.k).toFixed(1)},${y(r[f]).toFixed(1)}`).join(" ")}"
+        fill="none" stroke="${col}" stroke-width="2"/>`;
+    D.rows.forEach(r=>{g+=`<circle cx="${x(r.k).toFixed(1)}" cy="${y(r[f]).toFixed(1)}" r="3" fill="${col}"/>`;});
+  });
+  g+=`<text x="${W-PR}" y="${PT+11}" text-anchor="end" fill="var(--iv)" font-size="10"
+      font-family="JetBrains Mono,monospace">calls</text>
+      <text x="${W-PR}" y="${PT+24}" text-anchor="end" fill="var(--gex)" font-size="10"
+      font-family="JetBrains Mono,monospace">puts</text>`;
+  g += xax(ks);
+  $("smile").setAttribute("viewBox",`0 0 ${W} ${H}`); $("smile").innerHTML=g;
+  $("ivlab").textContent = `${(Math.min(...all)*100).toFixed(1)}% – ${(Math.max(...all)*100).toFixed(1)}%`;
+})();
+
+/* ---- gamma: calls above the axis, puts below ---- */
+(function(){
+  const mx=Math.max(...D.rows.map(r=>Math.max(r.call_gex,r.put_gex)))*1.1;
+  const mid=(PT+(H-PB))/2;
+  const y = v => mid - (v/mx)*((H-PB-PT)/2);
+  const bw=Math.max(6,(W-PL-PR)/D.rows.length*0.4);
+  let g=`<line x1="${PL}" y1="${mid}" x2="${W-PR}" y2="${mid}" stroke="var(--line-2)" stroke-width="1"/>`;
+  [0.5,1].forEach(f=>{ [1,-1].forEach(sgn=>{ const yy=(mid-sgn*f*((H-PB-PT)/2)).toFixed(1);
+    g+=`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--line)" stroke-width="1"/>
+        <text x="${PL-7}" y="${(+yy+3).toFixed(1)}" text-anchor="end" fill="var(--faint)" font-size="9.5"
+         font-family="JetBrains Mono,monospace">${(mx*f/1e6).toFixed(0)}M</text>`; }); });
+  g += spotLine(H-PB);
+  D.rows.forEach(r=>{
+    const isCW=r.k===D.call_wall, isPW=r.k===D.put_wall;
+    const ytc=y(r.call_gex);
+    g+=`<rect x="${(x(r.k)-bw).toFixed(1)}" y="${ytc.toFixed(1)}" width="${bw.toFixed(1)}"
+        height="${(mid-ytc).toFixed(1)}" fill="var(--gex)" opacity="${isCW?1:.45}"/>`;
+    const hp=(mid-y(r.put_gex));
+    g+=`<rect x="${x(r.k).toFixed(1)}" y="${mid}" width="${bw.toFixed(1)}"
+        height="${hp.toFixed(1)}" fill="var(--iv)" opacity="${isPW?1:.45}"/>`;
+    if(isCW) g+=`<text x="${(x(r.k)-bw/2).toFixed(1)}" y="${(ytc-5).toFixed(1)}" text-anchor="middle"
+        fill="var(--gex)" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">CALL WALL</text>`;
+    if(isPW) g+=`<text x="${(x(r.k)+bw/2).toFixed(1)}" y="${(mid+hp+12).toFixed(1)}" text-anchor="middle"
+        fill="var(--iv)" font-size="9.5" font-weight="700" font-family="JetBrains Mono,monospace">PUT WALL</text>`;
+  });
+  if(D.flip) g+=`<line x1="${x(D.flip).toFixed(1)}" y1="${PT}" x2="${x(D.flip).toFixed(1)}" y2="${H-PB}"
+      stroke="var(--spot)" stroke-width="1.5"/>`;
+  g += xax(ks);
+  $("gex").setAttribute("viewBox",`0 0 ${W} ${H}`); $("gex").innerHTML=g;
+  $("gexlab").textContent = `net ${D.net_total<0?"-":"+"}${m$(Math.abs(D.net_total)).slice(1)}`;
+})();
+
+/* ---- table ---- */
+$("nlab").textContent = D.rows.length + " strikes";
+$("tbl").innerHTML = `<thead><tr><th>Strike</th><th>Call IV</th><th>Put IV</th><th>Call OI</th>
+  <th>Put OI</th><th>Call gamma $</th><th>Put gamma $</th><th>Net $ / 1%</th></tr></thead><tbody>` +
+  D.rows.map(r=>`<tr class="${(r.k===D.call_wall||r.k===D.put_wall)?"wall":""}">
+    <td class="num"><b>${r.k.toLocaleString()}</b></td>
+    <td class="num" style="color:var(--iv)">${(r.call_iv*100).toFixed(2)}%</td>
+    <td class="num" style="color:var(--gex)">${(r.put_iv*100).toFixed(2)}%</td>
+    <td class="num">${r.call_oi.toLocaleString()}</td>
+    <td class="num">${r.put_oi.toLocaleString()}</td>
+    <td class="num" style="color:var(--gex)">${m$(r.call_gex)}</td>
+    <td class="num" style="color:var(--iv)">${m$(r.put_gex)}</td>
+    <td class="num" style="color:${r.net_gex<0?"#FF5757":"var(--ok)"}">${r.net_gex<0?"-":"+"}${m$(Math.abs(r.net_gex)).slice(1)}</td>
+    </tr>`).join("") + "</tbody>";
+
+$("honesty").innerHTML =
+  `<b>What this is, and what it is not.</b> ${esc(D.captured_note)} ${esc(D.spot_method)}
+   <br><br><b>Coverage:</b> ${esc(D.coverage_note)} ${esc(D.greeks_gap_note)}
+   <br><br><b>Sign convention:</b> ${esc(D.convention)}
+   <br><br><b>A true three-dimensional surface needs several expiries.</b> This is one slice through it.
+   Adding expiries is one more pull from the same endpoint, not a different capability.`;
+</script>

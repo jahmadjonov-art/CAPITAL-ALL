@@ -5,14 +5,17 @@ name: Deploy the site
 # single workflow: a second workflow uploading its own Pages artifact would
 # silently wipe whichever one deployed first.
 #
-#   /CAPITAL-ALL/          the trucking budget PWA, archived in legacy/ and
-#                          still in daily use. Built exactly as it always was —
-#                          this is the original deploy workflow with the app's
-#                          build moved under legacy/ and the research site added
-#                          beside it. It replaces deploy-legacy.yml, which
-#                          replaced legacy/.github/workflows/deploy.yml.
+#   /CAPITAL-ALL/          a front page listing the two, built by site/build.py.
+#   /CAPITAL-ALL/budget/   the trucking budget PWA, archived in legacy/ and still
+#                          in daily use. It served from the address above until
+#                          2026-09-18 and moved down a level when the front page
+#                          was added.
 #   /CAPITAL-ALL/office/   the research programme: the five dashboards and the
 #                          whole written record, built by site/build.py.
+#
+# This is the original app deploy workflow with the build moved under legacy/
+# and the research site added beside it. It replaces deploy-legacy.yml, which
+# replaced legacy/.github/workflows/deploy.yml.
 #
 # Do not split this into two workflows, and do not delete it while tidying —
 # without it the trucking app does not go down, it freezes on the last build.
@@ -57,9 +60,9 @@ jobs:
         working-directory: legacy/frontend
         run: npm run build
         env:
-          # vite.config.js defaults to /CAPITAL-ALL/; keep it derived from the
+          # vite.config.js defaults to the same value; keep it derived from the
           # repository name so a rename cannot silently break every asset URL.
-          BASE_PATH: /${{ github.event.repository.name }}/
+          BASE_PATH: /${{ github.event.repository.name }}/budget/
 
       - uses: actions/setup-python@v5
         with:
@@ -68,17 +71,23 @@ jobs:
       - name: Install the site generator's dependencies
         run: pip install -r site/requirements.txt
 
-      - name: Assemble both sites
+      - name: Assemble everything published at this address
         run: |
-          mkdir -p _site
-          cp -R legacy/frontend/dist/. _site/
-          python site/build.py --out _site/office
+          python site/build.py --out _site
+          mkdir -p _site/budget
+          cp -R legacy/frontend/dist/. _site/budget/
 
       - name: Check the site built something
         run: |
-          test -s _site/index.html            # the trucking app
-          test -s _site/office/index.html     # the research front door
+          test -s _site/index.html                  # the front page
+          test -s _site/budget/index.html           # the trucking app
+          test -s _site/office/index.html           # the research front door
           test -s _site/office/tipsheet/index.html
+          # The app must reference its own subdirectory, or every asset 404s.
+          grep -q '/budget/assets/' _site/budget/index.html
+          # And the worker that retires the app's old registration must be at
+          # the root, where that registration still points.
+          grep -q 'unregister' _site/sw.js
           echo "pages: $(find _site -name index.html | wc -l)"
 
       - uses: actions/upload-pages-artifact@v3

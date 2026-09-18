@@ -209,8 +209,15 @@ first. That file therefore builds *both* things and uploads them together:
 
 | Address | What |
 |---|---|
-| `/CAPITAL-ALL/` | the trucking budget PWA from `legacy/frontend` |
+| `/CAPITAL-ALL/` | a front page listing the two, from `site/build.py` |
+| `/CAPITAL-ALL/budget/` | the trucking budget PWA from `legacy/frontend` |
 | `/CAPITAL-ALL/office/` | the research site from `site/build.py` |
+
+**The app moved down a level on 2026-09-18**, when the owner chose a front page
+over burying either site under the other. `vite.config.js` now defaults to
+`/CAPITAL-ALL/budget/`, and the workflow passes the same value derived from the
+repository name. The manifest and icons are all relative (`./`), so they moved
+with it and `start_url` still resolves to the app rather than the front page.
 
 **Do not split it in two, and do not delete it while tidying.** Without it the
 trucking app does not go down, it *freezes* on its last build.
@@ -235,6 +242,25 @@ This was a latent bug, not one the research site introduced — any 404 under th
 path could already poison the cached shell. **Changed with the owner's explicit
 agreement on 2026-09-18**, which is the only reason the "do not touch `legacy/`"
 rule was set aside.
+
+**A second worker now sits at `/CAPITAL-ALL/sw.js`, and it exists only to
+delete itself.** When the app moved to `/budget/` it took its worker with it,
+but any browser that had installed the old one still has a registration at the
+root — where it would answer for the front page and the research site out of a
+cache of an app that is no longer there. `site/build.py` therefore publishes a
+replacement at the old address that claims the registration, empties every
+cache, unregisters itself and reloads the pages it was controlling. It has no
+fetch handler, so it answers for nothing while it does this.
+
+It clears on the owner's next *online* visit, because that is when the browser
+re-fetches the worker script. Offline before then, a phone may still show the
+old app from its cache. **Do not delete this file on the assumption it has done
+its job** — there is no way to know which devices have come back yet.
+
+One consequence the owner was told about in advance: his home-screen icon points
+at `/CAPITAL-ALL/`, so it now opens the front page, one tap from the app. Adding
+the app to the home screen again from `/CAPITAL-ALL/budget/` restores the direct
+icon.
 
 **There are TWO deploy paths, and the note above only knew about one.** Found
 2026-09-17 when PR #1 came back with a red check:
@@ -275,7 +301,7 @@ deploying, so its workflow was restored to the repository root. It began as
 every push to `main`. A research commit now redeploys the app too — harmless,
 since the build is reproducible, but that is why the path filter is gone.
 
-Verified rather than assumed: `npm ci && BASE_PATH=/CAPITAL-ALL/ npm run build`
+Verified rather than assumed: `npm ci && BASE_PATH=/CAPITAL-ALL/budget/ npm run build`
 in `legacy/frontend` succeeds, and the asset hashes it produces
 (`index-ClyjfRJt.js`, `index-DDWGn6xj.css`) are **identical to the ones the live
 site is serving right now**. The workflow reproduces the current deployment
@@ -553,6 +579,9 @@ reading, which matters when strikes sit $100 apart.
 **Everything is at one address now, and every page links to every other:**
 
 > **https://jahmadjonov-art.github.io/CAPITAL-ALL/office/**
+
+The front page at `https://jahmadjonov-art.github.io/CAPITAL-ALL/` lists that
+site and the budget app, and belongs to neither.
 
 | Page | Built by | Where |
 |---|---|---|

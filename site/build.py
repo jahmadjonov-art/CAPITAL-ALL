@@ -246,7 +246,14 @@ def bar(page_url, active=""):
     return '<nav id="sitebar">' + "".join(items) + "</nav>"
 
 
-def shell(page_url, title, description, body, css="", active="", head=""):
+def shell(page_url, title, description, body, css="", active="", head="",
+          show_bar=True):
+    """The skeleton every published page shares.
+
+    `show_bar` exists for the front page, which is not part of the research
+    site: the bar's links are relative to the office root and would point at
+    nothing from a level above it.
+    """
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -260,7 +267,7 @@ def shell(page_url, title, description, body, css="", active="", head=""):
 <style>{PALETTE}{BAR_CSS}{css}</style>
 </head>
 <body>
-{bar(page_url, active)}
+{bar(page_url, active) if show_bar else ""}
 {body}
 </body>
 </html>
@@ -539,8 +546,8 @@ Nothing is summarised away — this is the same text a session reads.</p>
 
 <div class="pagefoot">
 Generated from the repository by <a href="https://github.com/{REPO}/blob/main/site/build.py">site/build.py</a>
-on every push to main. The trucking budget app that used to live here is
-archived and still running at <a href="../">its own address</a>.
+on every push to main. The trucking budget app archived in <code>legacy/</code>
+is still running, at <a href="../budget/">its own address</a>.
 </div>
 </div>
 <script>{FILTER_JS}</script>"""
@@ -569,6 +576,99 @@ def dashboard_page(slug, name, src, blurb):
     return shell(f"{slug}/", f"{name} · Capital", blurb, raw, "", active=slug)
 
 
+# --------------------------------------------------------------- the front page
+# One address publishes two unrelated things. This page is what /CAPITAL-ALL/
+# serves, so neither has to be buried under the other.
+
+LANDING_CSS = """
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font:400 16px/1.65 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  display:flex; align-items:center; min-height:100vh}
+.wrap{max-width:720px; margin:0 auto; padding:40px 20px 56px; width:100%}
+.eyebrow{font:500 11px/1 "IBM Plex Mono",monospace; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3)}
+h1{font-family:Spectral,Georgia,serif; font-weight:600; margin:8px 0 0;
+  font-size:clamp(2.1rem,6vw,3rem); line-height:1.04; letter-spacing:-.02em}
+.sub{margin:10px 0 30px; color:var(--ink-2); max-width:46ch}
+.doors{display:grid; gap:14px}
+.door{display:block; text-decoration:none; color:inherit; padding:20px 22px;
+  background:var(--panel); border:1px solid var(--rule); border-radius:12px;
+  box-shadow:var(--shadow); transition:border-color .12s,transform .12s}
+.door:hover{border-color:var(--brass); transform:translateY(-1px)}
+.door .eyebrow{color:var(--brass)}
+.door h2{margin:7px 0 5px; font-size:1.22rem; font-weight:600;
+  font-family:Spectral,Georgia,serif}
+.door p{margin:0; color:var(--ink-2); font-size:.95rem; line-height:1.55}
+.foot{margin-top:34px; padding-top:16px; border-top:1px solid var(--rule);
+  font:400 12px/1.7 "IBM Plex Mono",monospace; color:var(--ink-3)}
+.foot a{color:var(--ink-3)}
+"""
+
+
+def landing_page(built, stamp):
+    inner = f"""<div class="wrap">
+<div class="eyebrow">jahmadjonov-art.github.io/CAPITAL-ALL</div>
+<h1>Capital</h1>
+<p class="sub">Two things are published at this address. They are unrelated —
+pick the one you came for.</p>
+
+<div class="doors">
+  <a class="door" href="./budget/">
+    <div class="eyebrow">The app</div>
+    <h2>Capital Allocation</h2>
+    <p>The trucking budget: income split across tax, repair, capital and salary.
+    Add it to your home screen from there and it opens like an app, with or
+    without signal.</p>
+  </a>
+  <a class="door" href="./office/">
+    <div class="eyebrow">The research</div>
+    <h2>Trading research</h2>
+    <p>The tip sheet, the fair value desk, the volatility surface, and the whole
+    written record of what has been tried and what is believed.</p>
+  </a>
+</div>
+
+<div class="foot">
+built {html.escape(built)} · commit {html.escape(stamp['commit'])} ·
+<a href="https://github.com/{REPO}">github.com/{REPO}</a>
+</div>
+</div>"""
+    return shell("", "Capital",
+                 "The trucking budget app and the trading research programme.",
+                 inner, LANDING_CSS, show_bar=False,
+                 head='<link rel="icon" type="image/png" href="./budget/icon-192.png">')
+
+
+# The app used to live at /CAPITAL-ALL/ and registered a service worker with
+# that scope. It has moved to /CAPITAL-ALL/budget/ and taken its worker with
+# it — but a browser that installed the old one still has it registered here,
+# where it would keep answering for this front page and for the research site
+# out of a cache of an app that is no longer at this address.
+#
+# A browser re-fetches this script whenever it navigates inside the scope, so
+# serving this file is how the old worker gets told to stand down: it takes
+# over, empties every cache it left behind, unregisters itself, and reloads the
+# pages it was controlling so they come from the network. It has no fetch
+# handler, so it answers for nothing in the meantime.
+RETIRING_SW = """// Replaces the service worker the budget app registered when it lived at this
+// address. Its only job is to undo that registration. See site/build.py.
+self.addEventListener('install', () => self.skipWaiting())
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => self.registration.unregister())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then((clients) => clients.forEach((client) => client.navigate(client.url)))
+  )
+})
+"""
+
+
 # --------------------------------------------------------------------- build
 
 def main():
@@ -583,8 +683,12 @@ def main():
              "commits": git("rev-list", "--count", "HEAD", default="0")}
     built = datetime.datetime.now(datetime.timezone.utc).strftime("%d %b %Y, %H:%M UTC")
 
+    # The research site is one of two things published at this address; the app
+    # is copied into ./budget/ by the workflow, beside it rather than under it.
+    office = out / "office"
+
     def write(url, content):
-        target = out / url / "index.html"
+        target = office / url / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content)
 
@@ -600,11 +704,15 @@ def main():
         write(slug + "/", dashboard_page(slug, name, src, blurb))
         published += 1
 
+    out.mkdir(parents=True, exist_ok=True)
     # GitHub Pages runs Jekyll over anything it serves unless told not to.
     (out / ".nojekyll").write_text("")
+    (out / "index.html").write_text(landing_page(built, stamp))
+    (out / "sw.js").write_text(RETIRING_SW)
 
     print(f"built {out}")
-    print(f"  {published} dashboards · {len(pages)} records · commit {stamp['commit']}")
+    print(f"  front page + {published} dashboards · {len(pages)} records "
+          f"· commit {stamp['commit']}")
 
 
 if __name__ == "__main__":

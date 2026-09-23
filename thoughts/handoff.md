@@ -582,3 +582,58 @@ floor plan `7b709ccd-35aa-4f97-a096-26026bf8573b`, desk
 `d39ab618-439a-48aa-a40e-d3fe756ec966`, surface
 `f85f0329-ca21-4474-bf1a-e6449c1e9020`, tip sheet
 `MqSnH99CKyT2WZuYNRu5QA`. Prefer the site; it is the one that stays true.
+
+
+---
+
+## Company value — the fundamental screen
+
+`scanner/value.py` values about **1,400 US companies** and produces three lists;
+`dashboard/value.py` renders them. Published at
+**https://claude.ai/artifact/AFBU6AZ6JJJKpaGg8DAasC**. Run with `/value`.
+
+**The data path, and why it is cheap.** Prices: one grouped-daily request
+returns all ~12,600 US tickers. Financials: the bulk endpoint returns ~109
+companies a page and they only change quarterly, so the cache is refreshed
+weekly with `--refresh` (about 100 pages, ten minutes). Neither needs the
+broker, so **this runs in a scheduled session even with the push still broken**
+— its deliverable is a published page, not a commit.
+
+**Forward P/E and the popular PEG are not here and cannot be.** Both need
+analyst estimates. Checked 2026-09-23: Massive serves reported figures only and
+answers "not entitled" for analyst insights; Yahoo's quote endpoints refuse
+anonymous requests (`Invalid Crumb`); **SEC EDGAR returns 403 from this
+container** and carries only actuals anyway. The PEG here uses delivered growth
+and the page says so in as many words. Do not let the two blur.
+
+**One window for the whole row.** P/E from the latest complete fiscal year,
+growth from that year against the one before. TTM would be fresher and was the
+first build — but Massive publishes a TTM row for only **281 of 6,161**
+companies against 3,457 with two full years, so ranking on it screened 99
+companies and called that the market. The TTM figure is kept in the data as a
+separate field and excluded from every ranking, because mixing windows row by
+row would make the P/E column mean different things on different lines.
+
+### Four artefacts this screen produced before the filters existed
+
+Each was found by reading the output, not by testing the code. Assume a fifth.
+
+1. **P/E on trivial earnings.** A company earning a cent a share prints a P/E in
+   the thousands. `MIN_TTM_EPS` keeps marginal earners out of the rankings.
+2. **Growth from a near-zero base.** NTNX, KMT and TPR topped the undervalued
+   list on 700% "growth" — EPS recovering from almost nothing, giving a PEG near
+   zero. `MIN_PRIOR_EPS` requires a real base; `HIGH_GROWTH` tags the rest
+   `recovery`.
+3. **Preferred shares.** `BACpL`, a Bank of America preferred, ranked second most
+   overvalued in the market: it carries the parent's EPS against its own
+   unrelated price. `COMMON_TICKER` allows `^[A-Z]{1,5}$` only.
+4. **Margins above 100%.** DX (279%), NLY (181%) and MFA led the undervalued
+   list. Mortgage REITs report net interest income as "revenue" and book gains
+   outside it, so the ratio divides two incomparable things.
+   `MAX_PLAUSIBLE_MARGIN` drops rows where the arithmetic is broken — a check on
+   the formula's assumptions, not a view on a sector.
+
+**The pattern, now five for five in this repository:** a screen that ranks will
+rank its own artefacts first, because an artefact is an extreme value and
+extremes sort to the top. Before trusting a new filter, ask what the list looks
+like when the effect it measures is absent.

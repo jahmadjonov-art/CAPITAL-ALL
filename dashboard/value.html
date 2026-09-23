@@ -1,0 +1,1083 @@
+<title>Company Value</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#8A96A4; --faint:#49535F;
+  --cheap:#2FD67F; --fair:#2BD4E8; --pricey:#F5A524; --expensive:#FF3D82;
+  --acc:#2BD4E8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 12.5px/1.6 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 52px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed",sans-serif;font-size:11.5px;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--faint)}
+.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;justify-content:space-between;
+  padding-bottom:13px;border-bottom:1px solid var(--line-2)}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:26px;letter-spacing:.05em}
+.brand b{color:var(--acc);font-weight:700}
+.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.75}
+
+/* the fair-value scale — the page's opening statement */
+.scale{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px 10px}
+.bar{position:relative;height:9px;border-radius:5px;margin:30px 0 0;
+  background:linear-gradient(90deg,var(--cheap) 0%,var(--fair) 26%,var(--pricey) 62%,var(--expensive) 100%)}
+.ticks{display:flex;justify-content:space-between;margin-bottom:4px}
+.tick{text-align:center}
+.tick .v{font-size:17px;font-weight:700}
+.tick .n{font-size:10.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;
+  font-family:"Barlow Condensed",sans-serif}
+.pins{position:relative;height:56px;margin-top:2px}
+.pin{position:absolute;transform:translateX(-50%);text-align:center;font-size:10px}
+.pin i{display:block;width:1px;height:12px;background:var(--faint);margin:0 auto 3px}
+.pin span{color:var(--dim);white-space:nowrap}
+
+.sec{margin-top:34px}
+.sec>header{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between;
+  padding-bottom:9px;border-bottom:1px solid var(--line-2)}
+.sec h2{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase}
+.sec .why{color:var(--dim);font-size:12px;max-width:66ch;margin-top:9px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+  padding:7px 10px 7px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:baseline}
+tr:last-child td{border-bottom:0}
+.r{text-align:right}
+.tk{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;letter-spacing:.04em}
+.co{color:var(--dim);font-size:11.5px;white-space:normal;min-width:15ch}
+.chip{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid}
+.b-cheap{color:var(--cheap);border-color:#14442C;background:#08170F}
+.b-fair{color:var(--fair);border-color:#12414A;background:#06171A}
+.b-pricey{color:var(--pricey);border-color:#3D2B0C;background:#1A1207}
+.b-expensive{color:var(--expensive);border-color:#5A1A1A;background:#1C0A0A}
+.pos{color:var(--cheap)} .neg{color:var(--expensive)} .na{color:var(--faint)}
+.flag{font-family:"Barlow Condensed",sans-serif;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--pricey);border:1px solid #3D2B0C;border-radius:2px;padding:1px 5px}
+.note{background:var(--sunk);border:1px solid var(--line);border-left:2px solid var(--acc);
+  border-radius:3px;padding:12px 14px;color:var(--dim);font-size:12px;margin-top:18px}
+.note b{color:var(--txt)}
+.note + .note{margin-top:10px}
+@media (max-width:620px){ .co{display:none} .stamp{text-align:left} }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">COMPANY <b>VALUE</b></div>
+      <div class="lbl">What a business earns &middot; against what its stock costs</div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+
+  <section class="scale">
+    <div class="lbl">The price-to-earnings scale</div>
+    <div class="ticks" id="ticks"></div>
+    <div class="bar"></div>
+    <div class="pins" id="pins"></div>
+  </section>
+
+  <div id="lists"></div>
+
+  <h2 class="lbl" style="margin-top:34px">How to read this</h2>
+  <div class="note" id="n1"></div>
+  <div class="note" id="n2"></div>
+  <div class="note">
+    <b>None of this is a recommendation.</b> A screen says where to look, not what to buy.
+    Every name here passed an arithmetic test and nothing more &mdash; no one has read a filing,
+    checked what the company actually does, or asked why the market disagrees. A stock is
+    usually cheap for a reason, and finding the reason is the work this page does not do.
+  </div>
+</div>
+
+<script>
+const D = {
+  "built": "23 Sep 2026  08:53 UTC",
+  "session": "2026-09-22",
+  "universe": 1426,
+  "thresholds": {
+    "cheap_pe": 15.0,
+    "fair_pe": 20.0,
+    "pricey_pe": 40.0,
+    "expensive_pe": 50.0,
+    "min_ttm_eps": 0.5,
+    "min_dollar_volume": 5000000.0
+  },
+  "peg_basis": "delivered earnings growth, not analyst forecast",
+  "lists": {
+    "undervalued": [
+      {
+        "ticker": "MFA",
+        "name": "MFA FINANCIAL, INC.",
+        "price": 8.56,
+        "eps": 1.3,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 6.6,
+        "band": "cheap",
+        "eps_growth": 58.5,
+        "rev_growth": 2.9,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 23.7,
+        "peg": 0.11,
+        "mcap": 890077360,
+        "dollar_vol": 13725421,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "SMCI",
+        "name": "Super Micro Computer, Inc.",
+        "price": 41.54,
+        "eps": 3.26,
+        "eps_ttm": 3.26,
+        "fiscal_year": "2026",
+        "fy_end": "2026-06-30",
+        "pe": 12.7,
+        "band": "cheap",
+        "eps_growth": 94.0,
+        "rev_growth": 77.8,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 5.7,
+        "peg": 0.14,
+        "mcap": 28967835920,
+        "dollar_vol": 1256578122,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "TDW",
+        "name": "TIDEWATER INC",
+        "price": 87.16,
+        "eps": 6.64,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 13.1,
+        "band": "cheap",
+        "eps_growth": 95.3,
+        "rev_growth": 0.5,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 24.6,
+        "peg": 0.14,
+        "mcap": 4395653120,
+        "dollar_vol": 60048306,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "VIRT",
+        "name": "Virtu Financial, Inc.",
+        "price": 54.49,
+        "eps": 5.13,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 10.6,
+        "band": "cheap",
+        "eps_growth": 72.7,
+        "rev_growth": 26.2,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 25.1,
+        "peg": 0.15,
+        "mcap": 4649001578,
+        "dollar_vol": 89318068,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "PSIX",
+        "name": "POWER SOLUTIONS INTERNATIONAL, INC.",
+        "price": 46.41,
+        "eps": 4.94,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 9.4,
+        "band": "cheap",
+        "eps_growth": 64.1,
+        "rev_growth": 51.8,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 15.8,
+        "peg": 0.15,
+        "mcap": 1070493060,
+        "dollar_vol": 19685266,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "OTEX",
+        "name": "OPEN TEXT CORP",
+        "price": 22.99,
+        "eps": 2.58,
+        "eps_ttm": 2.58,
+        "fiscal_year": "2026",
+        "fy_end": "2026-06-30",
+        "pe": 8.9,
+        "band": "cheap",
+        "eps_growth": 56.4,
+        "rev_growth": 1.5,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 12.3,
+        "peg": 0.16,
+        "mcap": 5733085270,
+        "dollar_vol": 31295257,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "ZM",
+        "name": "Zoom Communications, Inc.",
+        "price": 90.95,
+        "eps": 6.18,
+        "eps_ttm": null,
+        "fiscal_year": "2026",
+        "fy_end": "2026-01-31",
+        "pe": 14.7,
+        "band": "cheap",
+        "eps_growth": 92.5,
+        "rev_growth": 4.4,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 39.0,
+        "peg": 0.16,
+        "mcap": 27951953176,
+        "dollar_vol": 325125099,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "OMF",
+        "name": "OneMain Holdings, Inc.",
+        "price": 59.08,
+        "eps": 6.56,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 9.0,
+        "band": "cheap",
+        "eps_growth": 54.7,
+        "rev_growth": 9.3,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 14.4,
+        "peg": 0.16,
+        "mcap": 7046386288,
+        "dollar_vol": 72454277,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "LNG",
+        "name": "Cheniere Energy, Inc.",
+        "price": 272.96,
+        "eps": 24.13,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 11.3,
+        "band": "cheap",
+        "eps_growth": 69.9,
+        "rev_growth": 27.2,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 34.0,
+        "peg": 0.16,
+        "mcap": 60133088000,
+        "dollar_vol": 676284336,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "THFF",
+        "name": "FIRST FINANCIAL CORP /IN/",
+        "price": 75.72,
+        "eps": 6.68,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 11.3,
+        "band": "cheap",
+        "eps_growth": 67.0,
+        "rev_growth": 15.4,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 25.9,
+        "peg": 0.17,
+        "mcap": 897433440,
+        "dollar_vol": 7623559,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      }
+    ],
+    "overvalued": [
+      {
+        "ticker": "TSLA",
+        "name": "Tesla, Inc.",
+        "price": 378.9,
+        "eps": 1.08,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 350.8,
+        "band": "expensive",
+        "eps_growth": -47.1,
+        "rev_growth": -2.9,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 4.1,
+        "peg": null,
+        "mcap": 1336759200000,
+        "dollar_vol": 10696312446,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": false,
+          "earns_more": false,
+          "real_margin": false,
+          "liquid": true
+        },
+        "quality_score": 2
+      },
+      {
+        "ticker": "ALAB",
+        "name": "Astera Labs, Inc.",
+        "price": 363.46,
+        "eps": 1.22,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 297.9,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 115.1,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 25.7,
+        "peg": null,
+        "mcap": 65259606460,
+        "dollar_vol": 1984475152,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 4
+      },
+      {
+        "ticker": "PLTR",
+        "name": "Palantir Technologies Inc.",
+        "price": 184.99,
+        "eps": 0.63,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 293.6,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 56.2,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 36.5,
+        "peg": null,
+        "mcap": 474535793030,
+        "dollar_vol": 4068247267,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 4
+      },
+      {
+        "ticker": "HUBS",
+        "name": "HUBSPOT INC",
+        "price": 217.88,
+        "eps": 0.86,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 253.3,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 19.2,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 1.5,
+        "peg": null,
+        "mcap": 11589908720,
+        "dollar_vol": 446141056,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": false,
+          "liquid": true
+        },
+        "quality_score": 3
+      },
+      {
+        "ticker": "AMD",
+        "name": "ADVANCED MICRO DEVICES INC",
+        "price": 623.77,
+        "eps": 2.65,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-27",
+        "pe": 235.4,
+        "band": "expensive",
+        "eps_growth": 165.0,
+        "rev_growth": 34.3,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 12.5,
+        "peg": null,
+        "mcap": 1020487720000,
+        "dollar_vol": 17641974029,
+        "thin_earnings": false,
+        "recovery": true,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "RGEN",
+        "name": "REPLIGEN CORP",
+        "price": 186.75,
+        "eps": 0.86,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 217.2,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 16.4,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 6.6,
+        "peg": null,
+        "mcap": 10562767,
+        "dollar_vol": 216595091,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 4
+      },
+      {
+        "ticker": "EL",
+        "name": "ESTEE LAUDER COMPANIES INC",
+        "price": 100.29,
+        "eps": 0.5,
+        "eps_ttm": 0.5,
+        "fiscal_year": "2026",
+        "fy_end": "2026-06-30",
+        "pe": 200.6,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 5.0,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 1.2,
+        "peg": null,
+        "mcap": 36585792000,
+        "dollar_vol": 286202790,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": false,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": false,
+          "liquid": true
+        },
+        "quality_score": 2
+      },
+      {
+        "ticker": "TRNS",
+        "name": "TRANSCAT INC",
+        "price": 91.83,
+        "eps": 0.57,
+        "eps_ttm": null,
+        "fiscal_year": "2026",
+        "fy_end": "2026-03-28",
+        "pe": 161.1,
+        "band": "expensive",
+        "eps_growth": -63.7,
+        "rev_growth": 19.2,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 1.6,
+        "peg": null,
+        "mcap": 861365400,
+        "dollar_vol": 10964752,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": false,
+          "liquid": true
+        },
+        "quality_score": 3
+      },
+      {
+        "ticker": "VTR",
+        "name": "Ventas, Inc.",
+        "price": 86.86,
+        "eps": 0.54,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 160.9,
+        "band": "expensive",
+        "eps_growth": null,
+        "rev_growth": 18.5,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 4.5,
+        "peg": null,
+        "mcap": 40182738900,
+        "dollar_vol": 515537060,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": false,
+          "liquid": true
+        },
+        "quality_score": 3
+      },
+      {
+        "ticker": "SHOP",
+        "name": "SHOPIFY INC.",
+        "price": 147.74,
+        "eps": 0.94,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 157.2,
+        "band": "expensive",
+        "eps_growth": -39.4,
+        "rev_growth": 30.1,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 10.7,
+        "peg": null,
+        "mcap": 192793793894,
+        "dollar_vol": 3762403983,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": false,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 4
+      }
+    ],
+    "watch": [
+      {
+        "ticker": "GATX",
+        "name": "GATX CORP",
+        "price": 183.01,
+        "eps": 9.12,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.1,
+        "band": "pricey",
+        "eps_growth": 17.2,
+        "rev_growth": 9.8,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 19.2,
+        "peg": 1.17,
+        "mcap": 6570059000,
+        "dollar_vol": 58205841,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "HST",
+        "name": "HOST HOTELS & RESORTS, INC.",
+        "price": 22.28,
+        "eps": 1.1,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.3,
+        "band": "pricey",
+        "eps_growth": 11.1,
+        "rev_growth": 7.6,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 12.7,
+        "peg": 1.82,
+        "mcap": 15464548000,
+        "dollar_vol": 202194610,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "NI",
+        "name": "NISOURCE INC.",
+        "price": 39.88,
+        "eps": 1.95,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.5,
+        "band": "pricey",
+        "eps_growth": 20.4,
+        "rev_growth": 23.5,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 15.5,
+        "peg": 1.0,
+        "mcap": 18923060000,
+        "dollar_vol": 283906231,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "DRI",
+        "name": "DARDEN RESTAURANTS INC",
+        "price": 213.54,
+        "eps": 10.38,
+        "eps_ttm": null,
+        "fiscal_year": "2026",
+        "fy_end": "2026-05-31",
+        "pe": 20.6,
+        "band": "pricey",
+        "eps_growth": 17.2,
+        "rev_growth": 9.4,
+        "growth_years": "FY2025\u2192FY2026",
+        "margin": 9.1,
+        "peg": 1.2,
+        "mcap": 24834702000,
+        "dollar_vol": 280608688,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "FCPT",
+        "name": "Four Corners Property Trust, Inc.",
+        "price": 22.44,
+        "eps": 1.09,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.6,
+        "band": "pricey",
+        "eps_growth": 1.9,
+        "rev_growth": 9.7,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 38.2,
+        "peg": 11.01,
+        "mcap": 2310166965,
+        "dollar_vol": 21786001,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "ESQ",
+        "name": "Esquire Financial Holdings, Inc.",
+        "price": 121.05,
+        "eps": 5.87,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.6,
+        "band": "pricey",
+        "eps_growth": 14.2,
+        "rev_growth": 23.0,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 36.5,
+        "peg": 1.45,
+        "mcap": 1048561610,
+        "dollar_vol": 19762235,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "LNT",
+        "name": "ALLIANT ENERGY CORP",
+        "price": 64.62,
+        "eps": 3.14,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.6,
+        "band": "pricey",
+        "eps_growth": 16.7,
+        "rev_growth": 9.6,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 18.6,
+        "peg": 1.23,
+        "mcap": 16659036000,
+        "dollar_vol": 142877118,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "SCI",
+        "name": "SERVICE CORP INTERNATIONAL",
+        "price": 78.11,
+        "eps": 3.8,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.6,
+        "band": "pricey",
+        "eps_growth": 7.6,
+        "rev_growth": 2.9,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 12.6,
+        "peg": 2.69,
+        "mcap": 11145437790,
+        "dollar_vol": 69512187,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "PPL",
+        "name": "PPL Corp",
+        "price": 32.88,
+        "eps": 1.59,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.7,
+        "band": "pricey",
+        "eps_growth": 32.5,
+        "rev_growth": 6.9,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 13.1,
+        "peg": 0.64,
+        "mcap": 24441282240,
+        "dollar_vol": 179989907,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      },
+      {
+        "ticker": "MRK",
+        "name": "Merck & Co., Inc.",
+        "price": 150.91,
+        "eps": 7.28,
+        "eps_ttm": null,
+        "fiscal_year": "2025",
+        "fy_end": "2025-12-31",
+        "pe": 20.7,
+        "band": "pricey",
+        "eps_growth": 8.0,
+        "rev_growth": 1.3,
+        "growth_years": "FY2024\u2192FY2025",
+        "margin": 28.1,
+        "peg": 2.59,
+        "mcap": 378331370000,
+        "dollar_vol": 1686199581,
+        "thin_earnings": false,
+        "recovery": false,
+        "implausible": false,
+        "quality_passed": {
+          "profitable": true,
+          "growing": true,
+          "earns_more": true,
+          "real_margin": true,
+          "liquid": true
+        },
+        "quality_score": 5
+      }
+    ]
+  }
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const T = D.thresholds;
+
+$("stamp").innerHTML =
+  `prices from the ${esc(D.session)} close<br>${D.universe.toLocaleString()} companies valued`
+  + `<br>built ${esc(D.built)}`;
+
+/* ---- the scale ---- */
+$("ticks").innerHTML = [
+  [`<${T.cheap_pe}`, "cheap"], [`${T.fair_pe}`, "fair value"],
+  [`${T.pricey_pe}`, "pricey"], [`>${T.expensive_pe}`, "expensive"],
+].map(([v,n]) => `<div class="tick"><div class="v num">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join("");
+
+// Plot the extremes of each list on the scale, positioned by P/E.
+const pos = pe => Math.max(1.5, Math.min(98.5, (Math.min(pe, 70) / 70) * 100));
+const marks = [...(D.lists.undervalued||[]).slice(0,4), ...(D.lists.overvalued||[]).slice(0,3)]
+  .filter(r => r.pe).sort((a,b) => a.pe - b.pe);
+$("pins").innerHTML = marks.map((r,i) =>
+  `<div class="pin" style="left:${pos(r.pe)}%;top:${(i % 3) * 17}px">
+     <i></i><span>${esc(r.ticker)} ${r.pe.toFixed(0)}</span></div>`).join("");
+
+/* ---- the three lists ---- */
+const SECTIONS = [
+  ["undervalued", "Undervalued",
+   "Passed every quality gate &mdash; profitable, growing revenue, growing earnings, a real margin, "
+   + "enough daily volume to trade &mdash; <b>and only then</b> priced below fair value. Ranked by "
+   + "price paid per unit of growth the company actually delivered."],
+  ["overvalued", "Overvalued",
+   "Priced past the expensive line. Deliberately <b>not</b> quality-gated: a great company can be "
+   + "expensive and a poor one can be expensive, and the columns show which is which rather than "
+   + "filtering one away."],
+  ["watch", "Worth watching",
+   "Good businesses that are merely fairly priced, or cheap ones failing exactly one gate. "
+   + "The things that become interesting on a price fall or one better quarter."],
+];
+
+const num = (v, dp, suf) => v === null || v === undefined
+  ? '<span class="na">&mdash;</span>'
+  : `${v.toFixed(dp)}${suf || ""}`;
+const signed = (v) => v === null || v === undefined
+  ? '<span class="na">&mdash;</span>'
+  : `<span class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
+
+$("lists").innerHTML = SECTIONS.map(([key, title, why]) => {
+  const rows = D.lists[key] || [];
+  const body = rows.length ? rows.map(r => `<tr>
+      <td><span class="tk">${esc(r.ticker)}</span></td>
+      <td class="co">${esc(r.name || "")}</td>
+      <td class="r num">${r.price.toFixed(2)}</td>
+      <td class="r num">${r.eps_ttm.toFixed(2)}</td>
+      <td class="r num"><b>${r.pe.toFixed(1)}</b></td>
+      <td><span class="chip b-${esc(r.band)}">${esc(r.band)}</span></td>
+      <td class="r num">${num(r.peg, 2)}</td>
+      <td class="r num">${signed(r.eps_growth)}</td>
+      <td class="r num">${signed(r.rev_growth)}</td>
+      <td class="r num">${num(r.margin, 1, "%")}</td>
+      <td>${r.recovery ? '<span class="flag">rebound</span>' : ""}</td>
+    </tr>`).join("")
+    : `<tr><td colspan="11" class="na">Nothing cleared this list on ${esc(D.session)}.</td></tr>`;
+  return `<section class="sec">
+    <header><h2>${esc(title)}</h2><span class="lbl">${rows.length} names</span></header>
+    <p class="why">${why}</p>
+    <div class="scroll"><table>
+      <thead><tr>
+        <th></th><th>Company</th><th class="r">Price</th><th class="r">Earns/share</th>
+        <th class="r">P/E</th><th></th><th class="r">PEG</th>
+        <th class="r">Earnings</th><th class="r">Revenue</th><th class="r">Margin</th><th></th>
+      </tr></thead><tbody>${body}</tbody>
+    </table></div>
+  </section>`;
+}).join("");
+
+$("n1").innerHTML =
+  `<b>The PEG here is not the one from the video.</b> The popular PEG divides the P/E by an
+   <i>analyst forecast</i> of growth, and so does Forward P/E. Forecasts are a paid product and
+   this plan does not carry them, so both are absent rather than guessed. What is shown instead
+   divides the P/E by <b>${esc(D.peg_basis)}</b>. It answers a narrower question honestly:
+   delivered growth is a fact, forecast growth is an opinion with a decimal point on it.`;
+
+$("n2").innerHTML =
+  `<b>Two windows, never mixed.</b> The P/E is computed on the trailing twelve months. Growth is
+   computed on the last two complete financial years, so the comparison is like for like. They
+   are different windows and are shown as different columns.
+   <br><br>
+   <b>A P/E needs real earnings underneath it.</b> A company earning a cent a share prints a P/E
+   in the thousands &mdash; that is a rounding error in the denominator, not an expensive stock.
+   Companies earning under $${T.min_ttm_eps.toFixed(2)} a share are kept out of the rankings, and
+   a <span class="flag">rebound</span> tag marks growth measured from a very low base, where the
+   percentage flatters the business.`;
+</script>

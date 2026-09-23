@@ -1,0 +1,192 @@
+<title>Company Value</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070A; --panel:#0B0F15; --sunk:#0F141B; --line:#1A222C; --line-2:#26323F;
+  --txt:#D8E0E8; --dim:#8A96A4; --faint:#49535F;
+  --cheap:#2FD67F; --fair:#2BD4E8; --pricey:#F5A524; --expensive:#FF3D82;
+  --acc:#2BD4E8;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:400 12.5px/1.6 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 52px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font-family:"Barlow Condensed",sans-serif;font-size:11.5px;font-weight:600;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--faint)}
+.top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;justify-content:space-between;
+  padding-bottom:13px;border-bottom:1px solid var(--line-2)}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:26px;letter-spacing:.05em}
+.brand b{color:var(--acc);font-weight:700}
+.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.75}
+
+/* the fair-value scale — the page's opening statement */
+.scale{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px 10px}
+.bar{position:relative;height:9px;border-radius:5px;margin:30px 0 0;
+  background:linear-gradient(90deg,var(--cheap) 0%,var(--fair) 26%,var(--pricey) 62%,var(--expensive) 100%)}
+.ticks{display:flex;justify-content:space-between;margin-bottom:4px}
+.tick{text-align:center}
+.tick .v{font-size:17px;font-weight:700}
+.tick .n{font-size:10.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;
+  font-family:"Barlow Condensed",sans-serif}
+.pins{position:relative;height:56px;margin-top:2px}
+.pin{position:absolute;transform:translateX(-50%);text-align:center;font-size:10px}
+.pin i{display:block;width:1px;height:12px;background:var(--faint);margin:0 auto 3px}
+.pin span{color:var(--dim);white-space:nowrap}
+
+.sec{margin-top:34px}
+.sec>header{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between;
+  padding-bottom:9px;border-bottom:1px solid var(--line-2)}
+.sec h2{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase}
+.sec .why{color:var(--dim);font-size:12px;max-width:66ch;margin-top:9px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+  padding:7px 10px 7px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:baseline}
+tr:last-child td{border-bottom:0}
+.r{text-align:right}
+.tk{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;letter-spacing:.04em}
+.co{color:var(--dim);font-size:11.5px;white-space:normal;min-width:15ch}
+.chip{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid}
+.b-cheap{color:var(--cheap);border-color:#14442C;background:#08170F}
+.b-fair{color:var(--fair);border-color:#12414A;background:#06171A}
+.b-pricey{color:var(--pricey);border-color:#3D2B0C;background:#1A1207}
+.b-expensive{color:var(--expensive);border-color:#5A1A1A;background:#1C0A0A}
+.pos{color:var(--cheap)} .neg{color:var(--expensive)} .na{color:var(--faint)}
+.flag{font-family:"Barlow Condensed",sans-serif;font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--pricey);border:1px solid #3D2B0C;border-radius:2px;padding:1px 5px}
+.note{background:var(--sunk);border:1px solid var(--line);border-left:2px solid var(--acc);
+  border-radius:3px;padding:12px 14px;color:var(--dim);font-size:12px;margin-top:18px}
+.note b{color:var(--txt)}
+.note + .note{margin-top:10px}
+@media (max-width:620px){ .co{display:none} .stamp{text-align:left} }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">COMPANY <b>VALUE</b></div>
+      <div class="lbl">What a business earns &middot; against what its stock costs</div>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </div>
+
+  <section class="scale">
+    <div class="lbl">The price-to-earnings scale</div>
+    <div class="ticks" id="ticks"></div>
+    <div class="bar"></div>
+    <div class="pins" id="pins"></div>
+  </section>
+
+  <div id="lists"></div>
+
+  <h2 class="lbl" style="margin-top:34px">How to read this</h2>
+  <div class="note" id="n1"></div>
+  <div class="note" id="n2"></div>
+  <div class="note">
+    <b>None of this is a recommendation.</b> A screen says where to look, not what to buy.
+    Every name here passed an arithmetic test and nothing more &mdash; no one has read a filing,
+    checked what the company actually does, or asked why the market disagrees. A stock is
+    usually cheap for a reason, and finding the reason is the work this page does not do.
+  </div>
+</div>
+
+<script>
+const D = /*__VALUE__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const T = D.thresholds;
+
+$("stamp").innerHTML =
+  `prices from the ${esc(D.session)} close<br>${D.universe.toLocaleString()} companies valued`
+  + `<br>built ${esc(D.built)}`;
+
+/* ---- the scale ---- */
+$("ticks").innerHTML = [
+  [`<${T.cheap_pe}`, "cheap"], [`${T.fair_pe}`, "fair value"],
+  [`${T.pricey_pe}`, "pricey"], [`>${T.expensive_pe}`, "expensive"],
+].map(([v,n]) => `<div class="tick"><div class="v num">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join("");
+
+// Plot the extremes of each list on the scale, positioned by P/E.
+const pos = pe => Math.max(1.5, Math.min(98.5, (Math.min(pe, 70) / 70) * 100));
+const marks = [...(D.lists.undervalued||[]).slice(0,4), ...(D.lists.overvalued||[]).slice(0,3)]
+  .filter(r => r.pe).sort((a,b) => a.pe - b.pe);
+$("pins").innerHTML = marks.map((r,i) =>
+  `<div class="pin" style="left:${pos(r.pe)}%;top:${(i % 3) * 17}px">
+     <i></i><span>${esc(r.ticker)} ${r.pe.toFixed(0)}</span></div>`).join("");
+
+/* ---- the three lists ---- */
+const SECTIONS = [
+  ["undervalued", "Undervalued",
+   "Passed every quality gate &mdash; profitable, growing revenue, growing earnings, a real margin, "
+   + "enough daily volume to trade &mdash; <b>and only then</b> priced below fair value. Ranked by "
+   + "price paid per unit of growth the company actually delivered."],
+  ["overvalued", "Overvalued",
+   "Priced past the expensive line. Deliberately <b>not</b> quality-gated: a great company can be "
+   + "expensive and a poor one can be expensive, and the columns show which is which rather than "
+   + "filtering one away."],
+  ["watch", "Worth watching",
+   "Good businesses that are merely fairly priced, or cheap ones failing exactly one gate. "
+   + "The things that become interesting on a price fall or one better quarter."],
+];
+
+const num = (v, dp, suf) => v === null || v === undefined
+  ? '<span class="na">&mdash;</span>'
+  : `${v.toFixed(dp)}${suf || ""}`;
+const signed = (v) => v === null || v === undefined
+  ? '<span class="na">&mdash;</span>'
+  : `<span class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
+
+$("lists").innerHTML = SECTIONS.map(([key, title, why]) => {
+  const rows = D.lists[key] || [];
+  const body = rows.length ? rows.map(r => `<tr>
+      <td><span class="tk">${esc(r.ticker)}</span></td>
+      <td class="co">${esc(r.name || "")}</td>
+      <td class="r num">${r.price.toFixed(2)}</td>
+      <td class="r num">${r.eps_ttm.toFixed(2)}</td>
+      <td class="r num"><b>${r.pe.toFixed(1)}</b></td>
+      <td><span class="chip b-${esc(r.band)}">${esc(r.band)}</span></td>
+      <td class="r num">${num(r.peg, 2)}</td>
+      <td class="r num">${signed(r.eps_growth)}</td>
+      <td class="r num">${signed(r.rev_growth)}</td>
+      <td class="r num">${num(r.margin, 1, "%")}</td>
+      <td>${r.recovery ? '<span class="flag">rebound</span>' : ""}</td>
+    </tr>`).join("")
+    : `<tr><td colspan="11" class="na">Nothing cleared this list on ${esc(D.session)}.</td></tr>`;
+  return `<section class="sec">
+    <header><h2>${esc(title)}</h2><span class="lbl">${rows.length} names</span></header>
+    <p class="why">${why}</p>
+    <div class="scroll"><table>
+      <thead><tr>
+        <th></th><th>Company</th><th class="r">Price</th><th class="r">Earns/share</th>
+        <th class="r">P/E</th><th></th><th class="r">PEG</th>
+        <th class="r">Earnings</th><th class="r">Revenue</th><th class="r">Margin</th><th></th>
+      </tr></thead><tbody>${body}</tbody>
+    </table></div>
+  </section>`;
+}).join("");
+
+$("n1").innerHTML =
+  `<b>The PEG here is not the one from the video.</b> The popular PEG divides the P/E by an
+   <i>analyst forecast</i> of growth, and so does Forward P/E. Forecasts are a paid product and
+   this plan does not carry them, so both are absent rather than guessed. What is shown instead
+   divides the P/E by <b>${esc(D.peg_basis)}</b>. It answers a narrower question honestly:
+   delivered growth is a fact, forecast growth is an opinion with a decimal point on it.`;
+
+$("n2").innerHTML =
+  `<b>Two windows, never mixed.</b> The P/E is computed on the trailing twelve months. Growth is
+   computed on the last two complete financial years, so the comparison is like for like. They
+   are different windows and are shown as different columns.
+   <br><br>
+   <b>A P/E needs real earnings underneath it.</b> A company earning a cent a share prints a P/E
+   in the thousands &mdash; that is a rounding error in the denominator, not an expensive stock.
+   Companies earning under $${T.min_ttm_eps.toFixed(2)} a share are kept out of the rankings, and
+   a <span class="flag">rebound</span> tag marks growth measured from a very low base, where the
+   percentage flatters the business.`;
+</script>

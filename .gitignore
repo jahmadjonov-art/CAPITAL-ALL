@@ -11,3 +11,6 @@ secrets/
 # Built site output; regenerate with site/build.py.
 site/dist/
 _site/
+
+# Rebuildable market-data caches, not records.
+data/fundamentals/

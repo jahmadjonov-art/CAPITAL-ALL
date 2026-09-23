@@ -452,3 +452,57 @@ and it must be possible for it to come back on nearly everything, and which one
 happens has to be the market's decision rather than mine. The general rule —
 **before trusting any ranking, ask what it looks like if the underlying effect
 is absent.** If the answer is "the same", the ranking is measuring the filter.
+
+---
+
+### 2026-09-23 — Built the value screen on facts because the forecasts are not for sale
+**Asked:** a "company value" section producing ten undervalued names, ten
+overvalued, and some worth watching — from a video listing **P/E, Forward P/E
+and PEG**.
+**Did:** built P/E, and built PEG on the growth each company **actually
+delivered**. Left Forward P/E out entirely.
+**Assumed:** he wants the question answered, not the three specific formulas
+reproduced regardless of whether their inputs exist. Two of the three are
+forecasts — Forward P/E needs analysts' estimate of next year's earnings, and
+the popular PEG needs their estimated growth rate. Checked on the day: Massive
+serves reported figures only and answers "not entitled" for analyst insights;
+Yahoo's quote endpoints now refuse anonymous requests; SEC EDGAR returns 403
+from this container and carries only actuals anyway.
+**Would have settled it:** a subscription that includes estimates. If he wants
+the video's exact numbers, that is the purchase, and it is worth telling him the
+price before he assumes it is free.
+**If wrong:** the page gains a column when a source appears; nothing has to be
+rebuilt.
+
+The part worth arguing rather than just recording: **the substitute may be
+better than the original.** A PEG built on delivered growth is a measurement. A
+PEG built on forecast growth is a consensus opinion with a decimal point on it,
+and it inherits every incentive of the people publishing the forecast. The
+popular version is more current and more wrong; this one is staler and true. The
+page says which it is in as many words, because the one unacceptable outcome is
+him reading this number as the one from the video.
+
+---
+
+### 2026-09-23 — Priced on fiscal years, not the trailing twelve months
+**Asked:** implicit in the above.
+**Did:** computed P/E from the latest complete fiscal year and growth from that
+year against the prior one — one window for the whole row.
+**Assumed:** breadth beats freshness here. Trailing twelve months is the better
+number and was the first implementation, but Massive publishes a TTM row for
+only **281 of 6,161 companies**, against **3,457** with two full fiscal years.
+Ranked on TTM the screen covered 99 companies and called that the market; on
+fiscal years it covers about 1,400.
+**Would have settled it:** nothing to ask — this is a fact about the feed,
+measured rather than assumed after the first run returned a suspiciously small
+universe.
+**If wrong:** a fiscal year can be eleven months stale, so a company that has
+just changed sharply is priced off old earnings. Every row carries the year it
+came from and the page prints it, so the staleness is visible rather than
+implied.
+
+**What was deliberately NOT done:** use TTM where it exists and fall back to the
+fiscal year elsewhere. That would make the P/E column mean one thing on some
+rows and another on the rest — the same date-mixing mistake already made once
+here between option volume and share volume. The TTM figure is carried in the
+data as a separate field and is excluded from every ranking.

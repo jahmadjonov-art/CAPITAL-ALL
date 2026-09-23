@@ -344,6 +344,12 @@ def main():
                        "min_ttm_eps": MIN_TTM_EPS, "min_dollar_volume": MIN_DOLLAR_VOL},
         "peg_basis": "delivered earnings growth, not analyst forecast",
         "lists": lists,
+        # Every company that could be valued, ticker order. The three lists
+        # above are a starting point; this is the thing to actually look through.
+        "all": sorted(
+            [r for r in rows if r["pe"] and not r["thin_earnings"]
+             and not r["implausible"]],
+            key=lambda r: r["ticker"]),
     }
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(payload, indent=2))

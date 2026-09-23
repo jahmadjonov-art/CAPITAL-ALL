@@ -11,61 +11,84 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--txt);
   font:400 12.5px/1.6 "JetBrains Mono",ui-monospace,Menlo,monospace;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 52px}
-h1,h2,h3{margin:0;text-wrap:balance}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 56px}
+h1,h2{margin:0;text-wrap:balance}
 .num{font-variant-numeric:tabular-nums}
 .lbl{font-family:"Barlow Condensed",sans-serif;font-size:11.5px;font-weight:600;
-  letter-spacing:.17em;text-transform:uppercase;color:var(--faint)}
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
 .top{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;justify-content:space-between;
   padding-bottom:13px;border-bottom:1px solid var(--line-2)}
 .brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:26px;letter-spacing:.05em}
-.brand b{color:var(--acc);font-weight:700}
-.stamp{font-size:11px;color:var(--faint);text-align:right;line-height:1.75}
+.brand b{color:var(--acc)}
+.stamp{font-size:11px;color:var(--faint);line-height:1.75}
 
-/* the fair-value scale — the page's opening statement */
-.scale{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px 10px}
-.bar{position:relative;height:9px;border-radius:5px;margin:30px 0 0;
-  background:linear-gradient(90deg,var(--cheap) 0%,var(--fair) 26%,var(--pricey) 62%,var(--expensive) 100%)}
-.ticks{display:flex;justify-content:space-between;margin-bottom:4px}
-.tick{text-align:center}
-.tick .v{font-size:17px;font-weight:700}
-.tick .n{font-size:10.5px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;
-  font-family:"Barlow Condensed",sans-serif}
-.pins{position:relative;height:56px;margin-top:2px}
-.pin{position:absolute;transform:translateX(-50%);text-align:center;font-size:10px}
-.pin i{display:block;width:1px;height:12px;background:var(--faint);margin:0 auto 3px}
-.pin span{color:var(--dim);white-space:nowrap}
+/* band distribution — how the market is spread, no overlapping labels */
+.bands{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-top:20px}
+.bd{background:var(--panel);padding:12px 13px}
+.bd .n{font-size:22px;font-weight:700;line-height:1.1}
+.bd .k{font-family:"Barlow Condensed",sans-serif;font-size:11.5px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+.bd .r{font-size:10.5px;color:var(--faint);margin-top:2px}
+.bd .meter{height:3px;border-radius:2px;margin-top:9px;background:var(--line-2)}
+.bd .meter i{display:block;height:100%;border-radius:2px}
+.k-cheap{color:var(--cheap)} .k-fair{color:var(--fair)}
+.k-pricey{color:var(--pricey)} .k-expensive{color:var(--expensive)}
 
-.sec{margin-top:34px}
+.sec{margin-top:30px}
 .sec>header{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between;
   padding-bottom:9px;border-bottom:1px solid var(--line-2)}
 .sec h2{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:700;
   letter-spacing:.09em;text-transform:uppercase}
-.sec .why{color:var(--dim);font-size:12px;max-width:66ch;margin-top:9px}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
-th{text-align:left;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
-  padding:7px 10px 7px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
-td{padding:9px 10px 9px 0;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:baseline}
+.why{color:var(--dim);font-size:12px;max-width:68ch;margin:9px 0 0}
+
+.scroll{overflow-x:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:right;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--faint);
+  padding:7px 12px 7px 0;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th:first-child,th.l{text-align:left}
+td{padding:8px 12px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
+td:first-child,td.l{text-align:left}
 tr:last-child td{border-bottom:0}
-.r{text-align:right}
-.tk{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;letter-spacing:.04em}
-.co{color:var(--dim);font-size:11.5px;white-space:normal;min-width:15ch}
-.chip{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid}
+tbody tr:hover{background:var(--sunk)}
+.tk{font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:700;letter-spacing:.05em}
+.co{color:var(--dim);font-size:11.5px;white-space:normal;min-width:16ch;max-width:30ch}
+.chip{display:inline-block;font-family:"Barlow Condensed",sans-serif;font-size:10.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;padding:1px 6px;border-radius:2px;border:1px solid}
 .b-cheap{color:var(--cheap);border-color:#14442C;background:#08170F}
 .b-fair{color:var(--fair);border-color:#12414A;background:#06171A}
 .b-pricey{color:var(--pricey);border-color:#3D2B0C;background:#1A1207}
 .b-expensive{color:var(--expensive);border-color:#5A1A1A;background:#1C0A0A}
 .pos{color:var(--cheap)} .neg{color:var(--expensive)} .na{color:var(--faint)}
-.flag{font-family:"Barlow Condensed",sans-serif;font-size:10.5px;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--pricey);border:1px solid #3D2B0C;border-radius:2px;padding:1px 5px}
+.flag{font-family:"Barlow Condensed",sans-serif;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--pricey)}
+
+/* the full list */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+input[type=search]{flex:1 1 200px;min-width:0;background:var(--sunk);color:var(--txt);
+  border:1px solid var(--line-2);border-radius:3px;padding:8px 11px;
+  font:400 12.5px "JetBrains Mono",monospace}
+input[type=search]:focus{outline:2px solid var(--acc);outline-offset:1px}
+.filters{display:flex;gap:5px;flex-wrap:wrap}
+.f{font-family:"Barlow Condensed",sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.06em;
+  padding:6px 12px;border:1px solid var(--line-2);border-radius:2px;background:var(--panel);
+  color:var(--dim);cursor:pointer}
+.f:hover{color:var(--txt)}
+.f[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#04181C}
+.f:focus-visible{outline:2px solid var(--pricey);outline-offset:2px}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--txt)}
+th[aria-sort] .ar{color:var(--acc)}
+.count{color:var(--faint);font-size:11.5px;margin-top:8px}
+
 .note{background:var(--sunk);border:1px solid var(--line);border-left:2px solid var(--acc);
-  border-radius:3px;padding:12px 14px;color:var(--dim);font-size:12px;margin-top:18px}
+  border-radius:3px;padding:12px 14px;color:var(--dim);font-size:12px;margin-top:12px}
 .note b{color:var(--txt)}
-.note + .note{margin-top:10px}
-@media (max-width:620px){ .co{display:none} .stamp{text-align:left} }
+@media (max-width:640px){
+  .bands{grid-template-columns:repeat(2,1fr)}
+  .co{display:none}
+}
 </style>
 
 <div class="wrap">
@@ -77,23 +100,37 @@ tr:last-child td{border-bottom:0}
     <div class="stamp" id="stamp"></div>
   </div>
 
-  <section class="scale">
-    <div class="lbl">The price-to-earnings scale</div>
-    <div class="ticks" id="ticks"></div>
-    <div class="bar"></div>
-    <div class="pins" id="pins"></div>
-  </section>
+  <div class="bands" id="bands"></div>
 
   <div id="lists"></div>
 
-  <h2 class="lbl" style="margin-top:34px">How to read this</h2>
+  <section class="sec">
+    <header>
+      <h2>Every company</h2>
+      <span class="lbl" id="allcount"></span>
+    </header>
+    <p class="why">The rankings above are a starting point, not the universe. This is
+      every company that could be valued, in ticker order &mdash; search it, sort it, and
+      go read about the ones that look interesting.</p>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Search ticker or company name…" autocomplete="off">
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="count" id="shown"></div>
+    <div class="scroll"><table id="alltable">
+      <thead><tr id="allhead"></tr></thead>
+      <tbody id="allbody"></tbody>
+    </table></div>
+  </section>
+
+  <h2 class="lbl" style="margin-top:32px">How to read this</h2>
   <div class="note" id="n1"></div>
   <div class="note" id="n2"></div>
   <div class="note">
     <b>None of this is a recommendation.</b> A screen says where to look, not what to buy.
     Every name here passed an arithmetic test and nothing more &mdash; no one has read a filing,
     checked what the company actually does, or asked why the market disagrees. A stock is
-    usually cheap for a reason, and finding the reason is the work this page does not do.
+    usually cheap for a reason, and finding that reason is the work this page does not do.
   </div>
 </div>
 
@@ -102,91 +139,169 @@ const D = /*__VALUE__*/null;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const T = D.thresholds;
+const ALL = D.all || [];
 
 $("stamp").innerHTML =
-  `prices from the ${esc(D.session)} close<br>${D.universe.toLocaleString()} companies valued`
-  + `<br>built ${esc(D.built)}`;
+  `prices from the ${esc(D.session)} close<br>`
+  + `${D.universe.toLocaleString()} companies valued<br>built ${esc(D.built)}`;
 
-/* ---- the scale ---- */
-$("ticks").innerHTML = [
-  [`<${T.cheap_pe}`, "cheap"], [`${T.fair_pe}`, "fair value"],
-  [`${T.pricey_pe}`, "pricey"], [`>${T.expensive_pe}`, "expensive"],
-].map(([v,n]) => `<div class="tick"><div class="v num">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join("");
-
-// Plot the extremes of each list on the scale, positioned by P/E.
-const pos = pe => Math.max(1.5, Math.min(98.5, (Math.min(pe, 70) / 70) * 100));
-const marks = [...(D.lists.undervalued||[]).slice(0,4), ...(D.lists.overvalued||[]).slice(0,3)]
-  .filter(r => r.pe).sort((a,b) => a.pe - b.pe);
-$("pins").innerHTML = marks.map((r,i) =>
-  `<div class="pin" style="left:${pos(r.pe)}%;top:${(i % 3) * 17}px">
-     <i></i><span>${esc(r.ticker)} ${r.pe.toFixed(0)}</span></div>`).join("");
-
-/* ---- the three lists ---- */
-const SECTIONS = [
-  ["undervalued", "Undervalued",
-   "Passed every quality gate &mdash; profitable, growing revenue, growing earnings, a real margin, "
-   + "enough daily volume to trade &mdash; <b>and only then</b> priced below fair value. Ranked by "
-   + "price paid per unit of growth the company actually delivered."],
-  ["overvalued", "Overvalued",
-   "Priced past the expensive line. Deliberately <b>not</b> quality-gated: a great company can be "
-   + "expensive and a poor one can be expensive, and the columns show which is which rather than "
-   + "filtering one away."],
-  ["watch", "Worth watching",
-   "Good businesses that are merely fairly priced, or cheap ones failing exactly one gate. "
-   + "The things that become interesting on a price fall or one better quarter."],
+/* ---------- band distribution ---------- */
+// These ranges must match band() in scanner/value.py exactly. They did not on
+// the first build: the page said fair value was 15-40 and expensive was over
+// 50, while the code used 15-20 and 40-plus. A label that disagrees with the
+// number printed beside it is worse than no label at all.
+const BANDS = [
+  ["cheap", "Cheap", `under ${T.cheap_pe}`],
+  ["fair", "Fair value", `${T.cheap_pe}–${T.fair_pe}`],
+  ["pricey", "Pricey", `${T.fair_pe}–${T.pricey_pe}`],
+  ["expensive", "Expensive", `${T.pricey_pe} and over`],
 ];
+const counts = {};
+for (const b of BANDS) counts[b[0]] = ALL.filter(r => r.band === b[0]).length;
+const maxCount = Math.max(1, ...Object.values(counts));
+$("bands").innerHTML = BANDS.map(([key, name, range]) => `
+  <div class="bd">
+    <div class="n num k-${key}">${counts[key].toLocaleString()}</div>
+    <div class="k k-${key}">${esc(name)}</div>
+    <div class="r">P/E ${esc(range)}</div>
+    <div class="meter"><i style="width:${(counts[key] / maxCount * 100).toFixed(1)}%;
+      background:var(--${key})"></i></div>
+  </div>`).join("");
 
-const num = (v, dp, suf) => v === null || v === undefined
-  ? '<span class="na">&mdash;</span>'
-  : `${v.toFixed(dp)}${suf || ""}`;
-const signed = (v) => v === null || v === undefined
-  ? '<span class="na">&mdash;</span>'
+/* ---------- shared row rendering ---------- */
+const dash = '<span class="na">&mdash;</span>';
+const num = (v, dp, suf) => (v === null || v === undefined)
+  ? dash : `${v.toFixed(dp)}${suf || ""}`;
+const signed = v => (v === null || v === undefined) ? dash
   : `<span class="${v >= 0 ? "pos" : "neg"}">${v >= 0 ? "+" : ""}${v.toFixed(1)}%</span>`;
 
+function row(r) {
+  return `<tr>
+    <td class="l"><span class="tk">${esc(r.ticker)}</span></td>
+    <td class="l co">${esc(r.name || "")}</td>
+    <td class="num">${r.price.toFixed(2)}</td>
+    <td class="num">${num(r.eps, 2)}</td>
+    <td class="num"><b>${r.pe.toFixed(1)}</b></td>
+    <td class="l"><span class="chip b-${esc(r.band)}">${esc(r.band)}</span></td>
+    <td class="num">${num(r.peg, 2)}</td>
+    <td class="num">${signed(r.eps_growth)}${r.recovery ? ' <span class="flag">reb</span>' : ""}</td>
+    <td class="num">${signed(r.rev_growth)}</td>
+    <td class="num">${num(r.margin, 1, "%")}</td>
+    <td class="num">FY${esc(r.fiscal_year)}</td>
+  </tr>`;
+}
+const HEAD = [
+  ["", "l", null], ["Company", "l", null], ["Price", "", "price"],
+  ["Earns/share", "", "eps"], ["P/E", "", "pe"], ["", "l", null],
+  ["PEG", "", "peg"], ["Earnings", "", "eps_growth"], ["Revenue", "", "rev_growth"],
+  ["Margin", "", "margin"], ["Year", "", null],
+];
+const headHTML = (sortable) => HEAD.map(([t, cls, key], i) =>
+  `<th class="${cls}${sortable && (key || i === 0) ? " sortable" : ""}"
+       ${sortable && (key || i === 0) ? `data-key="${key || "ticker"}"` : ""}>${esc(t)}<span class="ar"></span></th>`
+).join("");
+
+/* ---------- the three ranked lists ---------- */
+const SECTIONS = [
+  ["undervalued", "Undervalued",
+   "Passed every quality gate &mdash; profitable, growing revenue, growing earnings, a real "
+   + "margin, enough daily volume to trade &mdash; <b>and only then</b> priced below fair value. "
+   + "Ranked by price paid per unit of growth the company actually delivered."],
+  ["overvalued", "Overvalued",
+   "Priced past the expensive line. Deliberately <b>not</b> quality-gated: a great company can "
+   + "be expensive and a poor one can be expensive, and the columns show which is which rather "
+   + "than filtering one away."],
+  ["watch", "Worth watching",
+   "Good businesses merely fairly priced, or cheap ones failing exactly one gate. The things "
+   + "that become interesting on a price fall or one better quarter."],
+];
 $("lists").innerHTML = SECTIONS.map(([key, title, why]) => {
   const rows = D.lists[key] || [];
-  const body = rows.length ? rows.map(r => `<tr>
-      <td><span class="tk">${esc(r.ticker)}</span></td>
-      <td class="co">${esc(r.name || "")}</td>
-      <td class="r num">${r.price.toFixed(2)}</td>
-      <td class="r num">${r.eps_ttm.toFixed(2)}</td>
-      <td class="r num"><b>${r.pe.toFixed(1)}</b></td>
-      <td><span class="chip b-${esc(r.band)}">${esc(r.band)}</span></td>
-      <td class="r num">${num(r.peg, 2)}</td>
-      <td class="r num">${signed(r.eps_growth)}</td>
-      <td class="r num">${signed(r.rev_growth)}</td>
-      <td class="r num">${num(r.margin, 1, "%")}</td>
-      <td>${r.recovery ? '<span class="flag">rebound</span>' : ""}</td>
-    </tr>`).join("")
-    : `<tr><td colspan="11" class="na">Nothing cleared this list on ${esc(D.session)}.</td></tr>`;
   return `<section class="sec">
     <header><h2>${esc(title)}</h2><span class="lbl">${rows.length} names</span></header>
     <p class="why">${why}</p>
     <div class="scroll"><table>
-      <thead><tr>
-        <th></th><th>Company</th><th class="r">Price</th><th class="r">Earns/share</th>
-        <th class="r">P/E</th><th></th><th class="r">PEG</th>
-        <th class="r">Earnings</th><th class="r">Revenue</th><th class="r">Margin</th><th></th>
-      </tr></thead><tbody>${body}</tbody>
+      <thead><tr>${headHTML(false)}</tr></thead>
+      <tbody>${rows.map(row).join("") ||
+        `<tr><td colspan="11" class="l na">Nothing cleared this list.</td></tr>`}</tbody>
     </table></div>
   </section>`;
 }).join("");
 
+/* ---------- every company: search, filter, sort ---------- */
+$("allhead").innerHTML = headHTML(true);
+$("allcount").textContent = `${ALL.length.toLocaleString()} valued`;
+$("filters").innerHTML = ['all', ...BANDS.map(b => b[0])].map(k =>
+  `<button class="f" type="button" data-band="${k}" aria-pressed="${k === 'all'}">${
+    k === 'all' ? 'All' : esc(BANDS.find(b => b[0] === k)[1])}</button>`).join("");
+
+let state = { q: "", band: "all", key: "ticker", dir: 1 };
+
+function draw() {
+  const q = state.q.trim().toLowerCase();
+  let rows = ALL.filter(r =>
+    (state.band === "all" || r.band === state.band) &&
+    (!q || r.ticker.toLowerCase().includes(q) || (r.name || "").toLowerCase().includes(q)));
+  const k = state.key;
+  rows.sort((a, b) => {
+    let x = a[k], y = b[k];
+    if (k === "ticker") return a.ticker.localeCompare(b.ticker) * state.dir;
+    // Missing values always sort last, whichever way the column is pointing —
+    // a blank is not "the smallest number", it is an absent one.
+    if (x === null || x === undefined) return 1;
+    if (y === null || y === undefined) return -1;
+    return (x - y) * state.dir;
+  });
+  $("allbody").innerHTML = rows.map(row).join("")
+    || `<tr><td colspan="11" class="l na">No company matches that.</td></tr>`;
+  $("shown").textContent = rows.length === ALL.length
+    ? `Showing all ${ALL.length.toLocaleString()}`
+    : `Showing ${rows.length.toLocaleString()} of ${ALL.length.toLocaleString()}`;
+  [...$("allhead").children].forEach(th => {
+    const key = th.dataset.key;
+    const on = key === state.key;
+    th.setAttribute("aria-sort", on ? (state.dir === 1 ? "ascending" : "descending") : "none");
+    const ar = th.querySelector(".ar");
+    if (ar) ar.textContent = on ? (state.dir === 1 ? " ↑" : " ↓") : "";
+  });
+}
+
+$("q").addEventListener("input", e => { state.q = e.target.value; draw(); });
+$("filters").addEventListener("click", e => {
+  const b = e.target.closest("[data-band]");
+  if (!b) return;
+  state.band = b.dataset.band;
+  [...$("filters").children].forEach(x =>
+    x.setAttribute("aria-pressed", String(x === b)));
+  draw();
+});
+$("allhead").addEventListener("click", e => {
+  const th = e.target.closest("th[data-key]");
+  if (!th) return;
+  const key = th.dataset.key;
+  // Numbers open on their most interesting end (highest first); tickers A-Z.
+  if (state.key === key) state.dir *= -1;
+  else { state.key = key; state.dir = key === "ticker" ? 1 : -1; }
+  draw();
+});
+draw();
+
+/* ---------- the caveats ---------- */
 $("n1").innerHTML =
   `<b>The PEG here is not the one from the video.</b> The popular PEG divides the P/E by an
-   <i>analyst forecast</i> of growth, and so does Forward P/E. Forecasts are a paid product and
-   this plan does not carry them, so both are absent rather than guessed. What is shown instead
-   divides the P/E by <b>${esc(D.peg_basis)}</b>. It answers a narrower question honestly:
-   delivered growth is a fact, forecast growth is an opinion with a decimal point on it.`;
+   <i>analyst forecast</i> of growth, and so does Forward P/E. Forecasts are a paid product this
+   plan does not carry, so both are absent rather than guessed. What is shown divides the P/E by
+   <b>${esc(D.peg_basis)}</b> &mdash; a narrower question answered honestly. Delivered growth is
+   a fact; forecast growth is an opinion with a decimal point on it.`;
 
 $("n2").innerHTML =
-  `<b>Two windows, never mixed.</b> The P/E is computed on the trailing twelve months. Growth is
-   computed on the last two complete financial years, so the comparison is like for like. They
-   are different windows and are shown as different columns.
+  `<b>Two windows, never mixed.</b> The P/E uses the latest complete financial year, shown in the
+   last column. Growth compares that year with the one before it, so it is like for like. A
+   financial year can be eleven months old, which is why the year is printed on every row.
    <br><br>
    <b>A P/E needs real earnings underneath it.</b> A company earning a cent a share prints a P/E
-   in the thousands &mdash; that is a rounding error in the denominator, not an expensive stock.
-   Companies earning under $${T.min_ttm_eps.toFixed(2)} a share are kept out of the rankings, and
-   a <span class="flag">rebound</span> tag marks growth measured from a very low base, where the
-   percentage flatters the business.`;
+   in the thousands &mdash; a rounding error in the denominator, not an expensive stock. Companies
+   earning under $${T.min_ttm_eps.toFixed(2)} a share are excluded, as are net margins above 100%,
+   which mean the revenue line is not what this arithmetic assumes. <span class="flag">reb</span>
+   marks growth measured from a very low base, where the percentage flatters the business.`;
 </script>

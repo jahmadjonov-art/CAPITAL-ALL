@@ -19,6 +19,7 @@ DATA = {
     "thresholds": d["thresholds"],
     "peg_basis": d["peg_basis"],
     "lists": d["lists"],
+    "all": d.get("all", []),
 }
 tpl = (ROOT / "dashboard" / "value_template.html").read_text()
 out = ROOT / "dashboard" / "value.html"

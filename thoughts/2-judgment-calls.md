@@ -452,3 +452,31 @@ and it must be possible for it to come back on nearly everything, and which one
 happens has to be the market's decision rather than mine. The general rule —
 **before trusting any ranking, ask what it looks like if the underlying effect
 is absent.** If the answer is "the same", the ranking is measuring the filter.
+
+
+---
+
+## Where a course the owner asked for should live (2026-10-01)
+
+He asked for a mathematics course, unprompted by the research programme and
+unrelated to it. Nothing in the records said where such a thing belongs.
+
+**Decision:** a new top-level `training/` directory, source committed, with the
+thing he actually uses published as a private claude.ai artifact rather than on
+the public GitHub Pages site.
+
+**Read I picked:** `legacy/` is precedent that this repository already houses
+work of his that is not research, so a sibling directory is in keeping; and his
+progress is personal data, which argues against the public site and for an
+artifact with per-user storage. `site/build.py` was left untouched, so the
+course does not appear on the public site at all.
+
+**What would have settled it:** asking whether he wants it public and listed on
+the office site alongside the dashboards. I did not ask, because publishing it
+privately is reversible in one step and publishing his study record publicly is
+not.
+
+**Rated:** Reasoned. It is a filing decision, not a finding.
+
+**If wrong:** move the directory and add a `site/build.py` entry. Nothing in the
+course depends on where it sits.

@@ -25,6 +25,22 @@ repair, capital and salary buckets. Do not modify it, refactor it, or build on
 top of it unless explicitly asked. It was moved with `git mv`, so
 `git log --follow` traces any file's full history through the move.
 
+**The owner's mathematics course lives in its own repository, not here.** It is
+[`jahmadjonov-art/mathlearn`](https://github.com/jahmadjonov-art/mathlearn) —
+*Zero to Quant*, counting through to quantitative finance — published as a
+private artifact he uses:
+
+> **https://claude.ai/artifact/PvHyJcrAx6Sqa6jVrgtcva**
+
+It was built here first, under `training/math/`, and moved out on 2026-10-02 when
+he made the separate repository. **Nothing of it remains in this repository**, so
+do not go looking: clone `mathlearn` instead. Republish to that same artifact URL
+or he loses his saved progress and his link. Levels 0–3 are built (131 skills,
+generated practice plus written lessons); levels 4–12 are mapped and being
+written in order. Its own README carries the rules that will bite you —
+permanent skill ids, tilde-delimited maths, and a test suite that must pass
+before publishing.
+
 **Read `SCORECARD.md` before planning anything.** Its Standing Directives
 section is binding — those lines were earned from the owner's ratings of earlier
 phases. `./scorecard/summary.sh` gives the short version.

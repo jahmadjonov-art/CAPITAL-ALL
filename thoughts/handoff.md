@@ -25,23 +25,21 @@ repair, capital and salary buckets. Do not modify it, refactor it, or build on
 top of it unless explicitly asked. It was moved with `git mv`, so
 `git log --follow` traces any file's full history through the move.
 
-**`training/` holds the owner's courses, not research.** It is separate from the
-trading programme and does not follow the `research/` evidence rules.
-`training/math/` is **Zero to Quant**, a mathematics course from counting to
-quantitative finance, published as a private artifact he uses:
+**The owner's mathematics course lives in its own repository, not here.** It is
+[`jahmadjonov-art/mathlearn`](https://github.com/jahmadjonov-art/mathlearn) —
+*Zero to Quant*, counting through to quantitative finance — published as a
+private artifact he uses:
 
 > **https://claude.ai/artifact/PvHyJcrAx6Sqa6jVrgtcva**
 
-Republish to that same URL (`Artifact` tool, `url` parameter, after reading it)
-or he loses his saved progress and his link. Levels 0–3 are fully built (131
-skills, generated practice plus written lessons); levels 4–12 are mapped and
-being written in order. Three things will bite a session that changes it:
-**skill ids are permanent** because progress is keyed on them; **maths is
-delimited by `~tildes~`, not dollars**, because prices appear everywhere in the
-content; and **`training/math/tests/run.sh` must pass before publishing** — it
-exercises every generator 360 times and drives the page in Chromium, and it
-caught six real bugs on the first build. Full rules in
-`training/math/README.md`.
+It was built here first, under `training/math/`, and moved out on 2026-10-02 when
+he made the separate repository. **Nothing of it remains in this repository**, so
+do not go looking: clone `mathlearn` instead. Republish to that same artifact URL
+or he loses his saved progress and his link. Levels 0–3 are built (131 skills,
+generated practice plus written lessons); levels 4–12 are mapped and being
+written in order. Its own README carries the rules that will bite you —
+permanent skill ids, tilde-delimited maths, and a test suite that must pass
+before publishing.
 
 **Read `SCORECARD.md` before planning anything.** Its Standing Directives
 section is binding — those lines were earned from the owner's ratings of earlier

@@ -478,5 +478,17 @@ not.
 
 **Rated:** Reasoned. It is a filing decision, not a finding.
 
-**If wrong:** move the directory and add a `site/build.py` entry. Nothing in the
-course depends on where it sits.
+**Settled the next day, and I was wrong about the repository.** On 2026-10-02 he
+created `jahmadjonov-art/mathlearn` and granted push access to it, which is the
+answer to the question I had chosen not to ask. The course moved there and was
+removed from this repository entirely; only the pointer in `handoff.md` remains.
+
+The lesson is about which uncertainty to raise. I asked myself whether the course
+should be *public*, decided that privately and moved on — but the question that
+actually mattered was whether it belonged in this repository at all, and that one
+I never put to him. A trading research programme and a mathematics course share
+no readers, no rules and no lifecycle; `legacy/` was weak precedent, because an
+archived app sitting still is not the same as a live project that will grow for
+months. **Co-locating on the strength of "there is precedent for unrelated things
+here" was the error.** Cheap to undo only because the pull request had not been
+merged.

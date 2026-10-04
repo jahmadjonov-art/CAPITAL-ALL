@@ -35,11 +35,10 @@ private artifact he uses:
 It was built here first, under `training/math/`, and moved out on 2026-10-02 when
 he made the separate repository. **Nothing of it remains in this repository**, so
 do not go looking: clone `mathlearn` instead. Republish to that same artifact URL
-or he loses his saved progress and his link. Levels 0–3 are built (131 skills,
-generated practice plus written lessons); levels 4–12 are mapped and being
-written in order. Its own README carries the rules that will bite you —
-permanent skill ids, tilde-delimited maths, and a test suite that must pass
-before publishing.
+or he loses his saved progress and his link. How much is built changes every
+session, so it is deliberately not stated here — that repository's README says,
+and carries the rules that will bite you: permanent skill ids, tilde-delimited
+maths, and a test suite that must pass before publishing.
 
 **Read `SCORECARD.md` before planning anything.** Its Standing Directives
 section is binding — those lines were earned from the owner's ratings of earlier
